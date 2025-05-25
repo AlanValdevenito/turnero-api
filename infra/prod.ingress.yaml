@@ -13,7 +13,7 @@ spec:
     http:
       paths:
       - pathType: ImplementationSpecific
-        path: "/equipo-prod(/|$)(.*)"
+        path: "/negro-prod(/|$)(.*)"
         backend:
           service:
             name: restapi
