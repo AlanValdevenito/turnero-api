@@ -30,6 +30,7 @@ def sistema
 end
 
 get '/version' do
+  logger.info('Handling /version')
   json({ version: Version.current })
 end
 
