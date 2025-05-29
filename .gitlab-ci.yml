@@ -16,6 +16,7 @@ stages:
   - build
   - package
   - deploy_test
+  - smoke_test
   - acceptance_test
   - deploy_prod
 
@@ -72,5 +73,15 @@ deploy_test_job:
     - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} apply -f infra/${CI_ENVIRONMENT_NAME}.secrets.yaml
     - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
     - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} set image deployment/restapi restapi=$CI_REGISTRY_IMAGE:$VERSION
+  only:
+    - tags
+
+smoke_test_job:
+  stage: smoke_test
+  image: nicopaez/kubectl:1.32.5
+  environment: test
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - ./scripts/smoke_test.sh ${TEAM} ${CI_ENVIRONMENT_NAME} $VERSION
   only:
     - tags
