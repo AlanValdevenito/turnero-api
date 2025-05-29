@@ -1,7 +1,7 @@
 REST API
 ========
 
-[![pipeline status](https://gitlab.com/fiuba-memo2/ejemplos/restapi/badges/main/pipeline.svg)](https://gitlab.com/fiuba-memo2/ejemplos/restapi/commits/main)
+[![pipeline status](https://gitlab.com/fiuba-memo2/tp2/negro-bot/badges/main/pipeline.svg)](https://gitlab.com/fiuba-memo2/tp2/negro-bot/-/commits/main)
 
 Este proyecto está basado en:
 
