@@ -27,9 +27,9 @@ Entonces('el médico {string} está registrado en el sistema') do |nombre|
   nombre, apellido = nombre.split
   @response = Faraday.get('/medicos')
   parsed_response = JSON.parse(@response.body)
-  medicos = parsed_response['medicos']
-  expect(medicos).to include(
-    'nombre' => nombre,
-    'apellido' => apellido
-  )
+  medicos = parsed_response
+  encontrado = medicos.any? do |medico|
+    medico['nombre'] == nombre && medico['apellido'] == apellido
+  end
+  expect(encontrado).to be true
 end

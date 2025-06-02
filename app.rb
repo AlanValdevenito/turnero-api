@@ -53,6 +53,7 @@ post '/reset' do
   halt 403 unless settings.environment == :test
 
   DB[:usuarios].delete
+  DB[:medicos].delete
 
   status 200
   json({ message: 'Datos reiniciados' })
