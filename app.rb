@@ -77,5 +77,5 @@ post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
   usuario = turnero.crear_usuario(@params['email'])
   status 201
-  { id: usuario.id, email: usuario.email }.to_json
+  json({ id: usuario.id, email: usuario.email, message: 'El paciente se registró existosamente' })
 end
