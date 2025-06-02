@@ -31,7 +31,7 @@ end
 
 post '/medicos' do
   logger.debug("POST /medicos: #{@params}")
-  medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:especialidad], @params[:matricula])
+  medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:matricula], @params[:especialidad])
   status 200
   { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
 end
@@ -52,9 +52,8 @@ end
 post '/reset' do
   halt 403 unless settings.environment == :test
 
-  DB[:usuarios].delete
-  DB[:medicos].delete
-
+  RepositorioMedicos.new.delete_all
+  RepositorioUsuarios.new.delete_all
   status 200
   json({ message: 'Datos reiniciados' })
 end

@@ -5,7 +5,7 @@ require_relative '../../dominio/medico'
 describe Turnero do
   let(:email) { 'test@email.com' }
   let(:repositorio_usuario) { instance_double('RepositorioUsuarios') }
-  let(:repositorio_medico) { instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 'Traumatologia', 1), all: [Medico.new('Michael', 'Jordan', 'Traumatologia', 1)]) }
+  let(:repositorio_medico) { instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, 'Traumatologia'), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]) }
   let(:turnero)     { described_class.new(repositorio_usuario, repositorio_medico) }
 
   it 'deberia crear un medico' do

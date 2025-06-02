@@ -7,7 +7,7 @@ class RepositorioMedicos < AbstractRepository
   protected
 
   def load_object(a_hash)
-    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], a_hash[:especialidad])
+    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], a_hash[:especialidad_id])
   end
 
   def changeset(medico)

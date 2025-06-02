@@ -22,8 +22,8 @@ class Turnero
     @repositorio_medicos.all
   end
 
-  def crear_medico(nombre, apellido, especialidad, matricula)
-    medico = Medico.new(nombre, apellido, especialidad, matricula)
+  def crear_medico(nombre, apellido, matricula, especialidad)
+    medico = Medico.new(nombre, apellido, matricula, especialidad.to_i)
     @repositorio_medicos.save(medico)
   end
 

@@ -28,6 +28,7 @@ Entonces('el médico {string} está registrado en el sistema') do |nombre|
   @response = Faraday.get('/medicos')
   parsed_response = JSON.parse(@response.body)
   medicos = parsed_response
+  puts medicos
   encontrado = medicos.any? do |medico|
     medico['nombre'] == nombre && medico['apellido'] == apellido
   end
