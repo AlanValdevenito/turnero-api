@@ -31,13 +31,13 @@ end
 
 post '/medicos' do
   logger.debug("POST /medicos: #{@params}")
-  medico = turnero.crear_medico(@params['nombre'], @params['apellido'], @params['especialidad'], @params['matricula'])
+  medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:especialidad], @params[:matricula])
   status 200
   { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
 end
 
 get '/medicos' do
-  medicos = []
+  medicos = turnero.medicos
   respuesta = []
   medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad } }
   status 200

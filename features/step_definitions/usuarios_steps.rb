@@ -19,6 +19,5 @@ end
 
 Entonces(/^tengo un listado vacio$/) do
   parsed_response = JSON.parse(@response.body)
-  puts parsed_response.class
   expect(parsed_response)
 end
