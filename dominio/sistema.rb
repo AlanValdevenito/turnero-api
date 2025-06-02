@@ -12,4 +12,8 @@ class Sistema
   def usuarios
     @repositorio_usuarios.all
   end
+
+  def buscar_usuario_por_email(email)
+    @repositorio_usuarios.buscar_por_email(email)
+  end
 end

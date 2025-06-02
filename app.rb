@@ -29,23 +29,8 @@ def sistema
   settings.sistema
 end
 
-post '/medicos' do
-  logger.debug("POST /medicos: #{@params}")
-  medico = sistema.crear_medico(@params['nombre'], @params['apellido'], @params['especialidad'], @params['matricula'])
-  status 200
-  { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
-end
-
-get '/medicos' do
-  medicos = []
-  respuesta = []
-  medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad } }
-  status 200
-  json(respuesta)
-end
-
 get '/version' do
-  logger.debug('Handling /version')
+  logger.info('Handling /version')
   json({ version: Version.current })
 end
 
@@ -59,6 +44,18 @@ get '/usuarios' do
   usuarios.map { |u| respuesta << { email: u.email, id: u.id } }
   status 200
   json(respuesta)
+end
+
+get '/usuarios/:email' do
+  email = params[:email]
+  usuario = sistema.buscar_usuario_por_email(email)
+  if usuario
+    status 200
+    json({ id: usuario.id, email: usuario.email })
+  else
+    status 404
+    json({ error: 'Usuario no encontrado' })
+  end
 end
 
 post '/usuarios' do
