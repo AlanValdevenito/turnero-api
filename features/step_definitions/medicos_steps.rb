@@ -1,18 +1,18 @@
-Dado('el sistema no tiene registrado al médico {string} con matricula {string}') do |nombre, _matricula|
-  nombre, apellido = nombre.split
+Dado('el sistema no tiene registrado al médico {string} con matricula {string}') do |nombre_completo, _matricula|
+  nombre, apellido = nombre_completo.split
   @response = Faraday.get('/medicos')
-  parsed_response = JSON.parse(@response.body)
-  medicos = parsed_response['medicos']
-  expect(medicos).not_to include(
-    'nombre' => nombre,
-    'apellido' => apellido
-  )
+  medicos = JSON.parse(@response.body)
+  encontrado = medicos.any? do |medico|
+    medico['nombre'] == nombre && medico['apellido'] == apellido
+  end
+  expect(encontrado).to be false
 end
 
 Cuando('doy de alta al médico {string} de {string} con matricula {string}') do |nombre, especialidad, matricula|
   nombre, apellido = nombre.split
   request_body = { nombre:, apellido:, matricula:, especialidad: }.to_json
   @response = Faraday.post('/medicos', request_body, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(200)
 end
 
 Entonces('veo el mensaje {string}') do |_mensaje|

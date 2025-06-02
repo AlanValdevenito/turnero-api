@@ -29,8 +29,23 @@ def sistema
   settings.sistema
 end
 
+post '/medicos' do
+  logger.debug("POST /medicos: #{@params}")
+  medico = sistema.crear_medico(@params['nombre'], @params['apellido'], @params['especialidad'], @params['matricula'])
+  status 200
+  { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
+end
+
+get '/medicos' do
+  medicos = []
+  respuesta = []
+  medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad } }
+  status 200
+  json(respuesta)
+end
+
 get '/version' do
-  logger.info('Handling /version')
+  logger.debug('Handling /version')
   json({ version: Version.current })
 end
 
