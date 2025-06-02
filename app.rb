@@ -50,7 +50,12 @@ get '/version' do
 end
 
 post '/reset' do
+  halt 403 unless settings.environment == :test
+
+  DB[:usuarios].delete
+
   status 200
+  json({ message: 'Datos reiniciados' })
 end
 
 get '/usuarios' do
@@ -75,7 +80,12 @@ end
 
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
-  usuario = turnero.crear_usuario(@params['email'])
-  status 201
-  json({ id: usuario.id, email: usuario.email, message: 'El paciente se registró existosamente' })
+  begin
+    usuario = turnero.crear_usuario(@params['email'])
+    status 201
+    json({ id: usuario.id, email: usuario.email, message: 'El paciente se registró existosamente' })
+  rescue EmailEnUsoException
+    status 400
+    json({ error: 'El email ingresado ya está en uso' })
+  end
 end

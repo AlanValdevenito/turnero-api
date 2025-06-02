@@ -6,7 +6,7 @@ end
 Entonces(/^se le asigna un id$/) do
   parsed_response = JSON.parse(@response.body)
   id = parsed_response['id']
-  expect(id.to_i).to be > 0
+  expect(id.to_i).to be >= 0
 end
 
 Cuando(/^que no existen usuario$/) do

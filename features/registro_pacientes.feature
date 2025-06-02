@@ -6,7 +6,6 @@ Escenario: US-17.1 Registro exitoso
     Cuando se quiere registrar con el mail "pepito@ejemplo.com"
     Entonces se registra exitosamente con el mensaje "El paciente se registró existosamente"
 
-@wip
 Escenario: US-17.2 El email ya está registrado
     Dado el email "pepe@ejemplo.com" ya está en uso
     Cuando otro paciente se quiere registrar con el mail "pepe@ejemplo.com"
