@@ -15,12 +15,12 @@ Cuando('doy de alta al médico {string} de {string} con matricula {string}') do 
   expect(@response.status).to eq(200)
 end
 
-Entonces('veo el mensaje {string}') do |_mensaje|
-  parsed_response = JSON.parse(@response.body)
-  id = parsed_response['id']
-  message = parsed_response['message']
+Entonces('veo el mensaje {string}') do |mensaje|
+  respuesta_parseada = JSON.parse(@response.body)
+  id = respuesta_parseada['id']
+  respuesta = respuesta_parseada['message']
   expect(id.to_i).to be > 0
-  expect(message).to eq 'El médico fue dado de alta correctamente.'
+  expect(respuesta).to eq mensaje
 end
 
 Entonces('el médico {string} está registrado en el sistema') do |nombre|
