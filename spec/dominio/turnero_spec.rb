@@ -29,4 +29,12 @@ describe Turnero do
     usuario = turnero.buscar_usuario_por_email(email)
     expect(usuario).to eq(usuario_mock)
   end
+
+  it 'deberia devolver todos los medicos' do
+    repo_usuarios = instance_double('repositorios_usuarios_dummy')
+    repo_medicos = instance_double('repositorios_medicos', all: [Medico.new('Michael', 'Jordan', 'Traumatologia', 1)])
+    turnero = described_class.new(repo_usuarios, repo_medicos)
+    medicos = turnero.medicos
+    expect(medicos.first.nombre).to eq('Michael')
+  end
 end
