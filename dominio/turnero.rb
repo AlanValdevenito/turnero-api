@@ -1,4 +1,4 @@
-class Sistema
+class Turnero
   def initialize(repositorio_usuarios)
     @repositorio_usuarios = repositorio_usuarios
   end
