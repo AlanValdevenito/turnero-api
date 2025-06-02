@@ -1,6 +1,6 @@
 # language: es
 Característica: Registro Pacientes
-@wip
+
 Escenario: US-17.1 Registro exitoso
     Dado el paciente no está registrado y el email "pepito@ejemplo.com" no está en uso
     Cuando se quiere registrar con el mail "pepito@ejemplo.com"

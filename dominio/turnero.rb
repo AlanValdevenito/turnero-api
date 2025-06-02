@@ -18,4 +18,8 @@ class Turnero
     medico = Medico.new(nombre, apellido, especialidad, matricula)
     @repositorio_medicos.save(medico)
   end
+
+  def buscar_usuario_por_email(email)
+    @repositorio_usuarios.buscar_por_email(email)
+  end
 end

@@ -45,7 +45,7 @@ get '/medicos' do
 end
 
 get '/version' do
-  logger.debug('Handling /version')
+  logger.info('Handling /version')
   json({ version: Version.current })
 end
 
@@ -61,9 +61,21 @@ get '/usuarios' do
   json(respuesta)
 end
 
+get '/usuarios/:email' do
+  email = params[:email]
+  usuario = turnero.buscar_usuario_por_email(email)
+  if usuario
+    status 200
+    json({ id: usuario.id, email: usuario.email })
+  else
+    status 404
+    json({ error: 'Usuario no encontrado' })
+  end
+end
+
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
   usuario = turnero.crear_usuario(@params['email'])
   status 201
-  { id: usuario.id, email: usuario.email }.to_json
+  json({ id: usuario.id, email: usuario.email, message: 'El paciente se registró existosamente' })
 end

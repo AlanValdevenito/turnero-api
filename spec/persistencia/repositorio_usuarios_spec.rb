@@ -16,4 +16,12 @@ describe RepositorioUsuarios do
     repositorio.save(juan)
     expect(repositorio.all.size).to be(cantidad_de_usuarios_iniciales + 1)
   end
+
+  it 'deberia buscar por email' do
+    repositorio = described_class.new
+    juan = Usuario.new('juan@test.com')
+    repositorio.save(juan)
+    usuario_recuperado = repositorio.buscar_por_email('juan@test.com')
+    expect(usuario_recuperado).to have_attributes(email: 'juan@test.com', id: juan.id)
+  end
 end
