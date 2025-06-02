@@ -14,8 +14,8 @@ configure do
   set :logger, customer_logger
   set :default_content_type, :json
   set :environment, ENV['APP_MODE'].to_sym
-  set :sistema, Sistema.new(RepositorioUsuarios.new)
-  customer_logger.info('Iniciando sistema...')
+  set :turnero, Turnero.new(RepositorioUsuarios.new)
+  customer_logger.info('Iniciando turnero...')
 end
 
 before do
@@ -25,13 +25,13 @@ before do
   end
 end
 
-def sistema
-  settings.sistema
+def turnero
+  settings.turnero
 end
 
 post '/medicos' do
   logger.debug("POST /medicos: #{@params}")
-  medico = sistema.crear_medico(@params['nombre'], @params['apellido'], @params['especialidad'], @params['matricula'])
+  medico = turnero.crear_medico(@params['nombre'], @params['apellido'], @params['especialidad'], @params['matricula'])
   status 200
   { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
 end
@@ -54,7 +54,7 @@ post '/reset' do
 end
 
 get '/usuarios' do
-  usuarios = sistema.usuarios
+  usuarios = turnero.usuarios
   respuesta = []
   usuarios.map { |u| respuesta << { email: u.email, id: u.id } }
   status 200
@@ -63,7 +63,7 @@ end
 
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
-  usuario = sistema.crear_usuario(@params['email'])
+  usuario = turnero.crear_usuario(@params['email'])
   status 201
   { id: usuario.id, email: usuario.email }.to_json
 end
