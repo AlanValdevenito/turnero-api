@@ -7,7 +7,8 @@ class RepositorioMedicos < AbstractRepository
   protected
 
   def load_object(a_hash)
-    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], a_hash[:especialidad_id])
+    especialidad = RepositorioEspecialidades.new.buscar_por_id(a_hash[:especialidad_id])
+    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], especialidad)
   end
 
   def changeset(medico)
@@ -15,7 +16,7 @@ class RepositorioMedicos < AbstractRepository
       nombre: medico.nombre,
       apellido: medico.apellido,
       matricula: medico.matricula,
-      especialidad_id: medico.especialidad
+      especialidad_id: medico.especialidad.id
     }
   end
 end
