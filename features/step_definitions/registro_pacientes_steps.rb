@@ -37,3 +37,12 @@ Cuando('se quiere registrar con el mail {string} y el id de telegram {int}') do 
   request_body = { email: string, telegram_id: int }.to_json
   @response = Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
 end
+
+Dado('el paciente no está registrado') do
+  # nada
+end
+
+Cuando('se quiere registrar sin especificar el mail') do
+  request_body = { telegram_id: 123456789 }.to_json
+  @response = Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
+end
