@@ -4,6 +4,11 @@ class RepositorioEspecialidades < AbstractRepository
   self.table_name = :especialidades
   self.model_class = 'Especialidad'
 
+  def buscar_por_nombre(nombre)
+    row = dataset.first(nombre:)
+    load_object(row) unless row.nil?
+  end
+
   protected
 
   def load_object(a_hash)

@@ -8,4 +8,12 @@ describe RepositorioEspecialidades do
     described_class.new.save(especialidad)
     expect(especialidad.id).not_to be_nil
   end
+
+  it 'deberia buscar especialidad por nombre' do
+    especialidad = Especialidad.new('Traumatologia', 10)
+    described_class.new.save(especialidad)
+    especialidad_encontrada = described_class.new.buscar_por_nombre('Traumatologia')
+    expect(especialidad_encontrada.nombre).to eq(especialidad.nombre)
+    expect(especialidad_encontrada.duracion_de_turnos).to eq(especialidad.duracion_de_turnos)
+  end
 end
