@@ -71,7 +71,7 @@ get '/especialidades' do
   logger.debug('GET /especialidades')
   especialidades = turnero.especialidades
   respuesta = []
-  especialidades.map { |e| respuesta << { nombre: e.nombre, apellido: e.duracion_de_turnos } }
+  especialidades.map { |e| respuesta << { nombre: e.nombre, duracion_de_turnos: e.duracion_de_turnos } }
   status 200
   json(respuesta)
 end
