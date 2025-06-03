@@ -34,6 +34,8 @@ post '/reset' do
 
   RepositorioMedicos.new.delete_all
   RepositorioUsuarios.new.delete_all
+  RepositorioEspecialidades.new.delete_all
+
   status 200
   json({ message: 'Datos reiniciados' })
 end
