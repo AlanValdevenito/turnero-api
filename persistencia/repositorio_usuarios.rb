@@ -9,15 +9,21 @@ class RepositorioUsuarios < AbstractRepository
     load_object(row) unless row.nil?
   end
 
+  def buscar_por_telegram_id(telegram_id)
+    row = dataset.first(telegram_id:)
+    load_object(row) unless row.nil?
+  end
+
   protected
 
   def load_object(a_hash)
-    Usuario.new(a_hash[:email], a_hash[:id])
+    Usuario.new(a_hash[:email], a_hash[:id], a_hash[:telegram_id])
   end
 
   def changeset(usuario)
     {
-      email: usuario.email
+      email: usuario.email,
+      telegram_id: usuario.telegram_id
     }
   end
 end
