@@ -8,8 +8,8 @@ class Turnero
   end
 
   def crear_usuario(email, telegram_id = nil)
-    raise EmailEnUsoException if buscar_usuario_por_email(email)
     raise TelegramIdEnUsoException if telegram_id && @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    raise EmailEnUsoException if buscar_usuario_por_email(email)
 
     begin
       usuario = Usuario.new(email, nil, telegram_id)
