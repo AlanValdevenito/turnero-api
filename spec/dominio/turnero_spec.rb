@@ -63,4 +63,14 @@ describe Turnero do
 
     expect { turnero.crear_usuario(email, 123_456_789) }.to raise_error(TelegramIdEnUsoException)
   end
+
+  it 'deberia devolver error si el email es nil al crear un usuario' do
+    stub_usuario_no_existente(repositorio_usuario, nil)
+    expect { turnero.crear_usuario(nil) }.to raise_error(EmailObligatorioException)
+  end
+
+  it 'deberia devolver error si el email es vacío al crear un usuario' do
+    stub_usuario_no_existente(repositorio_usuario, '')
+    expect { turnero.crear_usuario('') }.to raise_error(EmailObligatorioException)
+  end
 end

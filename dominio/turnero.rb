@@ -11,7 +11,12 @@ class Turnero
     raise EmailEnUsoException if buscar_usuario_por_email(email)
     raise TelegramIdEnUsoException if telegram_id && @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
 
-    usuario = Usuario.new(email, nil, telegram_id)
+    begin
+      usuario = Usuario.new(email, nil, telegram_id)
+    rescue ArgumentError
+      raise EmailObligatorioException
+    end
+
     @repositorio_usuarios.save(usuario)
     usuario
   end
