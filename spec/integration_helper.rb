@@ -13,6 +13,7 @@ RSpec.configure do |config|
   end
 
   config.after :each do
+    RepositorioTurnos.new.delete_all
     RepositorioUsuarios.new.delete_all
     RepositorioMedicos.new.delete_all
     RepositorioEspecialidades.new.delete_all

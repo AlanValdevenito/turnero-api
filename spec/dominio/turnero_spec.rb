@@ -3,15 +3,19 @@ require_relative '../../dominio/turnero'
 require_relative '../../dominio/medico'
 
 describe Turnero do
+  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos]) }
+
   let(:email) { 'test@email.com' }
-  let(:repositorio_usuario) { instance_double('RepositorioUsuarios') }
-  let(:repositorio_medico) do
-    instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')])
+
+  let(:repositorios) do
+    {
+      usuario: instance_double('RepositorioUsuarios'),
+      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]),
+      especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
+                                                                 buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
+      turnos: instance_double('RepositorioTurnos', all: [])
+    }
   end
-  let(:repositorio_especialidades) do
-    instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)], buscar_por_nombre: Especialidad.new('Traumatologia', 10))
-  end
-  let(:turnero) { described_class.new(repositorio_usuario, repositorio_medico, repositorio_especialidades) }
 
   def stub_usuario_no_existente(repositorio, email, telegram_id = nil)
     allow(repositorio).to receive(:save).with(instance_of(Usuario))
@@ -25,7 +29,7 @@ describe Turnero do
   end
 
   it 'deberia devolver error si el email ya existe al crear un usuario' do
-    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(Usuario.new(email, 1))
+    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(Usuario.new(email, 1))
 
     expect { turnero.crear_usuario(email) }.to raise_error(EmailEnUsoException)
   end
@@ -33,7 +37,7 @@ describe Turnero do
   it 'deberia buscar un usuario por email' do
     usuario_mock = Usuario.new(email, 1)
 
-    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(usuario_mock)
+    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(usuario_mock)
 
     usuario = turnero.buscar_usuario_por_email(email)
     expect(usuario).to eq(usuario_mock)
@@ -55,26 +59,26 @@ describe Turnero do
   end
 
   it 'deberia crear un usuario' do
-    stub_usuario_no_existente(repositorio_usuario, email, 123_456_789)
+    stub_usuario_no_existente(repositorios[:usuario], email, 123_456_789)
     created_user = turnero.crear_usuario(email, 123_456_789)
     expect(created_user.email).to eq(email)
     expect(created_user.telegram_id).to eq(123_456_789)
   end
 
   it 'deberia devolver error si el telegram_id ya existe al crear un usuario' do
-    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(nil)
-    allow(repositorio_usuario).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, 1, 123_456_789))
+    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
+    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, 1, 123_456_789))
 
     expect { turnero.crear_usuario(email, 123_456_789) }.to raise_error(TelegramIdEnUsoException)
   end
 
   it 'deberia devolver error si el email es nil al crear un usuario' do
-    stub_usuario_no_existente(repositorio_usuario, nil)
+    stub_usuario_no_existente(repositorios[:usuario], nil)
     expect { turnero.crear_usuario(nil) }.to raise_error(EmailObligatorioException)
   end
 
   it 'deberia devolver error si el email es vacío al crear un usuario' do
-    stub_usuario_no_existente(repositorio_usuario, '')
+    stub_usuario_no_existente(repositorios[:usuario], '')
     expect { turnero.crear_usuario('') }.to raise_error(EmailObligatorioException)
   end
 

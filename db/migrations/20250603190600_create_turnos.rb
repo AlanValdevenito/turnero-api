@@ -5,8 +5,8 @@ Sequel.migration do
       foreign_key :medico_id, :medicos
       foreign_key :usuario_id, :usuarios
       DateTime :fecha_hora
-      Date :created_at
-      Date :updated_at
+      Date :created_on
+      Date :updated_on
     end
   end
 

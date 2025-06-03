@@ -1,10 +1,13 @@
 require_relative '../dominio/excepciones/excepciones_registracion'
 
+MEDICOS_DISPONIBLES = 7
+
 class Turnero
-  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades)
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos)
     @repositorio_usuarios = repositorio_usuarios
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
+    @repositorio_turnos = repositorio_turnos
   end
 
   def crear_usuario(email, telegram_id = nil)
@@ -49,6 +52,6 @@ class Turnero
   end
 
   def medicos_disponibles
-    @repositorio_medicos.all.first(7)
+    @repositorio_medicos.all.first(MEDICOS_DISPONIBLES)
   end
 end
