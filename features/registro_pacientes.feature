@@ -16,7 +16,6 @@ Escenario: US-17.3 El paciente ya está registrado con un id de telegram
     Cuando se quiere registrar con el mail "pepe@ejemplo.com" y el id de telegram 1
     Entonces se muestra un error con el mensaje "El paciente ya se encuentra registrado"
 
-@wip
 Escenario: US-17.4 El paciente se intenta registrar sin indicar su email
     Dado el paciente no está registrado
     Cuando se quiere registrar sin especificar el mail

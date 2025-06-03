@@ -108,5 +108,8 @@ post '/usuarios' do
   rescue TelegramIdEnUsoException
     status 400
     json({ error: 'El paciente ya se encuentra registrado' })
+  rescue EmailObligatorioException
+    status 400
+    json({ error: 'El email es obligatorio' })
   end
 end
