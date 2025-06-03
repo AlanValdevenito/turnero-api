@@ -29,6 +29,20 @@ def turnero
   settings.turnero
 end
 
+post '/reset' do
+  halt 403 unless settings.environment == :test
+
+  RepositorioMedicos.new.delete_all
+  RepositorioUsuarios.new.delete_all
+  status 200
+  json({ message: 'Datos reiniciados' })
+end
+
+get '/version' do
+  logger.info('Handling /version')
+  json({ version: Version.current })
+end
+
 post '/medicos' do
   logger.debug("POST /medicos: #{@params}")
   medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:matricula], @params[:especialidad])
@@ -44,18 +58,20 @@ get '/medicos' do
   json(respuesta)
 end
 
-get '/version' do
-  logger.info('Handling /version')
-  json({ version: Version.current })
+post '/especialidades' do
+  logger.debug("POST /especialidades: #{@params}")
+  especialidad = turnero.crear_especialidad(@params[:nombre], @params[:duracion_de_turnos])
+  status 200
+  { message: 'La especialidad fue dada de alta correctamente.', id: especialidad.id }.to_json
 end
 
-post '/reset' do
-  halt 403 unless settings.environment == :test
-
-  RepositorioMedicos.new.delete_all
-  RepositorioUsuarios.new.delete_all
+get '/especialidades' do
+  logger.debug('GET /especialidades')
+  especialidades = turnero.especialidades
+  respuesta = []
+  especialidades.map { |e| respuesta << { nombre: e.nombre, apellido: e.duracion_de_turnos } }
   status 200
-  json({ message: 'Datos reiniciados' })
+  json(respuesta)
 end
 
 get '/usuarios' do
