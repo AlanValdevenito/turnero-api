@@ -11,10 +11,9 @@ Escenario: US-17.2 El email ya está registrado
     Cuando otro paciente se quiere registrar con el mail "pepe@ejemplo.com"
     Entonces se muestra un error con el mensaje "El email ingresado ya está en uso"
 
-@wip
 Escenario: US-17.3 El paciente ya está registrado con un id de telegram
     Dado el paciente ya está registrado con un id de telegram 1
-    Cuando se quiere registrar con el mail "pepe@ejemplo.com"
+    Cuando se quiere registrar con el mail "pepe@ejemplo.com" y el id de telegram 1
     Entonces se muestra un error con el mensaje "El paciente ya se encuentra registrado"
 
 @wip

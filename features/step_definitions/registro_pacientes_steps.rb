@@ -32,3 +32,8 @@ Dado('el paciente ya está registrado con un id de telegram {int}') do |telegram
   request_body = { email: "telegram#{telegram_id}@ejemplo.com", telegram_id: }.to_json
   Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
 end
+
+Cuando('se quiere registrar con el mail {string} y el id de telegram {int}') do |string, int|
+  request_body = { email: string, telegram_id: int }.to_json
+  @response = Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
+end

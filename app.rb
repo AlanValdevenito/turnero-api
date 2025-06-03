@@ -105,5 +105,8 @@ post '/usuarios' do
   rescue EmailEnUsoException
     status 400
     json({ error: 'El email ingresado ya está en uso' })
+  rescue TelegramIdEnUsoException
+    status 400
+    json({ error: 'El paciente ya se encuentra registrado' })
   end
 end
