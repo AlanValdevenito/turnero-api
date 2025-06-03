@@ -7,7 +7,13 @@ describe Turnero do
   let(:repositorio_usuario) { instance_double('RepositorioUsuarios') }
   let(:repositorio_medico) { instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, 'Traumatologia'), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]) }
   let(:repositorio_especialidades) { instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)]) }
-  let(:turnero)     { described_class.new(repositorio_usuario, repositorio_medico, repositorio_especialidades) }
+  let(:turnero) { described_class.new(repositorio_usuario, repositorio_medico, repositorio_especialidades) }
+
+  def stub_usuario_no_existente(repositorio, email, telegram_id = nil)
+    allow(repositorio).to receive(:save).with(instance_of(Usuario))
+    allow(repositorio).to receive(:buscar_por_email).with(email).and_return(nil)
+    allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(nil) if telegram_id
+  end
 
   it 'deberia crear un medico' do
     medico = turnero.crear_medico('Michael', 'Jordan', 'Traumatologia', 1)
@@ -45,11 +51,16 @@ describe Turnero do
   end
 
   it 'deberia crear un usuario' do
-    allow(repositorio_usuario).to receive(:save).with(instance_of(Usuario))
-    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(nil)
-
+    stub_usuario_no_existente(repositorio_usuario, email, 123_456_789)
     created_user = turnero.crear_usuario(email, 123_456_789)
     expect(created_user.email).to eq(email)
     expect(created_user.telegram_id).to eq(123_456_789)
+  end
+
+  it 'deberia devolver error si el telegram_id ya existe al crear un usuario' do
+    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(nil)
+    allow(repositorio_usuario).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, 1, 123_456_789))
+
+    expect { turnero.crear_usuario(email, 123_456_789) }.to raise_error(TelegramIdEnUsoException)
   end
 end

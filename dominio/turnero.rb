@@ -1,4 +1,4 @@
-require_relative '../dominio/excepciones/email_en_uso_exception'
+require_relative '../dominio/excepciones/excepciones_registracion'
 
 class Turnero
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades)
@@ -9,6 +9,7 @@ class Turnero
 
   def crear_usuario(email, telegram_id = nil)
     raise EmailEnUsoException if buscar_usuario_por_email(email)
+    raise TelegramIdEnUsoException if telegram_id && @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
 
     usuario = Usuario.new(email, nil, telegram_id)
     @repositorio_usuarios.save(usuario)

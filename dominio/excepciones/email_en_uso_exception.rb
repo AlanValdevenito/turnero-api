@@ -1,2 +1,0 @@
-class EmailEnUsoException < StandardError
-end
