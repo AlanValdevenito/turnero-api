@@ -76,6 +76,17 @@ get '/especialidades' do
   json(respuesta)
 end
 
+get '/turnos/medicos-disponibles' do
+  logger.debug('GET /turnos/medicos-disponibles')
+  medicos = turnero.medicos_disponibles
+  respuesta = []
+  medicos.each do |medico|
+    respuesta << { id: medico.id, nombre: medico.nombre, apellido: medico.apellido, matricula: medico.matricula, especialidad: medico.especialidad.nombre }
+  end
+  status 200
+  json(respuesta)
+end
+
 get '/usuarios' do
   usuarios = turnero.usuarios
   respuesta = []

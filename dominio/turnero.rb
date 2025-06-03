@@ -47,4 +47,8 @@ class Turnero
   def buscar_usuario_por_email(email)
     @repositorio_usuarios.buscar_por_email(email)
   end
+
+  def medicos_disponibles
+    @repositorio_medicos.all.first(7)
+  end
 end

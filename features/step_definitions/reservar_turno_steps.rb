@@ -1,15 +1,35 @@
+def crear_medicos_disponibles
+  response = Faraday.get('/turnos/medicos-disponibles')
+  if JSON.parse(response.body).size < 7
+    especialidad = { nombre: 'Cardiologia', duracion_turno: 20 }
+    Faraday.post('/especialidades', especialidad.to_json, { 'Content-Type' => 'application/json' })
+
+    (1..7).each do |i|
+      medico = {
+        nombre: "Nombre#{i}",
+        apellido: "Apellido#{i}",
+        matricula: i,
+        especialidad: 'Cardiologia'
+      }
+      Faraday.post('/medicos', medico.to_json, { 'Content-Type' => 'application/json' })
+    end
+  end
+end
+
 Dado('el usuario pide un turno') do
+  crear_medicos_disponibles
   @response = Faraday.get('/turnos/medicos-disponibles')
   expect(@response.status).to eq(200)
 end
 
-Entonces('se retorna un listado numerado de {int} médicos con nombre, apellido, matricula') do |int|
+Entonces('se retorna un listado numerado de {int} médicos con nombre, apellido, matricula, especialidad') do |int|
   json_response = JSON.parse(@response.body)
   expect(json_response.size).to eq(int)
   json_response.each do |medico|
     expect(medico).to have_key('nombre')
     expect(medico).to have_key('apellido')
     expect(medico).to have_key('matricula')
+    expect(medico).to have_key('especialidad')
   end
 end
 

@@ -82,4 +82,11 @@ describe Turnero do
     medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
     expect(medico.especialidad.nombre).to eq('Traumatologia')
   end
+
+  it 'deberia devolver los medicos disponibles' do
+    medicos_disponibles = turnero.medicos_disponibles
+    expect(medicos_disponibles.size).to be <= 7
+    expect(medicos_disponibles.first.apellido).to eq('Jordan')
+    expect(medicos_disponibles.first.matricula).to eq(1)
+  end
 end
