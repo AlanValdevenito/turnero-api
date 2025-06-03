@@ -1,9 +1,10 @@
 require_relative '../dominio/excepciones/email_en_uso_exception'
 
 class Turnero
-  def initialize(repositorio_usuarios, repositorio_medicos)
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades)
     @repositorio_usuarios = repositorio_usuarios
     @repositorio_medicos = repositorio_medicos
+    @repositorio_especialidades = repositorio_especialidades
   end
 
   def crear_usuario(email)
@@ -25,6 +26,11 @@ class Turnero
   def crear_medico(nombre, apellido, matricula, especialidad)
     medico = Medico.new(nombre, apellido, matricula, especialidad.to_i)
     @repositorio_medicos.save(medico)
+  end
+
+  def crear_especialidad(nombre, duracion_de_turnos)
+    especialidad = Especialidad.new(nombre, duracion_de_turnos)
+    @repositorio_especialidades.save(especialidad)
   end
 
   def buscar_usuario_por_email(email)

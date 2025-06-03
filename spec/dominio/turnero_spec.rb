@@ -6,7 +6,8 @@ describe Turnero do
   let(:email) { 'test@email.com' }
   let(:repositorio_usuario) { instance_double('RepositorioUsuarios') }
   let(:repositorio_medico) { instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, 'Traumatologia'), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]) }
-  let(:turnero)     { described_class.new(repositorio_usuario, repositorio_medico) }
+  let(:repositorio_especialidades) { instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10)) }
+  let(:turnero)     { described_class.new(repositorio_usuario, repositorio_medico, repositorio_especialidades) }
 
   it 'deberia crear un medico' do
     medico = turnero.crear_medico('Michael', 'Jordan', 'Traumatologia', 1)
@@ -31,5 +32,10 @@ describe Turnero do
   it 'deberia devolver todos los medicos' do
     medicos = turnero.medicos
     expect(medicos.first.nombre).to eq('Michael')
+  end
+
+  it 'deberia crear una especialidad' do
+    especialidad = turnero.crear_especialidad('Traumatologia', 10)
+    expect(especialidad.nombre).to eq('Traumatologia')
   end
 end
