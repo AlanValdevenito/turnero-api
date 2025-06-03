@@ -27,3 +27,8 @@ Entonces('se muestra un error con el mensaje {string}') do |mensaje|
   expect(@response.status).to eq(400)
   expect(@response.body).to include(mensaje)
 end
+
+Dado('el paciente ya está registrado con un id de telegram {int}') do |telegram_id|
+  request_body = { email: "telegram#{telegram_id}@ejemplo.com", telegram_id: }.to_json
+  Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
+end
