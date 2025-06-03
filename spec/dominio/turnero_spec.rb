@@ -43,4 +43,13 @@ describe Turnero do
     especialidades = turnero.especialidades
     expect(especialidades.first.nombre).to eq('Traumatologia')
   end
+
+  it 'deberia crear un usuario' do
+    allow(repositorio_usuario).to receive(:save).with(instance_of(Usuario))
+    allow(repositorio_usuario).to receive(:buscar_por_email).with(email).and_return(nil)
+
+    created_user = turnero.crear_usuario(email, 123_456_789)
+    expect(created_user.email).to eq(email)
+    expect(created_user.telegram_id).to eq(123_456_789)
+  end
 end

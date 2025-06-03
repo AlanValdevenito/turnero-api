@@ -7,10 +7,10 @@ class Turnero
     @repositorio_especialidades = repositorio_especialidades
   end
 
-  def crear_usuario(email)
+  def crear_usuario(email, telegram_id = nil)
     raise EmailEnUsoException if buscar_usuario_por_email(email)
 
-    usuario = Usuario.new(email)
+    usuario = Usuario.new(email, nil, telegram_id)
     @repositorio_usuarios.save(usuario)
     usuario
   end

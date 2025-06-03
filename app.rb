@@ -99,9 +99,9 @@ end
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
   begin
-    usuario = turnero.crear_usuario(@params['email'])
+    usuario = turnero.crear_usuario(@params[:email], @params[:telegram_id])
     status 201
-    json({ id: usuario.id, email: usuario.email, message: 'El paciente se registró existosamente' })
+    json({ id: usuario.id, email: usuario.email, telegram_id: usuario.telegram_id, message: 'El paciente se registró existosamente' })
   rescue EmailEnUsoException
     status 400
     json({ error: 'El email ingresado ya está en uso' })
