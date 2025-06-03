@@ -5,8 +5,12 @@ require_relative '../../dominio/medico'
 describe Turnero do
   let(:email) { 'test@email.com' }
   let(:repositorio_usuario) { instance_double('RepositorioUsuarios') }
-  let(:repositorio_medico) { instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, 'Traumatologia'), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]) }
-  let(:repositorio_especialidades) { instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)]) }
+  let(:repositorio_medico) do
+    instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')])
+  end
+  let(:repositorio_especialidades) do
+    instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)], buscar_por_nombre: Especialidad.new('Traumatologia', 10))
+  end
   let(:turnero) { described_class.new(repositorio_usuario, repositorio_medico, repositorio_especialidades) }
 
   def stub_usuario_no_existente(repositorio, email, telegram_id = nil)
@@ -16,7 +20,7 @@ describe Turnero do
   end
 
   it 'deberia crear un medico' do
-    medico = turnero.crear_medico('Michael', 'Jordan', 'Traumatologia', 1)
+    medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
     expect(medico.nombre).to eq('Michael')
   end
 
@@ -72,5 +76,10 @@ describe Turnero do
   it 'deberia devolver error si el email es vacío al crear un usuario' do
     stub_usuario_no_existente(repositorio_usuario, '')
     expect { turnero.crear_usuario('') }.to raise_error(EmailObligatorioException)
+  end
+
+  it 'deberia crear un medico con especialidad' do
+    medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
+    expect(medico.especialidad.nombre).to eq('Traumatologia')
   end
 end
