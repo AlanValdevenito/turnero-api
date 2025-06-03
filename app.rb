@@ -55,7 +55,7 @@ end
 get '/medicos' do
   medicos = turnero.medicos
   respuesta = []
-  medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad } }
+  medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad.nombre } }
   status 200
   json(respuesta)
 end

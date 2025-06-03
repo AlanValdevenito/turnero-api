@@ -1,3 +1,9 @@
+Dado('la especialidad {string} ya esta dada de alta en el sistema') do |especialidad|
+  request_body = { nombre: especialidad, duracion_de_turnos: 10 }.to_json
+  @response = Faraday.post('/especialidades', request_body, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(200)
+end
+
 Dado('el sistema no tiene registrado al médico {string} con matricula {string}') do |nombre_completo, _matricula|
   nombre, apellido = nombre_completo.split
   @response = Faraday.get('/medicos')
@@ -28,7 +34,6 @@ Entonces('el médico {string} está registrado en el sistema') do |nombre|
   @response = Faraday.get('/medicos')
   parsed_response = JSON.parse(@response.body)
   medicos = parsed_response
-  puts medicos
   encontrado = medicos.any? do |medico|
     medico['nombre'] == nombre && medico['apellido'] == apellido
   end
