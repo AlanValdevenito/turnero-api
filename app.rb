@@ -177,7 +177,7 @@ get '/usuarios/:email' do
   end
 end
 
-get '/usuarios/:telegram_id' do
+get '/usuarios/telegram/:telegram_id' do
   telegram_id = params[:telegram_id]
   usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
   if usuario
