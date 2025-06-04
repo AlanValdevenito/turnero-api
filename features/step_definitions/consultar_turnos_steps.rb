@@ -65,8 +65,8 @@ Dado('el paciente {string} no está registrado') do |email|
   expect(encontrado).to be false
 end
 
-Cuando('pido ver turnos del paciente {string}') do |_email|
-  @response = Faraday.get("/turnos/#{@email}")
+Cuando('pido ver turnos del paciente {string}') do |email|
+  @response = Faraday.get("/turnos/#{email}")
   @turnos = JSON.parse(@response.body)
 end
 

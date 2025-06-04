@@ -20,7 +20,7 @@ Característica: Consulta de turnos
     Dado el paciente tiene 3 turnos
     Cuando pido ver turnos del paciente
     Entonces debería ver una lista con 3 turnos
-  @wip
+
   Escenario: US-7.4 Ver los turnos de un paciente no registrado es invalido
     Dado el paciente "paciente@ejemplo.com" no está registrado
     Cuando pido ver turnos del paciente "paciente@ejemplo.com"
