@@ -82,3 +82,32 @@ Entonces('se muestra la información del turno: fecha y médico') do
   expect(json_response).to have_key('fecha')
   expect(json_response).to have_key('medico')
 end
+
+Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
+  especialidad = Especialidad.new('Cardiologia', 30)
+  RepositorioEspecialidades.new.save(especialidad)
+  medico = Medico.new('Lucas', 'Martinez', '25', especialidad)
+  RepositorioMedicos.new.save(medico)
+  usuario = Usuario.new('pepe@pepito.com', nil, 123_456_789)
+  RepositorioUsuarios.new.save(usuario)
+
+  duracion = medico.especialidad.duracion_de_turnos
+  fecha_inicio = Date.today
+  fecha_fin = fecha_inicio + 60
+  calculador = CalculadorDeDisponibilidad
+
+  (fecha_inicio...fecha_fin).each do |fecha|
+    next unless calculador.dia_laboral?(fecha)
+
+    tiempos_ocupados = Set.new
+    turnos_del_dia = calculador.turnos_para_dia(fecha, duracion, tiempos_ocupados)
+    turnos_del_dia.each do |fecha_hora|
+      turno = Turno.new(medico, usuario, fecha_hora)
+      RepositorioTurnos.new.save(turno)
+    end
+  end
+
+  @response = Faraday.get("/turnos/#{medico.matricula}/disponibilidad")
+  json_response = JSON.parse(@response.body)
+  expect(json_response).to be_empty
+end

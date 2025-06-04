@@ -13,7 +13,7 @@ Escenario: US-3.1 Reserva de turno exitosa
 @wip
 Escenario: US-3.3 Reserva no exitosa por falta de turnos disponibles
     Dado el usuario pide un turno
-    Entonces se muestra un listado numerado de 7 médicos con nombre, apellido, matricula, especialidad
+    Entonces se retorna un listado numerado de 7 médicos con nombre, apellido, matricula, especialidad
     Cuando el usuario selecciona un médico de la lista
     Y el médico no tiene turnos disponibles en los próximos 2 meses
     Entonces se muestra un error con el mensaje "No hay turnos disponibles para este médico"
