@@ -125,8 +125,7 @@ describe Turnero do
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
 
     stub_turnos_existentes([turno_mock])
-
     turnos_disponibles = turnero.disponibilidad_de_medico(1)
-    expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
+    expect(turnos_disponibles).not_to include(turno_mock[:fecha_hora])
   end
 end
