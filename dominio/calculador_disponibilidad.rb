@@ -1,4 +1,18 @@
 class CalculadorDeDisponibilidad
+  def self.turnos_disponibles(duracion_turno, turnos_existentes, cantidad, fecha_inicio, fecha_fin)
+    tiempos_ocupados = Set.new(turnos_existentes.map { |t| t[:fecha_hora].to_i })
+
+    turnos_disponibles = []
+
+    (fecha_inicio...fecha_fin).each do |fecha|
+      next unless dia_laboral?(fecha)
+
+      turnos_disponibles.concat(turnos_para_dia(fecha, duracion_turno, tiempos_ocupados))
+    end
+
+    turnos_disponibles.first(cantidad)
+  end
+
   def self.turnos_para_dia(fecha, duracion, tiempos_ocupados)
     inicio_jornada, fin_jornada = jornada_laboral(fecha)
     hora_actual = hora_inicio(fecha, inicio_jornada)

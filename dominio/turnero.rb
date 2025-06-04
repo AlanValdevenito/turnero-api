@@ -72,28 +72,19 @@ class Turnero
 
   def disponibilidad_de_medico(matricula)
     medico = buscar_medico_por_matricula(matricula)
-
     duracion_turno = medico.especialidad.duracion_de_turnos
+
     fecha_inicio = Date.today
     fecha_fin = fecha_inicio + 60
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
-    tiempos_existentes = Set.new(turnos_existentes.map { |turno| turno[:fecha_hora].to_i })
 
-    encontrar_turnos_disponibles(fecha_inicio, fecha_fin, tiempos_existentes, duracion_turno).first(TURNOS_DISPONIBLES)
-  end
-
-  private
-
-  def encontrar_turnos_disponibles(fecha_inicio, fecha_fin, tiempos_existentes, duracion)
-    turnos_disponibles = []
-
-    (fecha_inicio...fecha_fin).each do |fecha|
-      next unless CalculadorDeDisponibilidad.dia_laboral?(fecha)
-
-      turnos_disponibles.concat(CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, tiempos_existentes))
-    end
-
-    turnos_disponibles.first(TURNOS_DISPONIBLES)
+    CalculadorDeDisponibilidad.turnos_disponibles(
+      duracion_turno,
+      turnos_existentes,
+      TURNOS_DISPONIBLES,
+      fecha_inicio,
+      fecha_fin
+    )
   end
 end

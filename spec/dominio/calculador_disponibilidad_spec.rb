@@ -7,6 +7,24 @@ describe 'CalculadorDeDisponibilidad' do
     let(:fecha) { Date.today + 1 }
     let(:duracion) { 30 }
     let(:inicio_jornada) { Time.local(fecha.year, fecha.month, fecha.day, 8, 0, 0) }
+    let(:fecha_fin) { fecha + 3 }
+
+    it 'devuelve la cantidad exacta de turnos si hay suficientes' do
+      cantidad = 3
+      turnos = CalculadorDeDisponibilidad.turnos_disponibles(duracion, [], cantidad, fecha, fecha_fin)
+
+      expect(turnos.size).to eq(cantidad)
+      expect(turnos).to all(be_a(Time))
+    end
+
+    it 'no devuelve turnos en fines de semana' do
+      sabado = Date.parse('2025-06-07')
+      domingo = Date.parse('2025-06-08')
+      cantidad = 3
+
+      turnos = CalculadorDeDisponibilidad.turnos_disponibles(duracion, [], cantidad, sabado, domingo)
+      expect(turnos).to be_empty
+    end
 
     it 'genera turnos cada duracion si no hay tiempos ocupados' do
       turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, Set.new)
