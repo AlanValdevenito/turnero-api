@@ -139,7 +139,18 @@ post '/turnos' do
   begin
     turno = turnero.crear_turno(@params[:matricula], @params[:fecha], @params[:hora], @params[:telegram_id])
     status 201
-    json({ message: 'El turno se reservó exitosamente', id: turno.id, fecha: turno.fecha, hora: turno.hora, medico: turno.medico })
+    json({
+           message: 'El turno se reservó exitosamente',
+           id: turno.id,
+           fecha: turno.fecha,
+           hora: turno.hora,
+           medico: {
+             nombre: turno.medico.nombre,
+             apellido: turno.medico.apellido,
+             matricula: turno.medico.matricula,
+             especialidad: turno.medico.especialidad.nombre
+           }
+         })
   rescue MedicoNoEncontradoException
     status 404
     json({ error: 'Médico no encontrado' })
