@@ -5,6 +5,11 @@ class RepositorioTurnos < AbstractRepository
   self.table_name = :turnos
   self.model_class = 'Turno'
 
+  def buscar_por_usuario(usuario)
+    row = dataset.first(usuario_id: usuario.id)
+    load_object(row) unless row.nil?
+  end
+
   def obtener_turnos_existentes(medico_id, fecha_inicio, fecha_fin)
     dataset
       .where(medico_id:)

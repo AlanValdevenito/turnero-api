@@ -40,4 +40,12 @@ describe RepositorioTurnos do
     expect(turno_cargado.medico.id).to eq(medico.id)
     expect(turno_cargado.fecha_hora.to_time).to eq(turno.fecha_hora.to_time)
   end
+
+  it 'deberia buscar por el id del usuario' do
+    turno = crear_turno_para(medico, usuario, DateTime.parse('2025-06-10T11:30:00'))
+    turno_encontrado = repositorios[:repo_turnos].buscar_por_usuario(usuario)
+    expect(turno_encontrado.usuario.id).to eq(usuario.id)
+    expect(turno_encontrado.medico.id).to eq(medico.id)
+    expect(turno_encontrado.fecha_hora.to_time).to eq(turno.fecha_hora.to_time)
+  end
 end
