@@ -44,7 +44,10 @@ class Turnero
     usuario = @repositorio_usuarios.buscar_por_email(email)
     raise UsuarioNoEncontradoException unless usuario
 
-    @repositorio_turnos.buscar_por_usuario(usuario)
+    @repositorio_turnos
+      .buscar_por_usuario(usuario)
+      .sort_by(&:fecha_hora)
+      .first(20)
   end
 
   def crear_turno(matricula, fecha, hora, telegram_id)

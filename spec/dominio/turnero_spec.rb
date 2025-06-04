@@ -159,4 +159,39 @@ describe Turnero do
 
     expect { turnero.turnos(email) }.to raise_error(UsuarioNoEncontradoException)
   end
+
+  context 'when hay más de 20 turnos para un usuario' do
+    let(:usuario) { Usuario.new('pepe@mail.com') }
+    let(:turnos_mock) do
+      (1..30).map do |i|
+        Turno.new(
+          Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10)),
+          usuario,
+          DateTime.now + i
+        )
+      end
+    end
+
+    before(:each) do
+      allow(repositorios[:usuario]).to receive(:buscar_por_email).with(usuario.email).and_return(usuario)
+      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos_mock)
+    end
+
+    it 'devuelve como máximo 20 turnos' do
+      turnos = turnero.turnos(usuario.email)
+      expect(turnos.size).to be <= 20
+    end
+
+    it 'devuelve los turnos ordenados por fecha' do
+      turnos = turnero.turnos(usuario.email)
+      fechas = turnos.map(&:fecha_hora)
+      expect(fechas).to eq(fechas.sort)
+    end
+
+    it 'devuelve los 20 turnos más próximos' do
+      turnos = turnero.turnos(usuario.email)
+      fechas = turnos.map(&:fecha_hora)
+      expect(fechas).to eq(turnos_mock.map(&:fecha_hora).sort.first(20))
+    end
+  end
 end
