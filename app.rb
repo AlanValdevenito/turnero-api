@@ -76,6 +76,16 @@ get '/especialidades' do
   json(respuesta)
 end
 
+get '/turnos/:email' do
+  logger.debug("GET /turnos: #{params}")
+  respuesta = []
+  email = params[:email]
+  turnos = turnero.turnos(email)
+  turnos.map { |e| respuesta << { fecha: e.fecha, hora: e.hora, estado: e.estado, medico: e.medico, especialidad: e.especialidad } }
+  status 200
+  json(respuesta)
+end
+
 get '/turnos/medicos-disponibles' do
   logger.debug('GET /turnos/medicos-disponibles')
   medicos = turnero.medicos_disponibles
