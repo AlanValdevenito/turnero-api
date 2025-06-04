@@ -55,3 +55,22 @@ Entonces('deberia tener el estado {string}, medico {string} y especialidad {stri
   end
   expect(encontrado).to be true
 end
+
+Dado('el paciente {string} no está registrado') do |email|
+  @response = Faraday.get('/usuarios')
+  usuarios = JSON.parse(@response.body)
+  encontrado = usuarios.any? do |usuario|
+    usuario['email'] == email
+  end
+  expect(encontrado).to be false
+end
+
+Cuando('pido ver turnos del paciente {string}') do |_email|
+  @response = Faraday.get("/turnos/#{@email}")
+  @turnos = JSON.parse(@response.body)
+end
+
+Entonces('debería ver un error {int} con un mensaje {string}') do |error, mensaje|
+  expect(@response.status).to eq(error)
+  expect(@response.body).to include(mensaje)
+end

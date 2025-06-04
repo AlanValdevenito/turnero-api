@@ -24,7 +24,7 @@ Característica: Consulta de turnos
   Escenario: US-7.4 Ver los turnos de un paciente no registrado es invalido
     Dado el paciente "paciente@ejemplo.com" no está registrado
     Cuando pido ver turnos del paciente "paciente@ejemplo.com"
-    Entonces debería ver un error "404 Not Found" con un mensaje "Paciente con email paciente@ejemplo.com inexistente"
+    Entonces debería ver un error 404 con un mensaje "Paciente con email paciente@ejemplo.com inexistente"
   @wip
   Escenario: US-7.5 Quiero ver los turnos de un paciente con más de 20 turnos
     Dado el paciente tiene 30 turnos
