@@ -100,6 +100,13 @@ describe Turnero do
     expect(medicos_disponibles.first.matricula).to eq(1)
   end
 
+  it 'deberia buscar un medico por matricula' do
+    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
+    encontrado = turnero.buscar_medico_por_matricula(1)
+    expect(encontrado).to eq(medico)
+  end
+
   def stub_turnos_existentes(turnos)
     allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
   end

@@ -57,9 +57,15 @@ class Turnero
     @repositorio_medicos.all.first(MEDICOS_DISPONIBLES)
   end
 
-  def disponibilidad_de_medico(matricula)
+  def buscar_medico_por_matricula(matricula)
     medico = @repositorio_medicos.buscar_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico
+
+    medico
+  end
+
+  def disponibilidad_de_medico(matricula)
+    medico = buscar_medico_por_matricula(matricula)
 
     duracion_turno = medico.especialidad.duracion_de_turnos
     fecha_inicio = Date.today
