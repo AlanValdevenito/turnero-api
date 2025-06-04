@@ -9,11 +9,16 @@ class RepositorioMedicos < AbstractRepository
     load_object(row) unless row.nil?
   end
 
+  def buscar_por_id(id)
+    row = dataset.first(id:)
+    load_object(row) unless row.nil?
+  end
+
   protected
 
   def load_object(a_hash)
     especialidad = RepositorioEspecialidades.new.buscar_por_id(a_hash[:especialidad_id])
-    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], especialidad)
+    Medico.new(a_hash[:nombre], a_hash[:apellido], a_hash[:matricula], especialidad, a_hash[:id])
   end
 
   def changeset(medico)

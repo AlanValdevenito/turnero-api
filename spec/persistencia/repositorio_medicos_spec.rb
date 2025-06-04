@@ -25,4 +25,12 @@ describe RepositorioMedicos do
     medico_encontrado = described_class.new.buscar_por_matricula(medico.matricula)
     expect(medico_encontrado.nombre).to eq(medico.nombre)
   end
+
+  it 'deberia buscar medico por id' do
+    repositorio = described_class.new
+    medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 1))
+    repositorio.save(medico)
+    recuperado = repositorio.buscar_por_id(medico.id)
+    expect(recuperado.matricula).to eq('ABC123')
+  end
 end
