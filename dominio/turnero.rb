@@ -1,5 +1,6 @@
 require_relative '../dominio/excepciones/excepciones_registracion'
 require_relative '../dominio/excepciones/medico_no_encontrado_exception'
+require_relative '../dominio/excepciones/usuario_no_encontrado_exception'
 require_relative '../dominio/calculador_disponibilidad'
 
 MEDICOS_DISPONIBLES = 7
@@ -41,6 +42,8 @@ class Turnero
 
   def turnos(email)
     usuario = @repositorio_usuarios.buscar_por_email(email)
+    raise UsuarioNoEncontradoException unless usuario
+
     @repositorio_turnos.buscar_por_usuario(usuario)
   end
 

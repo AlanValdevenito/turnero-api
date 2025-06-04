@@ -1,0 +1,2 @@
+class UsuarioNoEncontradoException < StandardError
+end

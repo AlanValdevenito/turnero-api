@@ -153,4 +153,10 @@ describe Turnero do
     turno = turnero.crear_turno('1', '2025-06-05', '10:00', 123_456_789)
     expect(turno.fecha).to eq('2025-06-05')
   end
+
+  it 'debería devolver error si el usuario no existe' do
+    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
+
+    expect { turnero.turnos(email) }.to raise_error(UsuarioNoEncontradoException)
+  end
 end
