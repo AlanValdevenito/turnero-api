@@ -10,7 +10,6 @@ Escenario: US-3.1 Reserva de turno exitosa
     Entonces se reserva exitosamente con el mensaje "El turno se reservó exitosamente"
     Y se muestra la información del turno: fecha y médico
 
-@wip
 Escenario: US-3.3 Reserva no exitosa por falta de turnos disponibles
     Dado el usuario pide un turno
     Entonces se retorna un listado numerado de 7 médicos con nombre, apellido, matricula, especialidad
