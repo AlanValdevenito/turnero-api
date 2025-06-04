@@ -4,7 +4,7 @@ Característica: Consulta de turnos
     Dado hay 1 paciente registrado
     Y la especialidad "Traumatologia" dada de alta
     Y el medico "Perez" de "Traumatologia" dado de alta
-  @wip
+
   Escenario: US-7.1 Quiero ver los turnos de un paciente que nunca pidió turnos
     Dado el paciente tiene 0 turnos
     Cuando pido ver turnos del paciente

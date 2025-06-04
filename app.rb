@@ -116,7 +116,9 @@ get '/turnos/:email' do
   respuesta = []
   email = params[:email]
   turnos = turnero.turnos(email)
-  turnos.map { |e| respuesta << { fecha: e.fecha, hora: e.hora, estado: e.estado, medico: e.medico, especialidad: e.especialidad } }
+  turnos.map do |e|
+    respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: e.medico.nombre, especialidad: e.medico.especialidad.nombre }
+  end
   status 200
   json(respuesta)
 end
