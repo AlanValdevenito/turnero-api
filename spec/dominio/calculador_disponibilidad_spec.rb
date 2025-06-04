@@ -6,7 +6,7 @@ describe 'CalculadorDeDisponibilidad' do
   describe '.turnos_para_dia' do
     let(:fecha) { Date.today + 1 }
     let(:duracion) { 30 }
-    let(:inicio_jornada) { Time.local(fecha.year, fecha.month, fecha.day, 8, 0, 0) }
+    let(:inicio_jornada) { DateTime.parse("#{fecha}T08:00:00") }
     let(:fecha_fin) { fecha + 3 }
 
     it 'devuelve la cantidad exacta de turnos si hay suficientes' do
@@ -14,7 +14,7 @@ describe 'CalculadorDeDisponibilidad' do
       turnos = CalculadorDeDisponibilidad.turnos_disponibles(duracion, [], cantidad, fecha, fecha_fin)
 
       expect(turnos.size).to eq(cantidad)
-      expect(turnos).to all(be_a(Time))
+      expect(turnos).to all(be_a(DateTime))
     end
 
     it 'no devuelve turnos en fines de semana' do
@@ -30,13 +30,13 @@ describe 'CalculadorDeDisponibilidad' do
       turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, Set.new)
 
       expect(turnos).not_to be_empty
-      expect(turnos.first).to be_a(Time)
+      expect(turnos.first).to be_a(DateTime)
       expect(turnos.size).to eq(20)
     end
 
     it 'no ofrece los turnos ocupados' do
-      ocupado = Time.local(fecha.year, fecha.month, fecha.day, 9, 0, 0)
-      tiempos_ocupados = Set.new([ocupado.to_i])
+      ocupado = DateTime.parse("#{fecha}T09:00:00")
+      tiempos_ocupados = Set.new([ocupado.to_time.to_i])
 
       turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, tiempos_ocupados)
 
@@ -46,10 +46,10 @@ describe 'CalculadorDeDisponibilidad' do
 
     it 'devuelve un turno si solo uno está disponible' do
       turnos_ocupados = (1...20).map do |i|
-        (inicio_jornada + (i * duracion * 60)).to_i
+        (inicio_jornada + Rational(i * duracion, 1440))
       end.to_set
 
-      turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, turnos_ocupados)
+      turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, turnos_ocupados.map(&:to_time).map(&:to_i).to_set)
 
       expect(turnos.first).to eq(inicio_jornada)
     end

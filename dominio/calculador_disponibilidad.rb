@@ -15,12 +15,12 @@ class CalculadorDeDisponibilidad
 
   def self.turnos_para_dia(fecha, duracion, tiempos_ocupados)
     inicio_jornada, fin_jornada = jornada_laboral(fecha)
-    hora_actual = hora_inicio(fecha, inicio_jornada)
+    hora_actual = hora_inicio(fecha, inicio_jornada, duracion)
     ultimo_turno = fin_jornada - duracion * 60
 
     turnos = []
     while hora_actual <= ultimo_turno
-      turnos << hora_actual unless tiempos_ocupados.include?(hora_actual.to_i)
+      turnos << DateTime.parse(hora_actual.strftime('%Y-%m-%d %H:%M:%S')) unless tiempos_ocupados.include?(hora_actual.to_i)
       hora_actual += duracion * 60
     end
 
@@ -38,7 +38,27 @@ class CalculadorDeDisponibilidad
     ]
   end
 
-  def self.hora_inicio(fecha, inicio_jornada)
-    fecha == Date.today ? [Time.now, inicio_jornada].max : inicio_jornada
+  def self.hora_inicio(fecha, inicio_jornada, duracion)
+    if fecha == Date.today
+      proximo_turno = calcular_proximo_turno(fecha, duracion)
+      [proximo_turno, inicio_jornada].max
+    else
+      inicio_jornada
+    end
+  end
+
+  def self.calcular_proximo_turno(fecha, duracion)
+    ahora = Time.now
+    minutos = proximo_minuto_turno(ahora.min, duracion)
+    hora = proxima_hora_turno(ahora.hour, ahora.min, duracion)
+    Time.local(fecha.year, fecha.month, fecha.day, hora, minutos, 0)
+  end
+
+  def self.proximo_minuto_turno(min_actual, duracion)
+    ((min_actual / duracion.to_f).ceil * duracion) % 60
+  end
+
+  def self.proxima_hora_turno(hora_actual, min_actual, duracion)
+    hora_actual + ((min_actual / duracion.to_f).ceil * duracion) / 60
   end
 end
