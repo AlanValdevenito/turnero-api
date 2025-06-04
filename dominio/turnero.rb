@@ -78,6 +78,11 @@ class Turnero
     @repositorio_usuarios.buscar_por_email(email)
   end
 
+  # tal vez no deba tener este metodo acoplado a telegram_id
+  def buscar_usuario_por_telegram_id(telegram_id)
+    @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+  end
+
   def medicos_disponibles
     @repositorio_medicos.all.first(MEDICOS_DISPONIBLES)
   end

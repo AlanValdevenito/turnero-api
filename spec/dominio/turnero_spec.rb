@@ -52,6 +52,13 @@ describe Turnero do
     expect(usuario).to eq(usuario_mock)
   end
 
+  it 'deberia buscar un usuario por telegram_id' do
+    usuario_mock = Usuario.new(email, 1, 123_456_789)
+    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(usuario_mock)
+    usuario = turnero.buscar_usuario_por_telegram_id(123_456_789)
+    expect(usuario).to eq(usuario_mock)
+  end
+
   it 'deberia devolver todos los medicos' do
     medicos = turnero.medicos
     expect(medicos.first.nombre).to eq('Michael')
