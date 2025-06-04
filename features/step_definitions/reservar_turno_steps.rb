@@ -73,7 +73,7 @@ Cuando('el usuario selecciona un turno') do
 end
 
 Entonces('se reserva exitosamente con el mensaje {string}') do |mensaje|
-  expect(@response.status).to eq(200)
+  expect(@response.status).to eq(201)
   expect(@response.body).to include(mensaje)
 end
 

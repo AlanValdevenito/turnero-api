@@ -1,7 +1,6 @@
 # language: es
 Característica: Reserva de un turno
 
-@wip
 Escenario: US-3.1 Reserva de turno exitosa
     Dado el usuario pide un turno
     Entonces se retorna un listado numerado de 7 médicos con nombre, apellido, matricula, especialidad
