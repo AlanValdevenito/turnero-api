@@ -4,6 +4,11 @@ class RepositorioMedicos < AbstractRepository
   self.table_name = :medicos
   self.model_class = 'Medico'
 
+  def buscar_por_matricula(matricula)
+    row = dataset.first(matricula:)
+    load_object(row) unless row.nil?
+  end
+
   protected
 
   def load_object(a_hash)

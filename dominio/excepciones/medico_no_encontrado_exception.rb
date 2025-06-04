@@ -1,0 +1,2 @@
+class MedicoNoEncontradoException < StandardError
+end
