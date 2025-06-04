@@ -33,7 +33,7 @@ Entonces('debería ver una lista con {int} turnos') do |cantidad_turnos|
   expect(@turnos.size).to eq(cantidad_turnos)
 end
 
-Dado('el paciente tiene {int} turno {string} con el medico {string} de {string}') do |_cantidad_turnos, _estado, _medico, _especialidad|
+Dado('el paciente tiene {int} turno pendiente con el medico Perez de Traumatologia') do |_cantidad_turnos|
   medico = RepositorioMedicos.new.buscar_por_id(@medico_id)
   usuario = RepositorioUsuarios.new.buscar_por_id(@usuario_id)
   fecha_hora = DateTime.parse('2025-06-05T10:00:00')

@@ -9,12 +9,12 @@ Característica: Consulta de turnos
     Dado el paciente tiene 0 turnos
     Cuando pido ver turnos del paciente
     Entonces debería ver una lista con 0 turnos
-  @wip
+
   Escenario: US-7.2 Quiero ver los turnos y sus detalles de un paciente con 1 turno
-    Dado el paciente tiene 1 turno "Pendiente" con el medico "Perez" de "Traumatología"
+    Dado el paciente tiene 1 turno pendiente con el medico Perez de Traumatologia
     Cuando pido ver turnos del paciente
     Entonces debería ver una lista con 1 turnos
-    Y deberia tener el estado "Pendiente", medico "Perez" y especialidad "Traumatología"
+    Y deberia tener el estado "Pendiente", medico "Perez" y especialidad "Traumatologia"
   @wip
   Escenario: US-7.3 Quiero ver los turnos de un paciente con 3 turnos
     Dado el paciente tiene 3 turnos
