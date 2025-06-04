@@ -1,5 +1,6 @@
 require_relative '../dominio/excepciones/excepciones_registracion'
 require_relative '../dominio/excepciones/medico_no_encontrado_exception'
+require_relative '../dominio/calculador_disponibilidad'
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
@@ -88,46 +89,11 @@ class Turnero
     turnos_disponibles = []
 
     (fecha_inicio...fecha_fin).each do |fecha|
-      next unless dia_laboral?(fecha)
+      next unless CalculadorDeDisponibilidad.dia_laboral?(fecha)
 
-      turnos_disponibles.concat(buscar_turnos_para_dia(fecha, duracion, tiempos_existentes))
+      turnos_disponibles.concat(CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, tiempos_existentes))
     end
 
     turnos_disponibles.first(TURNOS_DISPONIBLES)
-  end
-
-  def buscar_turnos_para_dia(fecha, duracion, tiempos_existentes)
-    inicio_jornada, fin_jornada = calcular_jornada(fecha)
-    hora_actual = calcular_hora_inicio(fecha, inicio_jornada)
-    ultimo_turno = fin_jornada - (duracion * 60)
-
-    obtener_horarios_disponibles(hora_actual, ultimo_turno, duracion, tiempos_existentes)
-  end
-
-  def obtener_horarios_disponibles(hora_inicio, hora_fin, duracion, tiempos_existentes)
-    huecos = []
-    current = hora_inicio
-
-    while current <= hora_fin
-      huecos << current unless tiempos_existentes.include?(current.to_i)
-      current += duracion * 60
-    end
-
-    huecos
-  end
-
-  def dia_laboral?(fecha)
-    (1..5).cover?(fecha.wday)
-  end
-
-  def calcular_jornada(fecha)
-    [
-      Time.local(fecha.year, fecha.month, fecha.day, 8, 0, 0),
-      Time.local(fecha.year, fecha.month, fecha.day, 18, 0, 0)
-    ]
-  end
-
-  def calcular_hora_inicio(fecha, inicio_jornada)
-    fecha == Date.today ? [Time.now, inicio_jornada].max : inicio_jornada
   end
 end
