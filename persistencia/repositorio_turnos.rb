@@ -22,14 +22,15 @@ class RepositorioTurnos < AbstractRepository
   def load_object(a_hash)
     medico = RepositorioMedicos.new.buscar_por_id(a_hash[:medico_id])
     usuario = RepositorioUsuarios.new.buscar_por_id(a_hash[:usuario_id])
-    Turno.new(medico, usuario, a_hash[:fecha_hora], a_hash[:id])
+    Turno.new(medico, usuario, a_hash[:fecha_hora], a_hash[:estado], a_hash[:id])
   end
 
   def changeset(turno)
     {
       medico_id: turno.medico.id,
       usuario_id: turno.usuario.id,
-      fecha_hora: turno.fecha_hora
+      fecha_hora: turno.fecha_hora,
+      estado: turno.estado
     }
   end
 end
