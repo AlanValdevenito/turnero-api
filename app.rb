@@ -32,6 +32,7 @@ end
 post '/reset' do
   halt 403 unless settings.environment == :test
 
+  RepositorioTurnos.new.delete_all
   RepositorioMedicos.new.delete_all
   RepositorioUsuarios.new.delete_all
   RepositorioEspecialidades.new.delete_all
@@ -98,7 +99,7 @@ get '/turnos/:matricula/disponibilidad' do
       {
         fecha: fecha_hora.strftime('%Y-%m-%d'),
         hora: fecha_hora.strftime('%H:%M'),
-        medico_id: matricula
+        matricula:
       }
     end
 
