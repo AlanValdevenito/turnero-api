@@ -177,6 +177,18 @@ get '/usuarios/:email' do
   end
 end
 
+get '/usuarios/:telegram_id' do
+  telegram_id = params[:telegram_id]
+  usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
+  if usuario
+    status 200
+    json({ id: usuario.id, email: usuario.email, telegram_id: usuario.telegram_id })
+  else
+    status 404
+    json({ error: 'Usuario no encontrado' })
+  end
+end
+
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
   begin
