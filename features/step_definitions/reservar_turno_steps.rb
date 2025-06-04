@@ -16,7 +16,14 @@ def crear_medicos_disponibles
   end
 end
 
+def crear_usuario
+  @usuario = Usuario.new('juan@mail.com', nil, 123_456_789)
+  @repositorio_usuarios = RepositorioUsuarios.new
+  @repositorio_usuarios.save(@usuario)
+end
+
 Dado('el usuario pide un turno') do
+  crear_usuario
   crear_medicos_disponibles
   @response = Faraday.get('/turnos/medicos-disponibles')
   expect(@response.status).to eq(200)
@@ -44,9 +51,9 @@ Cuando('el usuario selecciona un médico de la lista') do
   expect(@response.status).to eq(200)
 end
 
-Entonces('se retornan los próximos {int} turnos disponibles del médico dentro de los próximos {int} meses') do |turnos, _meses|
+Entonces('se retornan los próximos {int} turnos disponibles del médico dentro de los próximos 2 meses') do |num_turnos|
   json_response = JSON.parse(@response.body)
-  expect(json_response.size).to eq(turnos)
+  expect(json_response.size).to eq(num_turnos)
   json_response.each do |turno|
     expect(turno).to have_key('fecha')
     expect(turno).to have_key('hora')
@@ -59,7 +66,7 @@ Cuando('el usuario selecciona un turno') do
     matricula: '1',
     fecha: @turno_seleccionado['fecha'],
     hora: @turno_seleccionado['hora'],
-    telegram_id: '123456789'
+    telegram_id: 123_456_789
   }
   @response = Faraday.post('/turnos', @params.to_json, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(201)
