@@ -113,15 +113,20 @@ end
 
 get '/turnos/:email' do
   logger.debug("GET /turnos: #{params}")
-  respuesta = []
-  email = params[:email]
-  turnos = turnero.turnos(email)
-  turnos.map do |e|
-    respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
-                   especialidad: e.medico.especialidad.nombre }
+  begin
+    respuesta = []
+    email = params[:email]
+    turnos = turnero.turnos(email)
+    turnos.map do |e|
+      respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
+                     especialidad: e.medico.especialidad.nombre }
+    end
+    status 200
+    json(respuesta)
+  rescue UsuarioNoEncontradoException
+    status 404
+    json({ error: "Paciente con email #{email} inexistente" })
   end
-  status 200
-  json(respuesta)
 end
 
 post '/turnos' do
