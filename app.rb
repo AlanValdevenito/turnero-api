@@ -4,6 +4,7 @@ require 'sequel'
 require 'sinatra/custom_logger'
 require_relative './config/configuration'
 require_relative './lib/version'
+require_relative './dominio/excepciones/turno_reservado_exception'
 Dir[File.join(__dir__, 'dominio', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, 'persistencia', '*.rb')].each { |file| require file }
 
@@ -76,16 +77,6 @@ get '/especialidades' do
   json(respuesta)
 end
 
-get '/turnos/:email' do
-  logger.debug("GET /turnos: #{params}")
-  respuesta = []
-  email = params[:email]
-  turnos = turnero.turnos(email)
-  turnos.map { |e| respuesta << { fecha: e.fecha, hora: e.hora, estado: e.estado, medico: e.medico, especialidad: e.especialidad } }
-  status 200
-  json(respuesta)
-end
-
 get '/turnos/medicos-disponibles' do
   logger.debug('GET /turnos/medicos-disponibles')
   medicos = turnero.medicos_disponibles
@@ -118,6 +109,27 @@ get '/turnos/:matricula/disponibilidad' do
     status 404
     json({ error: 'Médico no encontrado' })
   end
+end
+
+get '/turnos/:email' do
+  logger.debug("GET /turnos: #{params}")
+  respuesta = []
+  email = params[:email]
+  turnos = turnero.turnos(email)
+  turnos.map { |e| respuesta << { fecha: e.fecha, hora: e.hora, estado: e.estado, medico: e.medico, especialidad: e.especialidad } }
+  status 200
+  json(respuesta)
+end
+
+post '/turnos' do
+  logger.debug("POST /turnos: #{@params}")
+  begin
+    turno = turnero.crear_turno(@params[:matricula], @params[:fecha], @params[:hora], @params[:telegram_id])
+    status 201
+    json({ message: 'El turno se reservó exitosamente', id: turno.id, fecha: turno.fecha, hora: turno.hora, medico: turno.medico })
+  rescue MedicoNoEncontradoException
+    status 404
+    json({ error: 'Médico no encontrado' })
 end
 
 get '/usuarios' do
