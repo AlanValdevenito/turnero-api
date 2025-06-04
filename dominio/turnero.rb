@@ -44,6 +44,19 @@ class Turnero
     @repositorio_turnos.buscar_por_usuario(usuario)
   end
 
+  def crear_turno(matricula, fecha, hora, telegram_id)
+    medico = buscar_medico_por_matricula(matricula)
+    raise MedicoNoEncontradoException unless medico
+
+    usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    raise UsuarioNoEncontradoException unless usuario
+
+    fecha_hora = DateTime.parse("#{fecha} #{hora}")
+
+    turno = Turno.new(medico, usuario, fecha_hora)
+    @repositorio_turnos.save(turno)
+  end
+
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)
     medico = Medico.new(nombre, apellido, matricula, especialidad)

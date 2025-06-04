@@ -11,4 +11,12 @@ class Turno
     @fecha_hora = fecha_hora
     @estado = estado
   end
+
+  def fecha
+    fecha_hora.strftime('%Y-%m-%d')
+  end
+
+  def hora
+    fecha_hora.strftime('%H:%M')
+  end
 end

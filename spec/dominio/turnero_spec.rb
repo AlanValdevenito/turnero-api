@@ -144,4 +144,13 @@ describe Turnero do
     turnos = turnero.turnos(usuario.email)
     expect(turnos.first.usuario.email).to eq(usuario.email)
   end
+
+  it 'deberia crear un turno correctamente' do
+    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, nil, 123_456_789))
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('1').and_return(Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)))
+    allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno)) { |turno| turno }
+
+    turno = turnero.crear_turno('1', '2025-06-05', '10:00', 123_456_789)
+    expect(turno.fecha).to eq('2025-06-05')
+  end
 end
