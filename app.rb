@@ -100,11 +100,18 @@ end
 get '/turnos/:matricula/disponibilidad' do
   logger.debug("GET /turnos/#{params[:matricula]}/disponibilidad")
   matricula = params[:matricula]
+
   begin
     disponibilidad = turnero.disponibilidad_de_medico(matricula)
-    respuesta = disponibilidad.map do |turno|
-      { fecha: turno.fecha, hora: turno.hora, duracion: turno.duracion }
+
+    respuesta = disponibilidad.map do |fecha_hora|
+      {
+        fecha: fecha_hora.strftime('%Y-%m-%d'),
+        hora: fecha_hora.strftime('%H:%M'),
+        medico_id: matricula
+      }
     end
+
     status 200
     json(respuesta)
   rescue MedicoNoEncontradoException
