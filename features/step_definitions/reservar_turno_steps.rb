@@ -1,7 +1,7 @@
 def crear_medicos_disponibles
   response = Faraday.get('/turnos/medicos-disponibles')
   if JSON.parse(response.body).size < 7
-    especialidad = { nombre: 'Cardiologia', duracion_turno: 20 }
+    especialidad = { nombre: 'Cardiologia', duracion_de_turnos: 20 }
     Faraday.post('/especialidades', especialidad.to_json, { 'Content-Type' => 'application/json' })
 
     (1..7).each do |i|
@@ -54,8 +54,15 @@ Entonces('se retornan los próximos {int} turnos disponibles del médico dentro 
 end
 
 Cuando('el usuario selecciona un turno') do
-  request_body = { medico_id: 1, fecha_hora: '2023-10-01T10:00:00Z', telegram_id: 123_456_789 }.to_json
-  @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+  @turno_seleccionado = JSON.parse(@response.body).first
+  @params = {
+    matricula: '1',
+    fecha: @turno_seleccionado['fecha'],
+    hora: @turno_seleccionado['hora'],
+    telegram_id: '123456789'
+  }
+  @response = Faraday.post('/turnos', @params.to_json, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(201)
 end
 
 Entonces('se reserva exitosamente con el mensaje {string}') do |mensaje|
