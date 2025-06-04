@@ -38,6 +38,11 @@ class Turnero
     @repositorio_especialidades.all
   end
 
+  def turnos(email)
+    usuario = @repositorio_usuarios.buscar_por_email(email)
+    @repositorio_turnos.buscar_por_usuario(usuario)
+  end
+
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)
     medico = Medico.new(nombre, apellido, matricula, especialidad)

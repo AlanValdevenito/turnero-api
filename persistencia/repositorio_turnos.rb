@@ -6,8 +6,7 @@ class RepositorioTurnos < AbstractRepository
   self.model_class = 'Turno'
 
   def buscar_por_usuario(usuario)
-    row = dataset.first(usuario_id: usuario.id)
-    load_object(row) unless row.nil?
+    load_collection dataset.where(usuario_id: usuario.id)
   end
 
   def obtener_turnos_existentes(medico_id, fecha_inicio, fecha_fin)

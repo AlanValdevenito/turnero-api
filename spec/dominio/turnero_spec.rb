@@ -9,11 +9,14 @@ describe Turnero do
 
   let(:repositorios) do
     {
-      usuario: instance_double('RepositorioUsuarios'),
+      usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
       medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]),
       especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
                                                                  buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
-      turnos: instance_double('RepositorioTurnos', all: [])
+      turnos: instance_double('RepositorioTurnos', all: [],
+                                                   buscar_por_usuario: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
+                                                                                  Usuario.new('Juan@mail.com'),
+                                                                                  DateTime.parse('2025-06-05T10:00:00'))])
     }
   end
 
@@ -128,5 +131,11 @@ describe Turnero do
 
     turnos_disponibles = turnero.disponibilidad_de_medico(1)
     expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
+  end
+
+  it 'deberia devolver turnos disponibles de un usuario' do
+    usuario = Usuario.new('Juan@mail.com')
+    turnos = turnero.turnos(usuario.email)
+    expect(turnos.first.usuario.email).to eq(usuario.email)
   end
 end
