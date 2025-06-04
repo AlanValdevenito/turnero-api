@@ -108,6 +108,5 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
   end
 
   @response = Faraday.get("/turnos/#{medico.matricula}/disponibilidad")
-  json_response = JSON.parse(@response.body)
-  expect(json_response).to be_empty
+  expect(@response.status).to eq(400)
 end

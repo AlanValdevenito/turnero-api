@@ -95,6 +95,11 @@ get '/turnos/:matricula/disponibilidad' do
   begin
     disponibilidad = turnero.disponibilidad_de_medico(matricula)
 
+    if disponibilidad.empty?
+      status 400
+      return json({ error: 'No hay turnos disponibles para este médico' })
+    end
+
     respuesta = disponibilidad.map do |fecha_hora|
       {
         fecha: fecha_hora.strftime('%Y-%m-%d'),
