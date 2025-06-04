@@ -15,7 +15,7 @@ Característica: Consulta de turnos
     Cuando pido ver turnos del paciente
     Entonces debería ver una lista con 1 turnos
     Y deberia tener el estado "Pendiente", medico "Perez" y especialidad "Traumatologia"
-  @wip
+
   Escenario: US-7.3 Quiero ver los turnos de un paciente con 3 turnos
     Dado el paciente tiene 3 turnos
     Cuando pido ver turnos del paciente

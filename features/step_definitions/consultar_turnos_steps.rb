@@ -1,8 +1,9 @@
 Dado('hay {int} paciente registrado') do |_cantidad_pacientes|
   @email = 'usuario@gmail.com'
-  request_body = { email: @email, telegram_id: 345_634_634 }.to_json
+  @usuario_telegram_id = 345_634_634
+
+  request_body = { email: @email, telegram_id: @usuario_telegram_id }.to_json
   @response = Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
-  @usuario_id = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)
 end
 
@@ -13,14 +14,20 @@ Dado('la especialidad {string} dada de alta') do |especialidad|
 end
 
 Dado('el medico {string} de {string} dado de alta') do |apellido, especialidad|
-  request_body = { nombre: 'Juan', apellido:, matricula: 'ABC123', especialidad: }.to_json
+  @medico_matricula = 'ABC123'
+
+  request_body = { nombre: 'Juan', apellido:, matricula: @medico_matricula, especialidad: }.to_json
   @response = Faraday.post('/medicos', request_body, { 'Content-Type' => 'application/json' })
-  @medico_id = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(200)
 end
 
 Dado('el paciente tiene {int} turnos') do |cantidad_turnos|
-  # Nada
+  cantidad_turnos.times do |i|
+    mes = (i + 1).to_s.rjust(2, '0')
+    request_body = { matricula: @medico_matricula, fecha: "2025-#{mes}-01", hora: '15:50', telegram_id: @usuario_telegram_id }.to_json
+    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    expect(@response.status).to eq(201)
+  end
 end
 
 Cuando('pido ver turnos del paciente') do
@@ -33,13 +40,13 @@ Entonces('debería ver una lista con {int} turnos') do |cantidad_turnos|
   expect(@turnos.size).to eq(cantidad_turnos)
 end
 
-Dado('el paciente tiene {int} turno pendiente con el medico Perez de Traumatologia') do |_cantidad_turnos|
-  medico = RepositorioMedicos.new.buscar_por_id(@medico_id)
-  usuario = RepositorioUsuarios.new.buscar_por_id(@usuario_id)
-  fecha_hora = DateTime.parse('2025-06-05T10:00:00')
-
-  turno = Turno.new(medico, usuario, fecha_hora)
-  RepositorioTurnos.new.save(turno)
+Dado('el paciente tiene {int} turno pendiente con el medico Perez de Traumatologia') do |cantidad_turnos|
+  cantidad_turnos.times do |i|
+    mes = (i + 1).to_s.rjust(2, '0')
+    request_body = { matricula: @medico_matricula, fecha: "2025-#{mes}-01", hora: '15:50', telegram_id: @usuario_telegram_id }.to_json
+    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    expect(@response.status).to eq(201)
+  end
 end
 
 Entonces('deberia tener el estado {string}, medico {string} y especialidad {string}') do |estado, apellido_medico, especialidad|
