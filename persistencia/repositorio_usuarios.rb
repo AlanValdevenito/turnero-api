@@ -14,6 +14,11 @@ class RepositorioUsuarios < AbstractRepository
     load_object(row) unless row.nil?
   end
 
+  def buscar_por_id(id)
+    row = dataset.first(id:)
+    load_object(row) unless row.nil?
+  end
+
   protected
 
   def load_object(a_hash)

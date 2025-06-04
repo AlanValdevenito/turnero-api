@@ -33,4 +33,12 @@ describe RepositorioUsuarios do
     usuario_recuperado = repositorio.buscar_por_telegram_id(22_222)
     expect(usuario_recuperado).to have_attributes(email: 'juan@test.com', telegram_id: 22_222)
   end
+
+  it 'deberia buscar por id' do
+    repositorio = described_class.new
+    usuario = Usuario.new('juan@mail.com')
+    repositorio.save(usuario)
+    recuperado = repositorio.buscar_por_id(usuario.id)
+    expect(recuperado.email).to eq('juan@mail.com')
+  end
 end
