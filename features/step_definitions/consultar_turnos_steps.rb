@@ -23,8 +23,8 @@ end
 
 Dado('el paciente tiene {int} turnos') do |cantidad_turnos|
   cantidad_turnos.times do |i|
-    mes = (i + 1).to_s.rjust(2, '0')
-    request_body = { matricula: @medico_matricula, fecha: "2025-#{mes}-01", hora: '15:50', telegram_id: @usuario_telegram_id }.to_json
+    dia = (i + 1).to_s.rjust(2, '0')
+    request_body = { matricula: @medico_matricula, fecha: "2025-01-#{dia}", hora: '15:50', telegram_id: @usuario_telegram_id }.to_json
     @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
     expect(@response.status).to eq(201)
   end
