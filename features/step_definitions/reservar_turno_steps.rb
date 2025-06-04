@@ -34,6 +34,12 @@ Entonces('se retorna un listado numerado de {int} médicos con nombre, apellido,
 end
 
 Cuando('el usuario selecciona un médico de la lista') do
+  especialidad = Especialidad.new('Cardiologia', 20)
+  RepositorioEspecialidades.new.save(especialidad)
+
+  medico = Medico.new('Michael', 'Jackson', '1', especialidad)
+  RepositorioMedicos.new.save(medico)
+
   @response = Faraday.get('/turnos/1/disponibilidad')
   expect(@response.status).to eq(200)
 end
@@ -49,7 +55,7 @@ end
 
 Cuando('el usuario selecciona un turno') do
   request_body = { medico_id: 1, fecha_hora: '2023-10-01T10:00:00Z', telegram_id: 123_456_789 }.to_json
-  @response = Faraday.get('/turnos', request_body, { 'Content-Type' => 'application/json' })
+  @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
 end
 
 Entonces('se reserva exitosamente con el mensaje {string}') do |mensaje|

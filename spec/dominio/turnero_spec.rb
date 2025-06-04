@@ -17,6 +17,12 @@ describe Turnero do
     }
   end
 
+  let(:turno_mock) { { fecha_hora: Time.now + 3600 } }
+
+  def stub_turnos_existentes(turnos)
+    allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
+  end
+
   def stub_usuario_no_existente(repositorio, email, telegram_id = nil)
     allow(repositorio).to receive(:save).with(instance_of(Usuario))
     allow(repositorio).to receive(:buscar_por_email).with(email).and_return(nil)
@@ -92,5 +98,35 @@ describe Turnero do
     expect(medicos_disponibles.size).to be <= 7
     expect(medicos_disponibles.first.apellido).to eq('Jordan')
     expect(medicos_disponibles.first.matricula).to eq(1)
+  end
+
+  def stub_turnos_existentes(turnos)
+    allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
+  end
+
+  it 'debería devolver error si el médico no existe' do
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(999).and_return(nil)
+
+    expect { turnero.disponibilidad_de_medico(999) }.to raise_error(MedicoNoEncontradoException)
+  end
+
+  it 'debería devolver turnos disponibles para el médico' do
+    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
+
+    stub_turnos_existentes([])
+
+    turnos_disponibles = turnero.disponibilidad_de_medico(1)
+    expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
+  end
+
+  it 'debería devolver turnos disponibles cuando algunos turnos ya están ocupados' do
+    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
+
+    stub_turnos_existentes([turno_mock])
+
+    turnos_disponibles = turnero.disponibilidad_de_medico(1)
+    expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
   end
 end

@@ -1,8 +1,17 @@
+require 'date'
 require_relative './abstract_repository'
 
 class RepositorioTurnos < AbstractRepository
   self.table_name = :turnos
   self.model_class = 'Turno'
+
+  def obtener_turnos_existentes(medico_id, fecha_inicio, fecha_fin)
+    dataset
+      .where(medico_id:)
+      .where { fecha_hora >= fecha_inicio && fecha_hora < fecha_fin }
+      .select(:fecha_hora)
+      .to_a
+  end
 
   protected
 
