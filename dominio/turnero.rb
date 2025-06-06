@@ -51,6 +51,10 @@ class Turnero
       .first(20)
   end
 
+  def turnos_medico(_matricula)
+    []
+  end
+
   def crear_turno(matricula, fecha, hora, telegram_id)
     medico = buscar_medico_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico

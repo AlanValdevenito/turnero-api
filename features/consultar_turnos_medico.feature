@@ -5,7 +5,7 @@ Característica: Consultar los turnos asignados a un médico por su matrícula
     Dado existe el paciente con email "juan@mail.com"
     Y la especialidad "Cardiología" dada de alta
     Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología" dado de alta
-  @wip
+
   Escenario: US-30.1 Quiero ver los turnos de un medico que no tiene turnos
     Dado el médico con matrícula "ABC123" tiene 0 turnos
     Cuando consulto los turnos del médico con matrícula "ABC123"

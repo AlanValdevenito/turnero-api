@@ -152,6 +152,13 @@ describe Turnero do
     expect(turnos.first.usuario.email).to eq(usuario.email)
   end
 
+  it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
+    especialidad = Especialidad.new('Traumatologia', 10)
+    medico = Medico.new('Medico1', 'Apellido1', 'ABC123', especialidad)
+    turnos = turnero.turnos_medico(medico.matricula)
+    expect(turnos.size).to eq(0)
+  end
+
   def stub_usuario_telegram
     allow(repositorios[:usuario])
       .to receive(:buscar_por_telegram_id)
