@@ -18,6 +18,5 @@ end
 Cuando('consulto los turnos del médico con matrícula {string}') do |matricula|
   @response = Faraday.get("/turnos/#{matricula}")
   @turnos = JSON.parse(@response.body)
-  puts @turnos
   expect(@response.status).to eq(200)
 end

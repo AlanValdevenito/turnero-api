@@ -41,7 +41,7 @@ class Turnero
     @repositorio_especialidades.all
   end
 
-  def turnos(email)
+  def turnos_paciente(email)
     usuario = @repositorio_usuarios.buscar_por_email(email)
     raise UsuarioNoEncontradoException unless usuario
 

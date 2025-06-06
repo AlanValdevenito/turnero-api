@@ -116,15 +116,25 @@ get '/turnos/:matricula/disponibilidad' do
   end
 end
 
-get '/turnos/:email' do
+get '/turnos/:identificador' do
   logger.debug("GET /turnos: #{params}")
   begin
+    identificador = params[:identificador]
     respuesta = []
-    email = params[:email]
-    turnos = turnero.turnos(email)
-    turnos.map do |e|
-      respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
-                     especialidad: e.medico.especialidad.nombre }
+    if identificador.include?('@')
+      email = params[:identificador]
+      turnos = turnero.turnos_paciente(email)
+      turnos.map do |e|
+        respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
+                       especialidad: e.medico.especialidad.nombre }
+      end
+    else
+      matricula = params[:identificador]
+      turnos = turnero.turnos_medico(matricula)
+      turnos.map do |e|
+        respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.paciente.nombre} #{e.paciente.apellido}",
+                       email: e.paciente.email }
+      end
     end
     status 200
     json(respuesta)

@@ -148,7 +148,7 @@ describe Turnero do
 
   it 'deberia devolver turnos disponibles de un usuario' do
     usuario = Usuario.new('Juan@mail.com')
-    turnos = turnero.turnos(usuario.email)
+    turnos = turnero.turnos_paciente(usuario.email)
     expect(turnos.first.usuario.email).to eq(usuario.email)
   end
 
@@ -195,7 +195,7 @@ describe Turnero do
   it 'debería devolver error si el usuario no existe' do
     allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
 
-    expect { turnero.turnos(email) }.to raise_error(UsuarioNoEncontradoException)
+    expect { turnero.turnos_paciente(email) }.to raise_error(UsuarioNoEncontradoException)
   end
 
   context 'when hay más de 20 turnos para un usuario' do
@@ -218,18 +218,18 @@ describe Turnero do
     end
 
     it 'devuelve como máximo 20 turnos' do
-      turnos = turnero.turnos(usuario.email)
+      turnos = turnero.turnos_paciente(usuario.email)
       expect(turnos.size).to be <= 20
     end
 
     it 'devuelve los turnos ordenados por fecha' do
-      turnos = turnero.turnos(usuario.email)
+      turnos = turnero.turnos_paciente(usuario.email)
       fechas = turnos.map(&:fecha_hora)
       expect(fechas).to eq(fechas.sort)
     end
 
     it 'devuelve los 20 turnos más próximos' do
-      turnos = turnero.turnos(usuario.email)
+      turnos = turnero.turnos_paciente(usuario.email)
       fechas = turnos.map(&:fecha_hora)
       expect(fechas).to eq(turnos_mock.map(&:fecha_hora).sort.first(20))
     end
