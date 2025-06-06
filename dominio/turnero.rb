@@ -58,14 +58,13 @@ class Turnero
     usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
     raise UsuarioNoEncontradoException unless usuario
 
+    turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
+
+    turnos_existentes.each do |turno|
+      raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
+    end
+
     fecha_hora = DateTime.parse("#{fecha} #{hora}")
-
-    existe = @repositorio_turnos
-             .buscar_por_medico(medico)
-             .any? { |t| t.fecha_hora == fecha_hora }
-
-    raise TurnoYaExisteException if existe
-
     turno = Turno.new(medico, usuario, fecha_hora)
     @repositorio_turnos.save(turno)
   end
