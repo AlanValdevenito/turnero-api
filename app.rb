@@ -154,6 +154,9 @@ post '/turnos' do
   rescue MedicoNoEncontradoException
     status 404
     json({ error: 'Médico no encontrado' })
+  rescue TurnoYaExisteException
+    status 400
+    json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
   end
 end
 
