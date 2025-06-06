@@ -152,11 +152,42 @@ describe Turnero do
     expect(turnos.first.usuario.email).to eq(usuario.email)
   end
 
-  it 'deberia crear un turno correctamente' do
-    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, nil, 123_456_789))
-    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('1').and_return(Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)))
-    allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno)) { |turno| turno }
+  def stub_usuario_telegram
+    allow(repositorios[:usuario])
+      .to receive(:buscar_por_telegram_id)
+      .with(123_456_789)
+      .and_return(Usuario.new(email, nil, 123_456_789))
+  end
 
+  def stub_medico_matricula
+    allow(repositorios[:medico])
+      .to receive(:buscar_por_matricula)
+      .with('1')
+      .and_return(Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)))
+  end
+
+  def stub_turnos_por_medico
+    allow(repositorios[:turnos])
+      .to receive(:buscar_por_medico)
+      .with(instance_of(Medico))
+      .and_return([])
+  end
+
+  def stub_turno_save
+    allow(repositorios[:turnos])
+      .to receive(:save)
+      .with(instance_of(Turno)) { |turno| turno }
+  end
+
+  def stub_crear_turno_ok
+    stub_usuario_telegram
+    stub_medico_matricula
+    stub_turnos_por_medico
+    stub_turno_save
+  end
+
+  it 'deberia crear un turno correctamente' do
+    stub_crear_turno_ok
     turno = turnero.crear_turno('1', '2025-06-05', '10:00', 123_456_789)
     expect(turno.fecha).to eq('2025-06-05')
   end
@@ -182,6 +213,8 @@ describe Turnero do
     before(:each) do
       allow(repositorios[:usuario]).to receive(:buscar_por_email).with(usuario.email).and_return(usuario)
       allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos_mock)
+      allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('1').and_return(Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)))
+      allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(usuario)
     end
 
     it 'devuelve como máximo 20 turnos' do
@@ -199,6 +232,14 @@ describe Turnero do
       turnos = turnero.turnos(usuario.email)
       fechas = turnos.map(&:fecha_hora)
       expect(fechas).to eq(turnos_mock.map(&:fecha_hora).sort.first(20))
+    end
+
+    it 'no deberia guardar turnos duplicados' do
+      allow(repositorios[:turnos]).to receive(:buscar_por_medico).with(instance_of(Medico)).and_return([])
+      allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno)).and_raise(TurnoYaExisteException)
+      expect do
+        turnero.crear_turno('1', '2025-06-05', '10:00', 123_456_789)
+      end.to raise_error(TurnoYaExisteException)
     end
   end
 end

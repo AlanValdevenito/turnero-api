@@ -1,6 +1,7 @@
 require_relative '../dominio/excepciones/excepciones_registracion'
 require_relative '../dominio/excepciones/medico_no_encontrado_exception'
 require_relative '../dominio/excepciones/usuario_no_encontrado_exception'
+require_relative '../dominio/excepciones/turno_ya_existe_exception'
 require_relative '../dominio/calculador_disponibilidad'
 
 MEDICOS_DISPONIBLES = 7
@@ -58,6 +59,12 @@ class Turnero
     raise UsuarioNoEncontradoException unless usuario
 
     fecha_hora = DateTime.parse("#{fecha} #{hora}")
+
+    existe = @repositorio_turnos
+             .buscar_por_medico(medico)
+             .any? { |t| t.fecha_hora == fecha_hora }
+
+    raise TurnoYaExisteException if existe
 
     turno = Turno.new(medico, usuario, fecha_hora)
     @repositorio_turnos.save(turno)

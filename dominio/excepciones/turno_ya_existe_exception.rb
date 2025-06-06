@@ -1,0 +1,2 @@
+class TurnoYaExisteException < StandardError
+end
