@@ -25,19 +25,20 @@ end
 Dado('el médico con matrícula {string} tiene un turno {string} con el paciente {string} para la fecha {string} durante el horario {string}') do |matricula, _estado_del_turno, _email, fecha, hora|
   request_body = { matricula:, fecha:, hora:, telegram_id: @telegram_id }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+  @id_turno = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)
 end
 
 Entonces('deberia ver el id del turno') do
   encontrado = @turnos.any? do |turno|
-    turno['id'] == JSON.parse(@response.body)[:id]
+    turno['id'] == @id_turno
   end
   expect(encontrado).to be true
 end
 
-Entonces('deberia ver el estado {string}, paciente {string}, email {string}, fecha {string} y hora {string}') do |estado, paciente, email, fecha, hora|
+Entonces('deberia ver el estado {string}, email del paciente {string}, fecha {string} y hora {string}') do |estado, paciente_email, fecha, hora|
   encontrado = @turnos.any? do |turno|
-    turno['paciente'] == paciente && turno['email'] == email && turno['estado'] == estado && turno['fecha'] == fecha && turno['hora'] == hora
+    turno['paciente_email'] == paciente_email && turno['estado'] == estado && turno['fecha'] == fecha && turno['hora'] == hora
   end
   expect(encontrado).to be true
 end

@@ -132,8 +132,7 @@ get '/turnos/:identificador' do
       matricula = params[:identificador]
       turnos = turnero.turnos_medico(matricula)
       turnos.map do |e|
-        respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.paciente.nombre} #{e.paciente.apellido}",
-                       email: e.paciente.email }
+        respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, paciente_email: e.usuario.email }
       end
     end
     status 200
