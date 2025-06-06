@@ -10,13 +10,17 @@ describe Turnero do
   let(:repositorios) do
     {
       usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
-      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')]),
+      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
+                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10))]),
       especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
                                                                  buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
       turnos: instance_double('RepositorioTurnos', all: [],
                                                    buscar_por_usuario: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
                                                                                   Usuario.new('Juan@mail.com'),
-                                                                                  DateTime.parse('2025-06-05T10:00:00'))])
+                                                                                  DateTime.parse('2025-06-05T10:00:00'))],
+                                                   buscar_por_medico: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
+                                                                                 Usuario.new('Juan@mail.com'),
+                                                                                 DateTime.parse('2025-06-05T10:00:00'))])
     }
   end
 
@@ -153,10 +157,19 @@ describe Turnero do
   end
 
   it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
+    repositorio_turnos_vacio = instance_double('RepositorioTurnos', buscar_por_medico: [])
+    turnero_vacio = described_class.new(repositorios[:usuario], repositorios[:medico],
+                                        repositorios[:especialidad], repositorio_turnos_vacio)
+
+    turnos = turnero_vacio.turnos_medico('ABC123')
+    expect(turnos.size).to eq(0)
+  end
+
+  it 'deberia devolver 1 turno disponible de un medico que tiene 1 turno' do
     especialidad = Especialidad.new('Traumatologia', 10)
     medico = Medico.new('Medico1', 'Apellido1', 'ABC123', especialidad)
     turnos = turnero.turnos_medico(medico.matricula)
-    expect(turnos.size).to eq(0)
+    expect(turnos.size).to eq(1)
   end
 
   def stub_usuario_telegram

@@ -51,8 +51,9 @@ class Turnero
       .first(20)
   end
 
-  def turnos_medico(_matricula)
-    []
+  def turnos_medico(matricula)
+    medico = @repositorio_medicos.buscar_por_matricula(matricula)
+    @repositorio_turnos.buscar_por_medico(medico)
   end
 
   def crear_turno(matricula, fecha, hora, telegram_id)
