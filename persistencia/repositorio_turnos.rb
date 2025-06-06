@@ -9,6 +9,10 @@ class RepositorioTurnos < AbstractRepository
     load_collection dataset.where(usuario_id: usuario.id)
   end
 
+  def buscar_por_medico(medico)
+    load_collection dataset.where(medico_id: medico.id)
+  end
+
   def obtener_turnos_existentes(medico_id, fecha_inicio, fecha_fin)
     dataset
       .where(medico_id:)
