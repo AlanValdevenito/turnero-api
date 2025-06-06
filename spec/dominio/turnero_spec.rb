@@ -121,13 +121,13 @@ describe Turnero do
     allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
   end
 
-  it 'debería devolver error si el médico no existe' do
+  it 'deberia devolver error si el médico no existe' do
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(999).and_return(nil)
 
     expect { turnero.disponibilidad_de_medico(999) }.to raise_error(MedicoNoEncontradoException)
   end
 
-  it 'debería devolver turnos disponibles para el médico' do
+  it 'deberia devolver turnos disponibles para el médico' do
     medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
 
@@ -137,7 +137,7 @@ describe Turnero do
     expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
   end
 
-  it 'debería devolver turnos disponibles cuando algunos turnos ya están ocupados' do
+  it 'deberia devolver turnos disponibles cuando algunos turnos ya están ocupados' do
     medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
 
@@ -199,7 +199,7 @@ describe Turnero do
     expect(turno.fecha).to eq('2025-06-05')
   end
 
-  it 'debería devolver error si el usuario no existe' do
+  it 'deberia devolver error si el usuario no existe' do
     allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
 
     expect { turnero.turnos_paciente(email) }.to raise_error(UsuarioNoEncontradoException)

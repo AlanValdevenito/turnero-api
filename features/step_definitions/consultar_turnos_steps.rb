@@ -36,7 +36,7 @@ Cuando('pido ver turnos del paciente') do
   expect(@response.status).to eq(200)
 end
 
-Entonces('debería ver una lista con {int} turnos') do |cantidad_turnos|
+Entonces('deberia ver una lista con {int} turnos') do |cantidad_turnos|
   expect(@turnos.size).to eq(cantidad_turnos)
 end
 
@@ -70,7 +70,7 @@ Cuando('pido ver turnos del paciente {string}') do |email|
   @turnos = JSON.parse(@response.body)
 end
 
-Entonces('debería ver un error {int} con un mensaje {string}') do |error, mensaje|
+Entonces('deberia ver un error {int} con un mensaje {string}') do |error, mensaje|
   expect(@response.status).to eq(error)
   expect(@response.body).to include(mensaje)
 end
