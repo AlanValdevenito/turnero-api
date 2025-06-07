@@ -42,7 +42,7 @@ post '/reset' do
 end
 
 get '/version' do
-  logger.info('Handling /version')
+  logger.info('GET /version')
   json({ version: Version.current })
 end
 
@@ -54,6 +54,7 @@ post '/medicos' do
 end
 
 get '/medicos' do
+  logger.debug('GET /medicos')
   medicos = turnero.medicos
   respuesta = []
   medicos.map { |m| respuesta << { nombre: m.nombre, apellido: m.apellido, matricula: m.matricula, especialidad: m.especialidad.nombre } }
@@ -89,7 +90,7 @@ get '/turnos/medicos-disponibles' do
 end
 
 get '/turnos/:matricula/disponibilidad' do
-  logger.debug("GET /turnos/#{params[:matricula]}/disponibilidad")
+  logger.debug("GET /turnos/:matricula/disponibilidad: #{@params}")
   matricula = params[:matricula]
 
   begin
@@ -117,7 +118,7 @@ get '/turnos/:matricula/disponibilidad' do
 end
 
 get '/turnos/pacientes/:email' do
-  logger.debug("GET /turnos/pacientes: #{params}")
+  logger.debug("GET /turnos/pacientes/:email: #{params}")
   begin
     email = params[:email]
     respuesta = []
@@ -135,7 +136,7 @@ get '/turnos/pacientes/:email' do
 end
 
 get '/turnos/medicos/:matricula' do
-  logger.debug("GET /turnos/medicos: #{params}")
+  logger.debug("GET /turnos/medicos/:matricula: #{params}")
   begin
     respuesta = []
     matricula = params[:matricula]
@@ -178,6 +179,7 @@ post '/turnos' do
 end
 
 get '/usuarios' do
+  logger.debug('GET /usuarios')
   usuarios = turnero.usuarios
   respuesta = []
   usuarios.map { |u| respuesta << { email: u.email, id: u.id } }
@@ -186,6 +188,7 @@ get '/usuarios' do
 end
 
 get '/usuarios/:email' do
+  logger.debug("GET /usuarios/:email: #{params}")
   email = params[:email]
   usuario = turnero.buscar_usuario_por_email(email)
   if usuario
@@ -198,6 +201,7 @@ get '/usuarios/:email' do
 end
 
 get '/usuarios/telegram/:telegram_id' do
+  logger.debug("GET /usuarios/telegram/:telegram_id: #{params}")
   telegram_id = params[:telegram_id]
   usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
   if usuario
