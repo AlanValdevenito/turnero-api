@@ -268,4 +268,28 @@ describe Turnero do
       end.to raise_error(TurnoYaExisteException)
     end
   end
+
+  context 'when hay más de 20 turnos para un medico' do
+    let(:medico) { Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)) }
+    let(:turnos_mock) do
+      (1..30).reverse_each.map do |i|
+        Turno.new(
+          medico,
+          Usuario.new('usuario@prueba.com'),
+          DateTime.now + i
+        )
+      end
+    end
+
+    before(:each) do
+      allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(medico.matricula).and_return(medico)
+      allow(repositorios[:turnos]).to receive(:buscar_por_medico).with(medico).and_return(turnos_mock)
+    end
+
+    it 'devuelve los turnos de medicos ordenados por fecha' do
+      turnos = turnero.turnos_medico(medico.matricula)
+      fechas = turnos.map(&:fecha_hora)
+      expect(fechas).to eq(fechas.sort)
+    end
+  end
 end

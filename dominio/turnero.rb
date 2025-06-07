@@ -55,7 +55,7 @@ class Turnero
     medico = @repositorio_medicos.buscar_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico
 
-    @repositorio_turnos.buscar_por_medico(medico)
+    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora)
   end
 
   def crear_turno(matricula, fecha, hora, telegram_id)
