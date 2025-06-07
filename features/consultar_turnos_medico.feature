@@ -23,7 +23,7 @@ Característica: Consultar los turnos asignados a un médico por su matrícula
    Cuando consulto los turnos del médico con matrícula "XYZ999"
    Entonces deberia ver un error 404
    Y el mensaje de error debe ser "Medico con matricula XYZ999 inexistente"
-  @wip
+
   Escenario: US-30.4 - El médico tiene más de 20 turnos
     Dado que el médico con matrícula "ABC123" tiene 30 turnos
     Cuando consulto los turnos del médico con matrícula "ABC123"

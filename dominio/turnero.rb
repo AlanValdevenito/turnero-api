@@ -6,6 +6,7 @@ require_relative '../dominio/calculador_disponibilidad'
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
+MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 
 class Turnero
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos)
@@ -48,14 +49,14 @@ class Turnero
     @repositorio_turnos
       .buscar_por_usuario(usuario)
       .sort_by(&:fecha_hora)
-      .first(20)
+      .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end
 
   def turnos_medico(matricula)
     medico = @repositorio_medicos.buscar_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico
 
-    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora)
+    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end
 
   def crear_turno(matricula, fecha, hora, telegram_id)

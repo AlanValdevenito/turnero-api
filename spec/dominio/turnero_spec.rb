@@ -291,5 +291,10 @@ describe Turnero do
       fechas = turnos.map(&:fecha_hora)
       expect(fechas).to eq(fechas.sort)
     end
+
+    it 'devuelve solo 20 turnos de un medico' do
+      turnos = turnero.turnos_medico(medico.matricula)
+      expect(turnos.size).to be <= 20
+    end
   end
 end
