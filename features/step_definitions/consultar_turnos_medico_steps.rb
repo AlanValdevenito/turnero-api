@@ -17,7 +17,7 @@ Dado('el médico con matrícula {string} tiene {int} turnos') do |matricula, can
 end
 
 Cuando('consulto los turnos del médico con matrícula {string}') do |matricula|
-  @response = Faraday.get("/turnos/#{matricula}")
+  @response = Faraday.get("/turnos/medicos/#{matricula}")
   @turnos = JSON.parse(@response.body)
 end
 

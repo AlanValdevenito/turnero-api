@@ -116,30 +116,38 @@ get '/turnos/:matricula/disponibilidad' do
   end
 end
 
-get '/turnos/:identificador' do
-  logger.debug("GET /turnos: #{params}")
+get '/turnos/pacientes/:email' do
+  logger.debug("GET /turnos/pacientes: #{params}")
   begin
-    identificador = params[:identificador]
+    email = params[:email]
     respuesta = []
-    if identificador.include?('@')
-      email = params[:identificador]
-      turnos = turnero.turnos_paciente(email)
-      turnos.map do |e|
-        respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
-                       especialidad: e.medico.especialidad.nombre }
-      end
-    else
-      matricula = params[:identificador]
-      turnos = turnero.turnos_medico(matricula)
-      turnos.map do |e|
-        respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, paciente_email: e.usuario.email }
-      end
+    turnos = turnero.turnos_paciente(email)
+    turnos.map do |e|
+      respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
+                     especialidad: e.medico.especialidad.nombre }
     end
     status 200
     json(respuesta)
-  rescue UsuarioNoEncontradoException
+  rescue StandardError
     status 404
     json({ error: "Paciente con email #{email} inexistente" })
+  end
+end
+
+get '/turnos/medicos/:matricula' do
+  logger.debug("GET /turnos/medicos: #{params}")
+  begin
+    respuesta = []
+    matricula = params[:matricula]
+    turnos = turnero.turnos_medico(matricula)
+    turnos.map do |e|
+      respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, paciente_email: e.usuario.email }
+    end
+    status 200
+    json(respuesta)
+  rescue StandardError
+    status 404
+    json({ error: "Medico con matricula #{matricula} inexistente" })
   end
 end
 

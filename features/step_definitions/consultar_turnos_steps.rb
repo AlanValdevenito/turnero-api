@@ -31,7 +31,7 @@ Dado('el paciente tiene {int} turnos') do |cantidad_turnos|
 end
 
 Cuando('pido ver turnos del paciente') do
-  @response = Faraday.get("/turnos/#{@email}")
+  @response = Faraday.get("/turnos/pacientes/#{@email}")
   @turnos = JSON.parse(@response.body)
   expect(@response.status).to eq(200)
 end
@@ -66,7 +66,7 @@ Dado('el paciente {string} no está registrado') do |email|
 end
 
 Cuando('pido ver turnos del paciente {string}') do |email|
-  @response = Faraday.get("/turnos/#{email}")
+  @response = Faraday.get("/turnos/pacientes/#{email}")
   @turnos = JSON.parse(@response.body)
 end
 
