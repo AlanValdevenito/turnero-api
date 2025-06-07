@@ -17,7 +17,7 @@ Característica: Consultar los turnos asignados a un médico por su matrícula
     Entonces deberia ver una lista con 1 turnos
     Y deberia ver el id del turno
     Y deberia ver el estado "Pendiente", email del paciente "juan@mail.com", fecha "2025-06-10" y hora "10:00"
-  @wip
+
   Escenario: US-30.3 Ver los turnos de un medico no dado de alta es invalido
    Dado el medico con matricula "XYZ999" no esta dado de alta 
    Cuando consulto los turnos del médico con matrícula "XYZ999"
