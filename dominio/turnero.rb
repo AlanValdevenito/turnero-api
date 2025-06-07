@@ -9,11 +9,12 @@ TURNOS_DISPONIBLES = 3
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 
 class Turnero
-  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos)
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia)
     @repositorio_usuarios = repositorio_usuarios
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @repositorio_turnos = repositorio_turnos
+    @proveedor_dia = proveedor_dia
   end
 
   def crear_usuario(email, telegram_id = nil)
@@ -112,7 +113,7 @@ class Turnero
     medico = buscar_medico_por_matricula(matricula)
     duracion_turno = medico.especialidad.duracion_de_turnos
 
-    fecha_inicio = Date.today
+    fecha_inicio = @proveedor_dia.hoy
     fecha_fin = fecha_inicio + 60
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)

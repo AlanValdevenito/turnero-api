@@ -1,9 +1,8 @@
 require 'integration_helper'
-require_relative '../../dominio/turnero'
-require_relative '../../dominio/medico'
+Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
 
 describe Turnero do
-  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos]) }
+  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia]) }
 
   let(:email) { 'test@email.com' }
 
@@ -21,6 +20,12 @@ describe Turnero do
                                                    buscar_por_medico: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
                                                                                  Usuario.new('Juan@mail.com'),
                                                                                  DateTime.parse('2025-06-05T10:00:00'))])
+    }
+  end
+
+  let(:proveedores) do
+    {
+      dia: instance_double('ProveedorDia', hoy: Date.today)
     }
   end
 
@@ -159,7 +164,7 @@ describe Turnero do
   it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
     repositorio_turnos_vacio = instance_double('RepositorioTurnos', buscar_por_medico: [])
     turnero_vacio = described_class.new(repositorios[:usuario], repositorios[:medico],
-                                        repositorios[:especialidad], repositorio_turnos_vacio)
+                                        repositorios[:especialidad], repositorio_turnos_vacio, proveedores[:dia])
 
     turnos = turnero_vacio.turnos_medico('ABC123')
     expect(turnos.size).to eq(0)
@@ -225,20 +230,18 @@ describe Turnero do
   end
 
   context 'when hay más de 20 turnos para un usuario' do
-    let(:usuario) { Usuario.new('pepe@mail.com') }
-    let(:turnos_mock) do
-      (1..30).map do |i|
-        Turno.new(
-          Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10)),
-          usuario,
-          DateTime.now + i
-        )
-      end
+    usuario = Usuario.new('pepe@mail.com')
+    turnos = (1..30).map do |i|
+      Turno.new(
+        Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10)),
+        usuario,
+        DateTime.now + i
+      )
     end
 
     before(:each) do
       allow(repositorios[:usuario]).to receive(:buscar_por_email).with(usuario.email).and_return(usuario)
-      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos_mock)
+      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
       allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('1').and_return(Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)))
       allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(usuario)
     end
@@ -257,7 +260,7 @@ describe Turnero do
     it 'devuelve los 20 turnos más próximos' do
       turnos = turnero.turnos_paciente(usuario.email)
       fechas = turnos.map(&:fecha_hora)
-      expect(fechas).to eq(turnos_mock.map(&:fecha_hora).sort.first(20))
+      expect(fechas).to eq(turnos.map(&:fecha_hora).sort.first(20))
     end
 
     it 'no deberia guardar turnos duplicados' do
@@ -270,20 +273,19 @@ describe Turnero do
   end
 
   context 'when hay más de 20 turnos para un medico' do
-    let(:medico) { Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10)) }
-    let(:turnos_mock) do
-      (1..30).reverse_each.map do |i|
-        Turno.new(
-          medico,
-          Usuario.new('usuario@prueba.com'),
-          DateTime.now + i
-        )
-      end
+    medico = Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10))
+
+    turnos = (1..30).reverse_each.map do |i|
+      Turno.new(
+        medico,
+        Usuario.new('usuario@prueba.com'),
+        DateTime.now + i
+      )
     end
 
     before(:each) do
       allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(medico.matricula).and_return(medico)
-      allow(repositorios[:turnos]).to receive(:buscar_por_medico).with(medico).and_return(turnos_mock)
+      allow(repositorios[:turnos]).to receive(:buscar_por_medico).with(medico).and_return(turnos)
     end
 
     it 'devuelve los turnos de medicos ordenados por fecha' do
