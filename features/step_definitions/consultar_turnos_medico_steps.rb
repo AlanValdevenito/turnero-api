@@ -58,3 +58,18 @@ end
 Entonces('el mensaje de error debe ser {string}') do |mensaje|
   expect(@response.body).to include(mensaje)
 end
+
+Dado('que el médico con matrícula {string} tiene {int} turnos') do |matricula, cant_turnos|
+  medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
+  paciente = RepositorioUsuarios.new.buscar_por_telegram_id(@telegram_id)
+  cant_turnos.downto(1) do |i|
+    minuto = (i + 1).to_s.rjust(2, '0')
+    fecha = DateTime.parse("2025-06-05T10:#{minuto}:00")
+    RepositorioTurnos.new.save(Turno.new(medico, paciente, fecha))
+  end
+end
+
+Entonces('en orden desde el más reciente al más antiguo') do
+  fechas = @turnos.map { |t| DateTime.parse("#{t['fecha']} #{t['hora']}") }
+  expect(fechas).to eq(fechas.sort)
+end
