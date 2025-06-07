@@ -128,7 +128,7 @@ get '/turnos/pacientes/:email' do
     end
     status 200
     json(respuesta)
-  rescue StandardError
+  rescue UsuarioNoEncontradoException
     status 404
     json({ error: "Paciente con email #{email} inexistente" })
   end
@@ -136,19 +136,14 @@ end
 
 get '/turnos/medicos/:matricula' do
   logger.debug("GET /turnos/medicos: #{params}")
-  begin
-    respuesta = []
-    matricula = params[:matricula]
-    turnos = turnero.turnos_medico(matricula)
-    turnos.map do |e|
-      respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, paciente_email: e.usuario.email }
-    end
-    status 200
-    json(respuesta)
-  rescue StandardError
-    status 404
-    json({ error: "Medico con matricula #{matricula} inexistente" })
+  respuesta = []
+  matricula = params[:matricula]
+  turnos = turnero.turnos_medico(matricula)
+  turnos.map do |e|
+    respuesta << { id: e.id, fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, paciente_email: e.usuario.email }
   end
+  status 200
+  json(respuesta)
 end
 
 post '/turnos' do

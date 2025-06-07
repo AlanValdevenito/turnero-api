@@ -218,6 +218,12 @@ describe Turnero do
     expect { turnero.turnos_paciente(email) }.to raise_error(UsuarioNoEncontradoException)
   end
 
+  it 'deberia devolver error al consultar turnos si el medico no existe' do
+    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('ABC123').and_return(nil)
+
+    expect { turnero.turnos_medico('ABC123') }.to raise_error(MedicoNoEncontradoException)
+  end
+
   context 'when hay más de 20 turnos para un usuario' do
     let(:usuario) { Usuario.new('pepe@mail.com') }
     let(:turnos_mock) do

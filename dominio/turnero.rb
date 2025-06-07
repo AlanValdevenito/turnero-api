@@ -53,6 +53,8 @@ class Turnero
 
   def turnos_medico(matricula)
     medico = @repositorio_medicos.buscar_por_matricula(matricula)
+    raise MedicoNoEncontradoException unless medico
+
     @repositorio_turnos.buscar_por_medico(medico)
   end
 
