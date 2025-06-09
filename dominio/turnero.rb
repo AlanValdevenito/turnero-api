@@ -9,13 +9,16 @@ TURNOS_DISPONIBLES = 3
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 
 class Turnero
-  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia)
+  # rubocop:disable Metrics/ParameterLists
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados)
     @repositorio_usuarios = repositorio_usuarios
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
+    @proveedor_feriados = proveedor_feriados
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def crear_usuario(email, telegram_id = nil)
     raise TelegramIdEnUsoException if telegram_id && @repositorio_usuarios.buscar_por_telegram_id(telegram_id)

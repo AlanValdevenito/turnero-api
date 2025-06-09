@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/json'
 require 'sequel'
 require 'sinatra/custom_logger'
+require 'dotenv/load'
 require_relative './config/configuration'
 require_relative './lib/version'
 Dir[File.join(__dir__, 'dominio', '*.rb')].each { |file| require file }
@@ -15,7 +16,7 @@ configure do
   set :logger, customer_logger
   set :default_content_type, :json
   set :environment, ENV['APP_MODE'].to_sym
-  set :turnero, Turnero.new(RepositorioUsuarios.new, RepositorioMedicos.new, RepositorioEspecialidades.new, RepositorioTurnos.new, ProveedorDia.new)
+  set :turnero, Turnero.new(RepositorioUsuarios.new, RepositorioMedicos.new, RepositorioEspecialidades.new, RepositorioTurnos.new, ProveedorDia.new, ProveedorFeriados.new)
   customer_logger.info('Iniciando turnero...')
 end
 

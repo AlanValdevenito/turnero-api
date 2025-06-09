@@ -2,7 +2,7 @@ require 'integration_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
 
 describe Turnero do
-  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia]) }
+  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados]) }
 
   let(:email) { 'test@email.com' }
 
@@ -25,7 +25,8 @@ describe Turnero do
 
   let(:proveedores) do
     {
-      dia: instance_double('ProveedorDia', hoy: Date.today)
+      dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16'),
+                                           feriados: instance_double('ProveedorFeriadosDummy'))
     }
   end
 
@@ -164,7 +165,7 @@ describe Turnero do
   it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
     repositorio_turnos_vacio = instance_double('RepositorioTurnos', buscar_por_medico: [])
     turnero_vacio = described_class.new(repositorios[:usuario], repositorios[:medico],
-                                        repositorios[:especialidad], repositorio_turnos_vacio, proveedores[:dia])
+                                        repositorios[:especialidad], repositorio_turnos_vacio, proveedores[:dia], proveedores[:feriados])
 
     turnos = turnero_vacio.turnos_medico('ABC123')
     expect(turnos.size).to eq(0)

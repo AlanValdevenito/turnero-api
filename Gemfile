@@ -11,6 +11,7 @@ gem 'thin'
 group :development, :test do
   gem 'cucumber'
   gem 'debug', '>= 1.0.0'
+  gem 'dotenv'
   gem 'faraday'
   gem 'racc'
   gem 'rack-test', require: 'rack/test'
@@ -20,4 +21,5 @@ group :development, :test do
   gem 'rubocop', '1.50.2', require: false
   gem 'rubocop-rspec', '2.22.0', require: false
   gem 'simplecov'
+  gem 'webmock'
 end
