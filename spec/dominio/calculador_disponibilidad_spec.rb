@@ -6,7 +6,7 @@ require_relative '../../dominio/calculador_disponibilidad'
 
 describe 'CalculadorDeDisponibilidad' do
   describe '.turnos_para_dia' do
-    let(:fecha) { Date.today + 1 }
+    let(:fecha) { Date.parse('2025-06-12') }
     let(:duracion) { 30 }
     let(:inicio_jornada) { DateTime.parse("#{fecha}T08:00:00") }
     let(:fecha_fin) { fecha + 3 }

@@ -25,7 +25,8 @@ class CalculadorDeDisponibilidad
 
     turnos = []
     while hora_actual <= ultimo_turno
-      turnos << DateTime.parse(hora_actual.strftime('%Y-%m-%d %H:%M:%S')) unless tiempos_ocupados.include?(hora_actual.to_i)
+      hora = @proveedor_hora.formatear(hora_actual)
+      turnos << @proveedor_hora.time_to_date_time(hora) unless tiempos_ocupados.include?(hora_actual.to_i)
       hora_actual += duracion * 60
     end
 
@@ -34,9 +35,7 @@ class CalculadorDeDisponibilidad
 
   def es_feriado?(fecha)
     feriados = ProveedorFeriados.new.feriados(fecha.year)
-    feriados.any? do |feriado|
-      feriado['dia'] == fecha.day && feriado['mes'] == fecha.month
-    end
+    feriados.any? { |feriado| feriado['dia'] == fecha.day && feriado['mes'] == fecha.month }
   end
 
   def dia_laboral?(fecha)
@@ -45,13 +44,13 @@ class CalculadorDeDisponibilidad
 
   def jornada_laboral(fecha)
     [
-      Time.local(fecha.year, fecha.month, fecha.day, 8, 0, 0),
-      Time.local(fecha.year, fecha.month, fecha.day, 18, 0, 0)
+      @proveedor_hora.construir_hora(fecha.year, fecha.month, fecha.day, 8, 0),
+      @proveedor_hora.construir_hora(fecha.year, fecha.month, fecha.day, 18, 0)
     ]
   end
 
   def hora_inicio(fecha, inicio_jornada, duracion)
-    if fecha == Date.today
+    if fecha == @proveedor_dia.hoy
       proximo_turno = calcular_proximo_turno(fecha, duracion)
       [proximo_turno, inicio_jornada].max
     else
@@ -60,10 +59,11 @@ class CalculadorDeDisponibilidad
   end
 
   def calcular_proximo_turno(fecha, duracion)
-    ahora = Time.now
+    ahora = @proveedor_hora.ahora
     minutos = proximo_minuto_turno(ahora.min, duracion)
     hora = proxima_hora_turno(ahora.hour, ahora.min, duracion)
-    Time.local(fecha.year, fecha.month, fecha.day, hora, minutos, 0)
+
+    @proveedor_hora.construir_hora(fecha.year, fecha.month, fecha.day, hora, minutos)
   end
 
   def proximo_minuto_turno(min_actual, duracion)

@@ -90,11 +90,13 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
   RepositorioMedicos.new.save(medico)
   usuario = Usuario.new('pepe@pepito.com', nil, 123_456_789)
   RepositorioUsuarios.new.save(usuario)
+  calculador = CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new)
+
+  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse('2025-06-17'))
 
   duracion = medico.especialidad.duracion_de_turnos
-  fecha_inicio = Date.today
+  fecha_inicio = Date.parse('2025-06-17')
   fecha_fin = fecha_inicio + 60
-  calculador = CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new)
 
   (fecha_inicio...fecha_fin).each do |fecha|
     next unless calculador.dia_laboral?(fecha)
