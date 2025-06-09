@@ -64,8 +64,9 @@ Dado('que el médico con matrícula {string} tiene {int} turnos') do |matricula,
   paciente = RepositorioUsuarios.new.buscar_por_telegram_id(@telegram_id)
   cant_turnos.downto(1) do |i|
     minuto = (i + 1).to_s.rjust(2, '0')
-    fecha = DateTime.parse("2025-06-05T10:#{minuto}:00")
-    RepositorioTurnos.new.save(Turno.new(medico, paciente, fecha))
+    fecha = DateTime.now.strftime('%Y-%m-%d')
+    hora = "#{DateTime.now.hour}:#{minuto}"
+    RepositorioTurnos.new.save(Turno.crear(medico, paciente, fecha, hora))
   end
 end
 

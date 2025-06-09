@@ -12,6 +12,10 @@ class Turno
     @estado = estado
   end
 
+  def self.crear(medico, usuario, fecha, hora)
+    new(medico, usuario, DateTime.parse("#{fecha} #{hora}"))
+  end
+
   def fecha
     fecha_hora.strftime('%Y-%m-%d')
   end

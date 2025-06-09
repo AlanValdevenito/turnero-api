@@ -76,8 +76,7 @@ class Turnero
       raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
     end
 
-    fecha_hora = DateTime.parse("#{fecha} #{hora}")
-    turno = Turno.new(medico, usuario, fecha_hora)
+    turno = Turno.crear(medico, usuario, fecha, hora)
     @repositorio_turnos.save(turno)
   end
 

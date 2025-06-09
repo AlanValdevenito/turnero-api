@@ -14,12 +14,12 @@ describe Turnero do
       especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
                                                                  buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
       turnos: instance_double('RepositorioTurnos', all: [],
-                                                   buscar_por_usuario: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
-                                                                                  Usuario.new('Juan@mail.com'),
-                                                                                  DateTime.parse('2025-06-05T10:00:00'))],
-                                                   buscar_por_medico: [Turno.new(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
-                                                                                 Usuario.new('Juan@mail.com'),
-                                                                                 DateTime.parse('2025-06-05T10:00:00'))])
+                                                   buscar_por_usuario: [Turno.crear(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
+                                                                                    Usuario.new('Juan@mail.com'),
+                                                                                    '2025-06-05', '10:00')],
+                                                   buscar_por_medico: [Turno.crear(Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10)),
+                                                                                   Usuario.new('Juan@mail.com'),
+                                                                                   '2025-06-05', '10:00')])
     }
   end
 
