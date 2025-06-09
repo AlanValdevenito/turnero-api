@@ -94,7 +94,7 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
   duracion = medico.especialidad.duracion_de_turnos
   fecha_inicio = Date.today
   fecha_fin = fecha_inicio + 60
-  calculador = CalculadorDeDisponibilidad
+  calculador = CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new)
 
   (fecha_inicio...fecha_fin).each do |fecha|
     next unless calculador.dia_laboral?(fecha)

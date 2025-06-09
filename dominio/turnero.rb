@@ -95,7 +95,6 @@ class Turnero
     @repositorio_usuarios.buscar_por_email(email)
   end
 
-  # tal vez no deba tener este metodo acoplado a telegram_id
   def buscar_usuario_por_telegram_id(telegram_id)
     @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
   end
@@ -120,7 +119,9 @@ class Turnero
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
 
-    CalculadorDeDisponibilidad.turnos_disponibles(
+    calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
+
+    calculador_disponibilidad.turnos_disponibles(
       duracion_turno,
       turnos_existentes,
       TURNOS_DISPONIBLES,
