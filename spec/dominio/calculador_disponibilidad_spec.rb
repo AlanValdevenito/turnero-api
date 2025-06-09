@@ -9,8 +9,14 @@ describe 'CalculadorDeDisponibilidad' do
     let(:inicio_jornada) { DateTime.parse("#{fecha}T08:00:00") }
     let(:fecha_fin) { fecha + 3 }
 
+    def stub_feriados_api
+      stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
+        .to_return(status: 200, body: '[{ "dia": 16, "mes": 6 }]', headers: {})
+    end
+
     it 'devuelve la cantidad exacta de turnos si hay suficientes' do
       cantidad = 3
+      stub_feriados_api
       turnos = CalculadorDeDisponibilidad.turnos_disponibles(duracion, [], cantidad, fecha, fecha_fin)
 
       expect(turnos.size).to eq(cantidad)
@@ -52,6 +58,14 @@ describe 'CalculadorDeDisponibilidad' do
       turnos = CalculadorDeDisponibilidad.turnos_para_dia(fecha, duracion, turnos_ocupados.map(&:to_time).map(&:to_i).to_set)
 
       expect(turnos.first).to eq(inicio_jornada)
+    end
+
+    it 'no devuelve turnos en feriados o no laborables' do
+      stub_feriados_api
+      feriado = Date.parse('2025-06-16')
+      cantidad = 3
+      turnos = CalculadorDeDisponibilidad.turnos_disponibles(duracion, [], cantidad, feriado, feriado + 1)
+      expect(turnos).to be_empty
     end
   end
 end

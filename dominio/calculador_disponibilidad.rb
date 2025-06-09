@@ -27,8 +27,15 @@ class CalculadorDeDisponibilidad
     turnos
   end
 
+  def self.es_feriado?(fecha)
+    feriados = ProveedorFeriados.new.feriados(fecha.year)
+    feriados.any? do |feriado|
+      feriado['dia'] == fecha.day && feriado['mes'] == fecha.month
+    end
+  end
+
   def self.dia_laboral?(fecha)
-    (1..5).include?(fecha.wday)
+    (1..5).include?(fecha.wday) && !es_feriado?(fecha)
   end
 
   def self.jornada_laboral(fecha)

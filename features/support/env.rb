@@ -5,6 +5,7 @@ require 'rspec/expectations'
 require 'rspec/mocks'
 require_relative '../../app.rb'
 require 'faraday'
+require 'webmock/cucumber'
 
 
 DB = Configuration.db
@@ -22,6 +23,13 @@ end
 
 Before do
   RSpec::Mocks.setup
+
+  stub_request(:get, %r{https://nolaborables\.com\.ar/api/v2/feriados/\d{4}})
+  .to_return(
+    status: 200,
+    body: '[{ "dia": 16, "mes": 6 }]',
+    headers: { 'Content-Type' => 'application/json' }
+  )
 end
 
 After do |_scenario|

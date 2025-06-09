@@ -42,6 +42,15 @@ describe Turnero do
     allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(nil) if telegram_id
   end
 
+  def stub_feriados_api
+    stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
+      .to_return(status: 200, body: '[{ "dia": 16, "mes": 6 }]', headers: {})
+  end
+
+  before(:each) do
+    stub_feriados_api
+  end
+
   it 'deberia crear un medico' do
     medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
     expect(medico.nombre).to eq('Michael')
