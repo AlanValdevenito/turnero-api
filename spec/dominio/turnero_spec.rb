@@ -25,8 +25,8 @@ describe Turnero do
 
   let(:proveedores) do
     {
-      dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16'),
-                                           feriados: instance_double('ProveedorFeriadosDummy'))
+      dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16')),
+      feriados: instance_double('ProveedorFeriadosDummy')
     }
   end
 
