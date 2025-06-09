@@ -2,6 +2,7 @@ require_relative '../dominio/excepciones/excepciones_registracion'
 require_relative '../dominio/excepciones/medico_no_encontrado_exception'
 require_relative '../dominio/excepciones/usuario_no_encontrado_exception'
 require_relative '../dominio/excepciones/turno_ya_existe_exception'
+require_relative '../dominio/excepciones/fecha_no_valida_exception'
 require_relative '../dominio/calculador_disponibilidad'
 
 MEDICOS_DISPONIBLES = 7
@@ -17,6 +18,7 @@ class Turnero
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
     @proveedor_feriados = proveedor_feriados
+    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
   end
   # rubocop:enable Metrics/ParameterLists
 
@@ -66,6 +68,8 @@ class Turnero
   def crear_turno(matricula, fecha, hora, telegram_id)
     medico = buscar_medico_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico
+
+    raise FechaNoValidaException unless es_fecha_valida?(fecha)
 
     usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
     raise UsuarioNoEncontradoException unless usuario
@@ -119,14 +123,19 @@ class Turnero
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
 
-    calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
-
-    calculador_disponibilidad.turnos_disponibles(
+    @calculador_disponibilidad.turnos_disponibles(
       duracion_turno,
       turnos_existentes,
       TURNOS_DISPONIBLES,
       fecha_inicio,
       fecha_fin
     )
+  end
+
+  def es_fecha_valida?(fecha)
+    fecha = DateTime.parse(fecha)
+    raise FechaNoValidaException if @calculador_disponibilidad.dia_laboral?(fecha) == false
+
+    true
   end
 end

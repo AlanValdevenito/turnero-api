@@ -157,23 +157,18 @@ end
 post '/turnos' do
   logger.debug("POST /turnos: #{@params}")
   begin
-    turno = turnero.crear_turno(@params[:matricula], @params[:fecha], @params[:hora], @params[:telegram_id])
+    turno = crear_turno_desde_params(@params)
     status 201
-    json({
-           message: 'El turno se reservó exitosamente',
-           id: turno.id,
-           fecha: turno.fecha,
-           hora: turno.hora,
-           medico: {
-             nombre: turno.medico.nombre,
-             apellido: turno.medico.apellido,
-             matricula: turno.medico.matricula,
-             especialidad: turno.medico.especialidad.nombre
-           }
-         })
+    json(turno_a_json(turno))
+  rescue UsuarioNoEncontradoException
+    status 404
+    json({ error: 'Usuario no encontrado' })
   rescue MedicoNoEncontradoException
     status 404
     json({ error: 'Médico no encontrado' })
+  rescue FechaNoValidaException
+    status 400
+    json({ error: 'Fecha inválida para agendar un turno' })
   rescue TurnoYaExisteException
     status 400
     json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
@@ -231,4 +226,25 @@ post '/usuarios' do
     status 400
     json({ error: 'El email es obligatorio' })
   end
+end
+
+private
+
+def crear_turno_desde_params(params)
+  turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
+end
+
+def turno_a_json(turno)
+  {
+    message: 'El turno se reservó exitosamente',
+    id: turno.id,
+    fecha: turno.fecha,
+    hora: turno.hora,
+    medico: {
+      nombre: turno.medico.nombre,
+      apellido: turno.medico.apellido,
+      matricula: turno.medico.matricula,
+      especialidad: turno.medico.especialidad.nombre
+    }
+  }
 end

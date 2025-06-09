@@ -1,0 +1,2 @@
+class FechaNoValidaException < StandardError
+end
