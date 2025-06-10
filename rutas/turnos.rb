@@ -53,20 +53,20 @@ end
 
 get '/turnos/pacientes/telegram/:telegram_id/proximos' do
   logger.debug("GET /turnos/pacientes/telegram/:telegram_id/proximos: #{params}")
-  begin
-    telegram_id = params[:telegram_id]
-    respuesta = []
-    turnos = turnero.turnos_paciente_por_telegram(telegram_id)
-    turnos.map do |e|
-      respuesta << { fecha: e.fecha_hora.strftime('%Y-%m-%d'), hora: e.fecha_hora.strftime('%H:%M'), estado: e.estado, medico: "#{e.medico.nombre} #{e.medico.apellido}",
-                     especialidad: e.medico.especialidad.nombre }
-    end
-    status 200
-    json(respuesta)
-  rescue UsuarioNoEncontradoException
-    status 404
-    json({ error: "Paciente con telegram_id #{telegram_id} inexistente" })
+  telegram_id = params[:telegram_id]
+  respuesta = []
+  turnos = turnero.proximos_turnos_paciente(telegram_id)
+  turnos.map do |e|
+    respuesta << {
+      id: e.id,
+      'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
+      especialidad: e.medico.especialidad.nombre,
+      medico: "#{e.medico.nombre} #{e.medico.apellido}",
+      estado: e.estado
+    }
   end
+  status 200
+  json(respuesta)
 end
 
 get '/turnos/medicos/:matricula' do
