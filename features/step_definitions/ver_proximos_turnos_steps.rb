@@ -36,18 +36,17 @@ end
 
 Dado('el paciente tiene {int} turno con estado {string} con el médico {string} matricula {string} de la especialidad {string}') do |cantidad, estado, medico_nombre, matricula, especialidad|
   raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+  # TODO: POR AHORA NO SE PUEDE CAMBIAR EL ESTADO DEL TURNO, SE DEBE CREAR CON EL ESTADO QUE SE QUIERA
+  # O PODER CAMBIARLO DESDE LA API -> POR ESO USO REPOSITORIOS
+  usuario = RepositorioUsuarios.new.buscar_por_telegram_id(@paciente_telegram_id)
+  medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
+  repo_turnos = RepositorioTurnos.new
 
   cantidad.times do
-    turno_hash = {
-      matricula: matricula,
-      fecha: (@fecha_actual + 1).to_s,
-      hora: '10:00',
-      telegram_id: @paciente_telegram_id
-    }
-    Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+    fecha_hora = DateTime.parse((@fecha_actual + 1).to_s + 'T10:00:00')
+    turno = Turno.new(medico, usuario, fecha_hora, estado)
+    repo_turnos.save(turno)
   end
-
-  # necesito cambiar el estado del turno a lo que se pide
 end
 
 Cuando('solicito los proximos turnos del paciente') do
