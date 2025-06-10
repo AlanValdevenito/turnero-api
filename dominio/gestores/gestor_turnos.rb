@@ -110,14 +110,20 @@ class GestorTurnos
   def fecha_y_hora_actual
     hoy = @proveedor_dia.hoy
     ahora = @proveedor_hora.ahora
-    DateTime.parse("#{hoy} #{ahora.strftime('%H:%M:%S')}")
-  end
-
-  def validar_turno_futuro(turno, ahora)
-    raise EstadoInvalidoException if turno.fecha_hora > ahora
+    DateTime.parse("#{hoy} #{ahora}")
   end
 
   def validar_turno_pasado(turno, ahora)
-    raise EstadoInvalidoException if turno.fecha_hora < ahora
+    fecha_turno = turno.fecha_hora.to_time
+    fecha_ahora = ahora.to_time
+
+    raise EstadoInvalidoException if fecha_turno < fecha_ahora
+  end
+
+  def validar_turno_futuro(turno, ahora)
+    fecha_turno = turno.fecha_hora.to_time
+    fecha_ahora = ahora.to_time
+
+    raise EstadoInvalidoException if fecha_turno > fecha_ahora
   end
 end
