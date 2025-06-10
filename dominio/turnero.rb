@@ -11,15 +11,15 @@ MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 
 class Turnero
   # rubocop:disable Metrics/ParameterLists
-  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados)
-    @repositorio_usuarios = repositorio_usuarios
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
+    @proveedor_hora = proveedor_hora
     @proveedor_feriados = proveedor_feriados
-    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
-    @registro_usuario = RegistroUsuario.new(@repositorio_usuarios)
+    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora)
+    @registro_usuario = RegistroUsuario.new(repositorio_usuarios)
   end
   # rubocop:enable Metrics/ParameterLists
 
@@ -48,7 +48,7 @@ class Turnero
   end
 
   def turnos_paciente(email)
-    usuario = @repositorio_usuarios.buscar_por_email(email)
+    usuario = @registro_usuario.buscar_usuario_por_email(email)
     raise UsuarioNoEncontradoException unless usuario
 
     @repositorio_turnos
@@ -70,7 +70,7 @@ class Turnero
 
     raise FechaNoValidaException unless es_fecha_valida?(fecha)
 
-    usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    usuario = @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
     raise UsuarioNoEncontradoException unless usuario
 
     turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
@@ -131,11 +131,13 @@ class Turnero
   end
 
   def proximos_turnos_paciente(telegram_id)
-    usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    usuario = @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
+
+    ahora = @proveedor_hora.ahora
 
     @repositorio_turnos
       .buscar_por_usuario(usuario)
-      .select { |turno| turno.fecha_hora >= @proveedor_dia.hoy }
+      .select { |turno| turno.fecha_hora >= ahora }
       .sort_by(&:fecha_hora)
       .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end

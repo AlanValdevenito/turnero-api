@@ -2,7 +2,9 @@ require 'integration_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
 
 describe Turnero do
-  subject(:turnero) { described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados]) }
+  subject(:turnero) do
+    described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados], proveedores[:hora])
+  end
 
   let(:email) { 'test@email.com' }
 
@@ -26,7 +28,12 @@ describe Turnero do
   let(:proveedores) do
     {
       dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16')),
-      feriados: instance_double('ProveedorFeriadosDummy')
+      feriados: instance_double('ProveedorFeriadosDummy'),
+      hora: instance_double(
+        'ProveedorHora',
+        ahora: Time.new(2025, 6, 16, 10, 0, 0),
+        construir_hora: Time.new(2025, 6, 16, 10, 0, 0)
+      )
     }
   end
 
@@ -128,7 +135,7 @@ describe Turnero do
   it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
     repositorio_turnos_vacio = instance_double('RepositorioTurnos', buscar_por_medico: [])
     turnero_vacio = described_class.new(repositorios[:usuario], repositorios[:medico],
-                                        repositorios[:especialidad], repositorio_turnos_vacio, proveedores[:dia], proveedores[:feriados])
+                                        repositorios[:especialidad], repositorio_turnos_vacio, proveedores[:dia], proveedores[:feriados], proveedores[:hora])
 
     turnos = turnero_vacio.turnos_medico('ABC123')
     expect(turnos.size).to eq(0)
@@ -264,28 +271,28 @@ describe Turnero do
     end
   end
 
-  describe '#proximos_turnos_paciente' do
-    let(:hoy) { DateTime.parse('2025-06-16') }
+  describe '#proximos_turnos_paciente con horas' do
+    let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
 
     before(:each) do
       especialidad = instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10)
       medico = instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad:)
       usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: '123456789')
       turnos = [
-        instance_double('Turno', medico:, usuario:, fecha_hora: hoy - 1, estado: 'Pendiente', id: 1),
-        instance_double('Turno', medico:, usuario:, fecha_hora: hoy,     estado: 'Pendiente', id: 2),
-        instance_double('Turno', medico:, usuario:, fecha_hora: hoy + 1, estado: 'Pendiente', id: 3)
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T14:00:00'), estado: 'Pendiente', id: 1),
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 2),
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Pendiente', id: 3)
       ]
 
       allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with('123456789').and_return(usuario)
       allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
-      allow(proveedores[:dia]).to receive(:hoy).and_return(hoy)
+      allow(turnero.instance_variable_get(:@proveedor_hora)).to receive(:ahora).and_return(ahora)
     end
 
-    it 'devuelve solo los turnos desde hoy en adelante, ordenados por fecha, máximo 20' do
+    it 'devuelve solo los turnos desde la hora actual en adelante, ordenados por fecha y hora' do
       result = turnero.proximos_turnos_paciente('123456789')
       expect(result.size).to eq(2)
-      expect(result.map(&:fecha_hora)).to eq([hoy, hoy + 1])
+      expect(result.map(&:fecha_hora)).to eq([DateTime.parse('2025-06-16T15:00:00'), DateTime.parse('2025-06-16T16:00:00')])
       expect(result.map(&:id)).to eq([2, 3])
     end
   end
