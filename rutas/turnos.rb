@@ -107,21 +107,23 @@ post '/turnos' do
   end
 end
 
-def crear_turno_desde_params(params)
-  turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
-end
+helpers do
+  def crear_turno_desde_params(params)
+    turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
+  end
 
-def turno_a_json(turno)
-  {
-    message: 'El turno se reservó exitosamente',
-    id: turno.id,
-    fecha: turno.fecha,
-    hora: turno.hora,
-    medico: {
-      nombre: turno.medico.nombre,
-      apellido: turno.medico.apellido,
-      matricula: turno.medico.matricula,
-      especialidad: turno.medico.especialidad.nombre
+  def turno_a_json(turno)
+    {
+      message: 'El turno se reservó exitosamente',
+      id: turno.id,
+      fecha: turno.fecha,
+      hora: turno.hora,
+      medico: {
+        nombre: turno.medico.nombre,
+        apellido: turno.medico.apellido,
+        matricula: turno.medico.matricula,
+        especialidad: turno.medico.especialidad.nombre
+      }
     }
-  }
+  end
 end
