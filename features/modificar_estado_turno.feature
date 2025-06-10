@@ -8,13 +8,12 @@ Antecedentes:
   Y el médico "Juan Perez" de la especialidad "Traumatologia" con matricula "ABC123" dado de alta
   Y el médico "Nicolas Sanchez" de la especialidad "Dermatologia" con matricula "DEF456" dado de alta
 
-@wip
 Escenario: US-26.1 Marcar como cancelado un turno que aún no pasó
 Dado hay un turno en el futuro
 Y tiene estado "Pendiente"
 Y el hospital intenta pasar a "Cancelado" el turno
 Entonces el turno queda con estado "Cancelado"
-Y recibo un mensaje "Turno actualizado: estado cancelado"
+Y recibo un mensaje "Turno actualizado: estado Cancelado"
 
 @wip
 Escenario: US-26.2 Marcar como ausente un turno que ya pasó
@@ -22,7 +21,7 @@ Dado hay un turno ya pasado
 Y tiene estado "Pendiente"
 Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Ausente"
-Y recibo un mensaje "Turno actualizado: estado ausente"
+Y recibo un mensaje "Turno actualizado: estado Ausente"
 
 @wip
 Escenario: US-26.3 Marcar como asistido un turno que ya pasó
@@ -30,7 +29,7 @@ Dado hay un turno ya pasado
 Y tiene estado "Pendiente"
 Y el hospital intenta pasar a "Asistido" el turno
 Entonces el turno queda con estado "Asistido"
-Y recibo un mensaje "Turno actualizado: estado asistido"
+Y recibo un mensaje "Turno actualizado: estado Asistido"
 
 @wip
 Escenario: US-26.4 - Marcar como cancelado un turno que ya pasó es invalido
