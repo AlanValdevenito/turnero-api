@@ -1,3 +1,6 @@
+require_relative '../dominio/excepciones/turno_no_encontrado_exception'
+require_relative '../dominio/excepciones/estado_invalido_exception'
+
 get '/turnos/medicos-disponibles' do
   logger.debug('GET /turnos/medicos-disponibles')
   medicos = turnero.medicos_disponibles
@@ -108,6 +111,23 @@ post '/turnos' do
   rescue TurnoYaExisteException
     status 400
     json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
+  end
+end
+
+put '/turnos/:id' do
+  logger.debug("PUT /turnos/:id: #{@params}")
+  begin
+    id = params['id']
+    estado = @params[:estado]
+    turno = turnero.modificar_estado_turno(id, estado)
+    status 200
+    json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  rescue TurnoNoEncontradoException
+    status 404
+    json({ error: 'Turno no encontrado' })
+  rescue EstadoInvalidoException
+    status 400
+    json({ error: 'Estado inválido para el turno' })
   end
 end
 
