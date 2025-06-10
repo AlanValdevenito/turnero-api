@@ -263,4 +263,30 @@ describe Turnero do
       expect(turnos.size).to be <= 20
     end
   end
+
+  describe '#proximos_turnos_paciente' do
+    let(:hoy) { DateTime.parse('2025-06-16') }
+
+    before(:each) do
+      especialidad = instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10)
+      medico = instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad:)
+      usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: '123456789')
+      turnos = [
+        instance_double('Turno', medico:, usuario:, fecha_hora: hoy - 1, estado: 'Pendiente', id: 1),
+        instance_double('Turno', medico:, usuario:, fecha_hora: hoy,     estado: 'Pendiente', id: 2),
+        instance_double('Turno', medico:, usuario:, fecha_hora: hoy + 1, estado: 'Pendiente', id: 3)
+      ]
+
+      allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with('123456789').and_return(usuario)
+      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
+      allow(proveedores[:dia]).to receive(:hoy).and_return(hoy)
+    end
+
+    it 'devuelve solo los turnos desde hoy en adelante, ordenados por fecha, máximo 20' do
+      result = turnero.proximos_turnos_paciente('123456789')
+      expect(result.size).to eq(2)
+      expect(result.map(&:fecha_hora)).to eq([hoy, hoy + 1])
+      expect(result.map(&:id)).to eq([2, 3])
+    end
+  end
 end

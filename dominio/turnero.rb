@@ -129,4 +129,14 @@ class Turnero
 
     true
   end
+
+  def proximos_turnos_paciente(telegram_id)
+    usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+
+    @repositorio_turnos
+      .buscar_por_usuario(usuario)
+      .select { |turno| turno.fecha_hora >= @proveedor_dia.hoy }
+      .sort_by(&:fecha_hora)
+      .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+  end
 end
