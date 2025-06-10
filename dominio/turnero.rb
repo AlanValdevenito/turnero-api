@@ -17,8 +17,7 @@ class Turnero
     @repositorio_especialidades = repositorio_especialidades
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
-    @proveedor_feriados = proveedor_feriados
-    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
+    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new, proveedor_feriados)
     @registro_usuario = RegistroUsuario.new(@repositorio_usuarios)
   end
   # rubocop:enable Metrics/ParameterLists

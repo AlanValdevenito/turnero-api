@@ -26,7 +26,7 @@ describe Turnero do
   let(:proveedores) do
     {
       dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16')),
-      feriados: instance_double('ProveedorFeriadosDummy')
+      feriados: instance_double('ProveedorFeriadosDummy', feriados: [{ "dia": 16, "mes": 6 }])
     }
   end
 
@@ -34,15 +34,6 @@ describe Turnero do
 
   def stub_turnos_existentes(turnos)
     allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
-  end
-
-  def stub_feriados_api
-    stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
-      .to_return(status: 200, body: '[{ "dia": 16, "mes": 6 }]', headers: {})
-  end
-
-  before(:each) do
-    stub_feriados_api
   end
 
   it 'deberia crear un medico' do
