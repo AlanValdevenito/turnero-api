@@ -55,18 +55,23 @@ get '/turnos/pacientes/telegram/:telegram_id/proximos' do
   logger.debug("GET /turnos/pacientes/telegram/:telegram_id/proximos: #{params}")
   telegram_id = params[:telegram_id]
   respuesta = []
-  turnos = turnero.proximos_turnos_paciente(telegram_id)
-  turnos.map do |e|
-    respuesta << {
-      id: e.id,
-      'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
-      especialidad: e.medico.especialidad.nombre,
-      medico: "#{e.medico.nombre} #{e.medico.apellido}",
-      estado: e.estado
-    }
+  begin
+    turnos = turnero.proximos_turnos_paciente(telegram_id)
+    turnos.map do |e|
+      respuesta << {
+        id: e.id,
+        'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
+        especialidad: e.medico.especialidad.nombre,
+        medico: "#{e.medico.nombre} #{e.medico.apellido}",
+        estado: e.estado
+      }
+    end
+    status 200
+    json(respuesta)
+  rescue NoHayProximosTurnosException
+    status 400
+    json({ mensaje: 'El paciente no tiene próximos turnos' })
   end
-  status 200
-  json(respuesta)
 end
 
 get '/turnos/medicos/:matricula' do
