@@ -1,5 +1,6 @@
 require 'spec_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
+Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| require file }
 
 describe GestorTurnos do
   let(:contexto) do
@@ -288,6 +289,12 @@ describe GestorTurnos do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 1, 1, 9, 0, 0))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(EstadoInvalidoException)
+    end
+  end
+
+  describe 'Historial de turnos' do
+    it 'deberia lanzar excepcion NoHayHistorialTurnosException si el paciente nunca reservo turnos' do
+      expect { contexto[:gestor_turnos].historial_turnos_paciente(123_456_789) }.to raise_error(NoHayHistorialTurnosException)
     end
   end
 end
