@@ -22,7 +22,6 @@ Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Ausente"
 Y recibo un mensaje "Turno actualizado: estado Ausente"
 
-@wip
 Escenario: US-26.3 Marcar como asistido un turno que ya pasó
 Dado hay un turno ya pasado
 Y tiene estado "Pendiente"
