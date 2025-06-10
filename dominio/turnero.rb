@@ -97,6 +97,11 @@ class Turnero
     @gestor_turnos.proximos_turnos_paciente(usuario)
   end
 
+  def historial_turnos_paciente(telegram_id)
+    usuario = buscar_usuario_por_telegram_id(telegram_id)
+    @gestor_turnos.historial_turnos_paciente(usuario)
+  end
+
   def modificar_estado_turno(turno_id, nuevo_estado)
     @gestor_turnos.modificar_estado_turno(turno_id, nuevo_estado)
   end
