@@ -1,3 +1,9 @@
+MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
+ESTADO_PENDIENTE = 'Pendiente'.freeze
+ESTADO_AUSENTE = 'Ausente'.freeze
+ESTADO_CANCELADO = 'Cancelado'.freeze
+ESTADO_ASISTIDO = 'Asistido'.freeze
+
 class GestorTurnos
   def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
     @repositorio_turnos = repositorio_turnos
@@ -61,5 +67,57 @@ class GestorTurnos
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
 
     turnos
+  end
+
+  def buscar_turno_por_id(turno_id)
+    turno = @repositorio_turnos.buscar_por_id(turno_id)
+    raise TurnoNoEncontradoException unless turno
+
+    turno
+  end
+
+  def modificar_estado_turno(turno_id, nuevo_estado)
+    turno = buscar_turno_por_id(turno_id)
+
+    validar_estado_actual(turno)
+
+    ahora = fecha_y_hora_actual
+
+    case nuevo_estado
+    when ESTADO_CANCELADO
+      validar_turno_pasado(turno, ahora)
+      turno.estado = ESTADO_CANCELADO
+    when ESTADO_ASISTIDO
+      validar_turno_futuro(turno, ahora)
+      turno.estado = ESTADO_ASISTIDO
+    when ESTADO_AUSENTE
+      validar_turno_futuro(turno, ahora)
+      turno.estado = ESTADO_AUSENTE
+    else
+      raise EstadoInvalidoException
+    end
+
+    @repositorio_turnos.save(turno)
+    turno
+  end
+
+  private
+
+  def validar_estado_actual(turno)
+    raise EstadoInvalidoException unless turno.estado == ESTADO_PENDIENTE
+  end
+
+  def fecha_y_hora_actual
+    hoy = @proveedor_dia.hoy
+    ahora = @proveedor_hora.ahora
+    DateTime.parse("#{hoy} #{ahora.strftime('%H:%M:%S')}")
+  end
+
+  def validar_turno_futuro(turno, ahora)
+    raise EstadoInvalidoException if turno.fecha_hora > ahora
+  end
+
+  def validar_turno_pasado(turno, ahora)
+    raise EstadoInvalidoException if turno.fecha_hora < ahora
   end
 end
