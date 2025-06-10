@@ -24,6 +24,20 @@ Dado('el hospital intenta pasar a {string} el turno') do |estado|
   expect(@response.status).to eq(200)
 end
 
+Dado('hay un turno ya pasado') do
+  turno = {
+    matricula: 'ABC123',
+    fecha: '2025-03-03',
+    hora: '12:00',
+    telegram_id: @paciente_telegram_id
+  }
+  response = Faraday.post('/turnos', turno.to_json, { 'Content-Type' => 'application/json' })
+  json = JSON.parse(response.body)
+  puts json
+  expect(response.status).to eq(201)
+  @turno_id = json['id']
+end
+
 Entonces('el turno queda con estado {string}') do |estado|
   response = Faraday.get("/turnos/pacientes/#{@paciente_email}")
   expect(response.body).to include(estado)
