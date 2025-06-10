@@ -18,13 +18,14 @@ Dado('tiene estado {string}') do |estado|
 end
 
 Dado('el hospital intenta pasar a {string} el turno') do |estado|
-  @params = { estado: }
-  @response = Faraday.put("/turnos/#{@turno_id}", @params.to_json, { 'Content-Type' => 'application/json' })
+  params = { estado: }
+  @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+
   expect(@response.status).to eq(200)
 end
 
 Entonces('el turno queda con estado {string}') do |estado|
-  @response = Faraday.get("/turnos/pacientes/#{@paciente_email}")
+  response = Faraday.get("/turnos/pacientes/#{@paciente_email}")
   expect(response.body).to include(estado)
 end
 
