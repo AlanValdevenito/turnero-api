@@ -1,5 +1,6 @@
 require 'integration_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
+require_relative '../../dominio/excepciones/estado_invalido_exception'
 
 describe Turnero do
   subject(:turnero) do
@@ -326,10 +327,64 @@ describe Turnero do
       allow(turnero.instance_variable_get(:@proveedor_hora)).to receive(:ahora).and_return(ahora)
     end
 
-    it 'lanza NoHayProximosTurnosException si no hay próximos turnos' do
+    it 'tira NoHayProximosTurnosException si no hay próximos turnos' do
       expect do
         turnero.proximos_turnos_paciente('123456789')
       end.to raise_error(NoHayProximosTurnosException)
+    end
+  end
+
+  describe 'Editar estado turno' do
+    let(:turnos) do
+      {
+        futuro: instance_double(
+          'Turno',
+          id: 2,
+          estado: ESTADO_PENDIENTE,
+          fecha_hora: DateTime.parse('2025-11-01T10:00:00')
+        ),
+        pasado: instance_double(
+          'Turno',
+          id: 3,
+          estado: ESTADO_PENDIENTE,
+          fecha_hora: DateTime.parse('2025-01-01T10:00:00')
+        )
+      }
+    end
+
+    before(:each) do
+      allow(turnos[:futuro]).to receive(:estado=)
+      allow(turnos[:pasado]).to receive(:estado=)
+      allow(repositorios[:turnos]).to receive(:save).with(turnos[:futuro]).and_return(turnos[:futuro])
+      allow(repositorios[:turnos]).to receive(:save).with(turnos[:pasado]).and_return(turnos[:pasado])
+    end
+
+    it 'permite cancelar un turno futuro' do
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
+      allow(proveedores[:hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      expect(turnos[:futuro]).to receive(:estado=).with(ESTADO_CANCELADO)
+      result = turnero.modificar_estado_turno(2, ESTADO_CANCELADO)
+      expect(result).to eq(turnos[:futuro])
+    end
+
+    it 'no permite cancelar un turno pasado' do
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
+      allow(proveedores[:hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      expect { turnero.modificar_estado_turno(3, ESTADO_CANCELADO) }.to raise_error(EstadoInvalidoException)
+    end
+
+    it 'permite marcar como asistido un turno pasado' do
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
+      allow(proveedores[:hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      expect(turnos[:pasado]).to receive(:estado=).with(ESTADO_ASISTIDO)
+      result = turnero.modificar_estado_turno(3, ESTADO_ASISTIDO)
+      expect(result).to eq(turnos[:pasado])
+    end
+
+    it 'no permite marcar como asistido un turno futuro' do
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
+      allow(proveedores[:hora]).to receive(:ahora).and_return(Time.new(2025, 1, 1, 9, 0, 0))
+      expect { turnero.modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(EstadoInvalidoException)
     end
   end
 end

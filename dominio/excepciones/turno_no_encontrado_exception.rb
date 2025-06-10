@@ -1,0 +1,2 @@
+class TurnoNoEncontradoException < StandardError
+end

@@ -1,0 +1,2 @@
+class EstadoInvalidoException < StandardError
+end

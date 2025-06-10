@@ -10,8 +10,12 @@ require_relative '../dominio/gestores/gestor_usuarios'
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
+ESTADO_PENDIENTE = 'Pendiente'.freeze
+ESTADO_AUSENTE = 'Ausente'.freeze
+ESTADO_CANCELADO = 'Cancelado'.freeze
+ESTADO_ASISTIDO = 'Asistido'.freeze
 
-class Turnero
+class Turnero # rubocop:disable Metrics/ClassLength
   # rubocop:disable Metrics/ParameterLists
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
     @repositorio_medicos = repositorio_medicos
@@ -142,5 +146,51 @@ class Turnero
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
 
     turnos
+  end
+
+  def modificar_estado_turno(id, nuevo_estado)
+    turno = @repositorio_turnos.buscar_por_id(id)
+    raise TurnoNoEncontradoException unless turno
+
+    validar_estado_actual(turno)
+
+    ahora = fecha_y_hora_actual
+
+    case nuevo_estado
+    when ESTADO_CANCELADO
+      validar_turno_pasado(turno, ahora)
+
+      turno.estado = ESTADO_CANCELADO
+    when ESTADO_ASISTIDO
+      validar_turno_futuro(turno, ahora)
+      turno.estado = ESTADO_ASISTIDO
+    when ESTADO_AUSENT
+      validar_turno_futuro(turno, ahora)
+
+      turno.estado = ESTADO_AUSENTE
+    else
+      raise EstadoInvalidoException
+    end
+
+    @repositorio_turnos.save(turno)
+    turno
+  end
+
+  def validar_estado_actual(turno)
+    raise EstadoInvalidoException unless turno.estado == ESTADO_PENDIENTE
+  end
+
+  def fecha_y_hora_actual
+    hoy = @proveedor_dia.hoy
+    ahora = @proveedor_hora.ahora
+    DateTime.parse("#{hoy} #{ahora.strftime('%H:%M:%S')}")
+  end
+
+  def validar_turno_futuro(turno, ahora)
+    raise EstadoInvalidoException if turno.fecha_hora > ahora
+  end
+
+  def validar_turno_pasado(turno, ahora)
+    raise EstadoInvalidoException if turno.fecha_hora < ahora
   end
 end
