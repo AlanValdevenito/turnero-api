@@ -43,13 +43,12 @@ Y el hospital intenta pasar a "Asistido" el turno
 Entonces el turno queda con estado "Pendiente"
 Y recibo un mensaje "No se puede marcar como Asistido un turno futuro"
 
-@wip
-Escenario: US-26.6 Marcar como ausente un turno que aún no paso es invalido
+Escenario: US-26.6 Marcar como Ausente un turno que aún no paso es invalido
 Dado hay un turno en el futuro
 Y tiene estado "Pendiente"
 Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Pendiente"
-Y recibo un mensaje "no se puede marcar como ausente un turno en el futuro"
+Y recibo un mensaje "No se puede marcar como Ausente un turno futuro"
 
 @wip
 Escenario: US-26.7 Intentar cambiar el estado de un turno con estado cancelado es invalido
