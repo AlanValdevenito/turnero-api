@@ -73,6 +73,31 @@ get '/turnos/pacientes/telegram/:telegram_id/proximos' do
   end
 end
 
+get '/turnos/pacientes/historial/:telegram_id' do
+  logger.debug("GET /turnos/pacientes/historial/:telegram_id: #{params}")
+  telegram_id = params[:telegram_id]
+  respuesta = []
+
+  begin
+    turnos = turnero.historial_turnos_paciente(telegram_id)
+    turnos.map do |e|
+      respuesta << {
+        'id': e.id,
+        'fecha y hora': "#{e.fecha} #{e.hora}",
+        'especialidad': e.medico.especialidad.nombre,
+        'medico': "#{e.medico.nombre} #{e.medico.apellido}",
+        'estado': e.estado
+      }
+    end
+
+    status 200
+    json(respuesta)
+  rescue NoHayHistorialTurnosException
+    status 400
+    json({ mensaje: 'El paciente no tiene turnos en su historial' })
+  end
+end
+
 get '/turnos/medicos/:matricula' do
   logger.debug("GET /turnos/medicos/:matricula: #{params}")
   begin

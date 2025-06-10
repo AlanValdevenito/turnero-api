@@ -69,6 +69,14 @@ class GestorTurnos
     turnos
   end
 
+  def historial_turnos_paciente(_usuario)
+    turnos = []
+
+    raise NoHayHistorialTurnosException if turnos.empty?
+
+    turnos
+  end
+
   def buscar_turno_por_id(turno_id)
     turno = @repositorio_turnos.buscar_por_id(turno_id)
     raise TurnoNoEncontradoException unless turno
