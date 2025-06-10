@@ -1,4 +1,5 @@
 require_relative '../excepciones/turno_pasado_exception'
+require_relative '../excepciones/turno_futuro_exception'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 ESTADO_PENDIENTE = 'Pendiente'.freeze
@@ -134,6 +135,6 @@ class GestorTurnos
     fecha_turno = turno.fecha_hora.to_time
     fecha_ahora = ahora.to_time
 
-    raise EstadoInvalidoException if fecha_turno > fecha_ahora
+    raise TurnoFuturoException if fecha_turno > fecha_ahora
   end
 end

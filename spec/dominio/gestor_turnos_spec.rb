@@ -288,7 +288,7 @@ describe GestorTurnos do
     it 'no permite marcar como asistido un turno futuro' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 1, 1, 9, 0, 0))
-      expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(EstadoInvalidoException)
+      expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(TurnoFuturoException)
     end
   end
 
