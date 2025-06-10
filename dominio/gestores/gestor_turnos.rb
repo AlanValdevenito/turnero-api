@@ -1,3 +1,5 @@
+require_relative '../excepciones/turno_pasado_exception'
+
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 ESTADO_PENDIENTE = 'Pendiente'.freeze
 ESTADO_AUSENTE = 'Ausente'.freeze
@@ -125,7 +127,7 @@ class GestorTurnos
     fecha_turno = turno.fecha_hora.to_time
     fecha_ahora = ahora.to_time
 
-    raise EstadoInvalidoException if fecha_turno < fecha_ahora
+    raise TurnoYaPasadoException if fecha_turno < fecha_ahora
   end
 
   def validar_turno_futuro(turno, ahora)

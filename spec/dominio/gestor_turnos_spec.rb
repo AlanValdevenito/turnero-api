@@ -274,7 +274,7 @@ describe GestorTurnos do
     it 'no permite cancelar un turno pasado' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
-      expect { contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_CANCELADO) }.to raise_error(EstadoInvalidoException)
+      expect { contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_CANCELADO) }.to raise_error(TurnoYaPasadoException)
     end
 
     it 'permite marcar como asistido un turno pasado' do
