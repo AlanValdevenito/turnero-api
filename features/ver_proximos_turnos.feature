@@ -29,15 +29,14 @@ Escenario: US-5.3 Ver próximos turnos con 0 turnos pendientes
   Cuando solicito los proximos turnos del paciente
   Entonces recibo un mensaje de error "El paciente no tiene próximos turnos"
 
-@wip
 Escenario: US-5.4 Ver próximos turnos con 2 turnos pendientes
   Dado la fecha actual es "2026-07-01" 
-  Y el paciente tiene 1 turno con estado "Pendiente" con el médico "Juan Perez" matricula "ABC123" de la especialidad "Traumatologia" para la fecha "2026-08-01"
-  Y el paciente tiene 1 turno con estado "Pendiente" con el médico "Nicolas Sanchez" matricula "DFG567" de la especialidad "Dermatologia" para la fecha "2026-10-01"
-  Cuando solicito los próximos turnos del paciente
+  Y el paciente tiene 1 turno con estado "Pendiente" con el médico matricula "ABC123" para la fecha "2026-10-01"
+  Y el paciente tiene 1 turno con estado "Pendiente" con el médico matricula "DEF456" para la fecha "2026-10-02"
+  Cuando solicito los proximos turnos del paciente
   Entonces recibo un listado de sus próximos turnos con 2 turno
-  Y tiene el turno para la fecha "2026-08-01" con el médico "Juan Perez" de la especialidad "Traumatologia"
-  Y tiene el turno para la fecha "2026-10-01" con el médico "Nicolas Sanchez" de la especialidad "Dermatologia"
+  Y tiene el turno para la fecha "2026-10-01" con el médico "Juan Perez" de la especialidad "Traumatologia"
+  Y tiene el turno para la fecha "2026-10-02" con el médico "Nicolas Sanchez" de la especialidad "Dermatologia"
 
 
 

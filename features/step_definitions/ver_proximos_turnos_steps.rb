@@ -57,6 +57,7 @@ end
 
 Entonces('recibo un listado de sus próximos turnos con {int} turno') do |cantidad|
   body = JSON.parse(@response.body)
+  puts "Respuesta de la API: #{body.inspect}"
   expect(body.size).to eq(cantidad)
 end
 
@@ -69,4 +70,28 @@ Entonces('recibo un mensaje de error {string}') do |mensaje_error|
   expect(@response.status).to eq(400)
   body = JSON.parse(@response.body)
   expect(body['mensaje']).to eq(mensaje_error)
+end
+
+Dado('el paciente tiene {int} turno con estado {string} con el médico matricula {string} para la fecha {string}') do |cantidad, _estado, matricula, fecha|
+  raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+
+  cantidad.times do
+    turno_hash = {
+      matricula:,
+      fecha:,
+      hora: '10:00',
+      telegram_id: @paciente_telegram_id
+    }
+    response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+    puts "Respuesta al crear turno: #{response.body}"
+  end
+end
+
+Entonces('tiene el turno para la fecha {string} con el médico {string} de la especialidad {string}') do |fecha, medico, especialidad|
+  body = JSON.parse(@response.body)
+  expect(
+    body.any? do |t|
+      t['fecha y hora'].start_with?(fecha) && t['medico'] == medico && t['especialidad'] == especialidad
+    end
+  ).to be true
 end
