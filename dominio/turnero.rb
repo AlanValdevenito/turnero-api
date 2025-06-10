@@ -19,25 +19,24 @@ class Turnero
     @proveedor_dia = proveedor_dia
     @proveedor_feriados = proveedor_feriados
     @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, ProveedorHora.new)
+    @registro_usuario = RegistroUsuario.new(@repositorio_usuarios)
   end
   # rubocop:enable Metrics/ParameterLists
 
   def crear_usuario(email, telegram_id = nil)
-    raise TelegramIdEnUsoException if telegram_id && @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
-    raise EmailEnUsoException if buscar_usuario_por_email(email)
-
-    begin
-      usuario = Usuario.new(email, nil, telegram_id)
-    rescue ArgumentError
-      raise EmailObligatorioException
-    end
-
-    @repositorio_usuarios.save(usuario)
-    usuario
+    @registro_usuario.crear_usuario(email, telegram_id)
   end
 
   def usuarios
-    @repositorio_usuarios.all
+    @registro_usuario.usuarios
+  end
+
+  def buscar_usuario_por_email(email)
+    @registro_usuario.buscar_usuario_por_email(email)
+  end
+
+  def buscar_usuario_por_telegram_id(telegram_id)
+    @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
   end
 
   def medicos
@@ -93,14 +92,6 @@ class Turnero
   def crear_especialidad(nombre, duracion_de_turnos)
     especialidad = Especialidad.new(nombre, duracion_de_turnos)
     @repositorio_especialidades.save(especialidad)
-  end
-
-  def buscar_usuario_por_email(email)
-    @repositorio_usuarios.buscar_por_email(email)
-  end
-
-  def buscar_usuario_por_telegram_id(telegram_id)
-    @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
   end
 
   def medicos_disponibles

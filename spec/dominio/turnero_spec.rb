@@ -36,12 +36,6 @@ describe Turnero do
     allow(repositorios[:turnos]).to receive(:obtener_turnos_existentes).and_return(turnos)
   end
 
-  def stub_usuario_no_existente(repositorio, email, telegram_id = nil)
-    allow(repositorio).to receive(:save).with(instance_of(Usuario))
-    allow(repositorio).to receive(:buscar_por_email).with(email).and_return(nil)
-    allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(nil) if telegram_id
-  end
-
   def stub_feriados_api
     stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
       .to_return(status: 200, body: '[{ "dia": 16, "mes": 6 }]', headers: {})
@@ -62,22 +56,6 @@ describe Turnero do
     expect { turnero.crear_usuario(email) }.to raise_error(EmailEnUsoException)
   end
 
-  it 'deberia buscar un usuario por email' do
-    usuario_mock = Usuario.new(email, 1)
-
-    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(usuario_mock)
-
-    usuario = turnero.buscar_usuario_por_email(email)
-    expect(usuario).to eq(usuario_mock)
-  end
-
-  it 'deberia buscar un usuario por telegram_id' do
-    usuario_mock = Usuario.new(email, 1, 123_456_789)
-    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(usuario_mock)
-    usuario = turnero.buscar_usuario_por_telegram_id(123_456_789)
-    expect(usuario).to eq(usuario_mock)
-  end
-
   it 'deberia devolver todos los medicos' do
     medicos = turnero.medicos
     expect(medicos.first.nombre).to eq('Michael')
@@ -91,30 +69,6 @@ describe Turnero do
   it 'deberia devolver todas las especialidades' do
     especialidades = turnero.especialidades
     expect(especialidades.first.nombre).to eq('Traumatologia')
-  end
-
-  it 'deberia crear un usuario' do
-    stub_usuario_no_existente(repositorios[:usuario], email, 123_456_789)
-    created_user = turnero.crear_usuario(email, 123_456_789)
-    expect(created_user.email).to eq(email)
-    expect(created_user.telegram_id).to eq(123_456_789)
-  end
-
-  it 'deberia devolver error si el telegram_id ya existe al crear un usuario' do
-    allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
-    allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(Usuario.new(email, 1, 123_456_789))
-
-    expect { turnero.crear_usuario(email, 123_456_789) }.to raise_error(TelegramIdEnUsoException)
-  end
-
-  it 'deberia devolver error si el email es nil al crear un usuario' do
-    stub_usuario_no_existente(repositorios[:usuario], nil)
-    expect { turnero.crear_usuario(nil) }.to raise_error(EmailObligatorioException)
-  end
-
-  it 'deberia devolver error si el email es vacío al crear un usuario' do
-    stub_usuario_no_existente(repositorios[:usuario], '')
-    expect { turnero.crear_usuario('') }.to raise_error(EmailObligatorioException)
   end
 
   it 'deberia crear un medico con especialidad' do
