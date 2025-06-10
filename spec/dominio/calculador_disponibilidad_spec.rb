@@ -10,7 +10,7 @@ describe 'CalculadorDeDisponibilidad' do
     let(:duracion) { 30 }
     let(:inicio_jornada) { DateTime.parse("#{fecha}T08:00:00") }
     let(:fecha_fin) { fecha + 3 }
-    let(:calculador) { CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new) }
+    let(:calculador) { CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new, ProveedorFeriados.new) }
 
     def stub_feriados_api
       stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')

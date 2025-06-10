@@ -1,7 +1,8 @@
 class CalculadorDeDisponibilidad
-  def initialize(proveedor_dia, proveedor_hora)
+  def initialize(proveedor_dia, proveedor_hora, proveedor_feriados)
     @proveedor_dia = proveedor_dia
     @proveedor_hora = proveedor_hora
+    @proveedor_feriados = proveedor_feriados
   end
 
   def turnos_disponibles(duracion_turno, turnos_existentes, cantidad, fecha_inicio, fecha_fin)
@@ -34,7 +35,7 @@ class CalculadorDeDisponibilidad
   end
 
   def es_feriado?(fecha)
-    feriados = ProveedorFeriados.new.feriados(fecha.year)
+    feriados = @proveedor_feriados.feriados(fecha.year)
     feriados.any? { |feriado| feriado['dia'] == fecha.day && feriado['mes'] == fecha.month }
   end
 
