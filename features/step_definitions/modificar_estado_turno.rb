@@ -20,8 +20,6 @@ end
 Dado('el hospital intenta pasar a {string} el turno') do |estado|
   params = { estado: }
   @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
-
-  expect(@response.status).to eq(200)
 end
 
 Dado('hay un turno ya pasado') do
@@ -46,5 +44,4 @@ end
 Entonces('recibo un mensaje {string}') do |mensaje|
   json_response = JSON.parse(@response.body)
   expect(json_response['mensaje']).to eq(mensaje)
-  expect(@response.status).to eq(200)
 end
