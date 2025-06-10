@@ -15,7 +15,6 @@ Y el hospital intenta pasar a "Cancelado" el turno
 Entonces el turno queda con estado "Cancelado"
 Y recibo un mensaje "Turno actualizado: estado Cancelado"
 
-@wip
 Escenario: US-26.2 Marcar como ausente un turno que ya pasó
 Dado hay un turno ya pasado
 Y tiene estado "Pendiente"
