@@ -1,5 +1,6 @@
 require_relative '../dominio/excepciones/turno_no_encontrado_exception'
 require_relative '../dominio/excepciones/estado_invalido_exception'
+require_relative '../dominio/excepciones/turno_pasado_exception'
 
 get '/turnos/medicos-disponibles' do
   logger.debug('GET /turnos/medicos-disponibles')
@@ -147,12 +148,15 @@ put '/turnos/:id' do
     turno = turnero.modificar_estado_turno(id, estado)
     status 200
     json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  rescue TurnoYaPasadoException
+    status 404
+    json({ mensaje: 'No se puede cancelar un turno ya pasado' })
   rescue TurnoNoEncontradoException
     status 404
-    json({ error: 'Turno no encontrado' })
+    json({ mensaje: 'Turno no encontrado' })
   rescue EstadoInvalidoException
     status 400
-    json({ error: 'Estado inválido para el turno' })
+    json({ mensaje: 'Estado inválido para el turno' })
   end
 end
 
