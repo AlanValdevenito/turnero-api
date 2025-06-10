@@ -1,5 +1,6 @@
 require_relative '../dominio/excepciones/turno_no_encontrado_exception'
 require_relative '../dominio/excepciones/estado_invalido_exception'
+require_relative '../dominio/excepciones/no_hay_historial_turnos_exception'
 require_relative '../dominio/excepciones/turno_pasado_exception'
 
 get '/turnos/medicos-disponibles' do

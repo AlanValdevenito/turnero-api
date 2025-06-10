@@ -5,7 +5,7 @@ Antecedentes:
     Dado existe el paciente con email "usuario@prueba.com"
     Y la especialidad "Cardiología" dada de alta
     Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología" dado de alta
-@wip
+
 Escenario: US-6.1 Ver historial de turnos con ningún turno
   Dado que nunca reserve un turno
   Cuando quiero ver mi historial de turnos
