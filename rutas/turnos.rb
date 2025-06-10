@@ -152,6 +152,9 @@ put '/turnos/:id' do
   rescue TurnoYaPasadoException
     status 404
     json({ mensaje: 'No se puede cancelar un turno ya pasado' })
+  rescue TurnoFuturoException
+    status 404
+    json({ mensaje: "No se puede marcar como #{estado} un turno futuro" })
   rescue TurnoNoEncontradoException
     status 404
     json({ mensaje: 'Turno no encontrado' })
