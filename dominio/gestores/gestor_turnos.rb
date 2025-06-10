@@ -1,0 +1,65 @@
+class GestorTurnos
+  def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
+    @repositorio_turnos = repositorio_turnos
+    @proveedor_dia = proveedor_dia
+    @proveedor_hora = proveedor_hora
+    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora, proveedor_feriados)
+  end
+
+  def turnos_paciente(usuario)
+    @repositorio_turnos
+      .buscar_por_usuario(usuario)
+      .sort_by(&:fecha_hora)
+      .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+  end
+
+  def turnos_medico(medico)
+    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+  end
+
+  def crear_turno(medico, usuario, fecha, hora)
+    raise FechaNoValidaException unless es_fecha_valida?(fecha)
+
+    turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
+    turnos_existentes.each do |turno|
+      raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
+    end
+
+    @repositorio_turnos.save(Turno.crear(medico, usuario, fecha, hora))
+  end
+
+  def disponibilidad_de_medico(medico)
+    duracion_turno = medico.especialidad.duracion_de_turnos
+    fecha_inicio = @proveedor_dia.hoy
+    fecha_fin = fecha_inicio + 60
+
+    turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
+
+    @calculador_disponibilidad.turnos_disponibles(
+      duracion_turno,
+      turnos_existentes,
+      TURNOS_DISPONIBLES,
+      fecha_inicio,
+      fecha_fin
+    )
+  end
+
+  def es_fecha_valida?(fecha)
+    fecha = DateTime.parse(fecha)
+    raise FechaNoValidaException if @calculador_disponibilidad.dia_laboral?(fecha) == false
+
+    true
+  end
+
+  def proximos_turnos_paciente(usuario)
+    turnos = @repositorio_turnos
+             .buscar_por_usuario(usuario)
+             .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == Turno::ESTADO_PENDIENTE }
+             .sort_by(&:fecha_hora)
+             .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+
+    raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
+
+    turnos
+  end
+end

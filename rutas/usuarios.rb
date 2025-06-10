@@ -10,11 +10,11 @@ end
 get '/usuarios/:email' do
   logger.debug("GET /usuarios/:email: #{params}")
   email = params[:email]
-  usuario = turnero.buscar_usuario_por_email(email)
-  if usuario
+  begin
+    usuario = turnero.buscar_usuario_por_email(email)
     status 200
     json({ id: usuario.id, email: usuario.email })
-  else
+  rescue UsuarioNoEncontradoException
     status 404
     json({ error: 'Usuario no encontrado' })
   end
@@ -23,11 +23,11 @@ end
 get '/usuarios/telegram/:telegram_id' do
   logger.debug("GET /usuarios/telegram/:telegram_id: #{params}")
   telegram_id = params[:telegram_id]
-  usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
-  if usuario
+  begin
+    usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
     status 200
     json({ id: usuario.id, email: usuario.email, telegram_id: usuario.telegram_id })
-  else
+  rescue UsuarioNoEncontradoException
     status 404
     json({ error: 'Usuario no encontrado' })
   end

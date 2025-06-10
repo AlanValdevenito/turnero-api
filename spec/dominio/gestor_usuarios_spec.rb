@@ -59,4 +59,14 @@ describe GestorUsuarios do
     allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(usuario)
     expect(gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)).to eq(usuario)
   end
+
+  it 'lanza error si no se encuentra usuario por email' do
+    allow(repositorio).to receive(:buscar_por_email).with(email).and_return(nil)
+    expect { gestor_usuarios.buscar_usuario_por_email(email) }.to raise_error(UsuarioNoEncontradoException)
+  end
+
+  it 'lanza error si no se encuentra usuario por telegram_id' do
+    allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(nil)
+    expect { gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id) }.to raise_error(UsuarioNoEncontradoException)
+  end
 end

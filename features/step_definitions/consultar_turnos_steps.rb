@@ -22,7 +22,7 @@ Dado('el medico {string} de {string} dado de alta') do |apellido, especialidad|
 end
 
 Dado('el paciente tiene {int} turnos') do |cantidad_turnos|
-  allow_any_instance_of(Turnero).to receive(:es_fecha_valida?).and_return(true)
+  allow_any_instance_of(GestorTurnos).to receive(:es_fecha_valida?).and_return(true)
   cantidad_turnos.times do |i|
     dia = (i + 1).to_s.rjust(2, '0')
     request_body = { matricula: @medico_matricula, fecha: "2025-03-#{dia}", hora: '15:00', telegram_id: @usuario_telegram_id }.to_json

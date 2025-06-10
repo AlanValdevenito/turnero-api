@@ -1,4 +1,5 @@
 require_relative '../excepciones/excepciones_registracion'
+require_relative '../excepciones/usuario_no_encontrado_exception'
 
 class GestorUsuarios
   def initialize(repositorio_usuarios)
@@ -24,10 +25,16 @@ class GestorUsuarios
   end
 
   def buscar_usuario_por_email(email)
-    @repositorio_usuarios.buscar_por_email(email)
+    usuario = @repositorio_usuarios.buscar_por_email(email)
+    raise UsuarioNoEncontradoException unless usuario
+
+    usuario
   end
 
   def buscar_usuario_por_telegram_id(telegram_id)
-    @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    usuario = @repositorio_usuarios.buscar_por_telegram_id(telegram_id)
+    raise UsuarioNoEncontradoException unless usuario
+
+    usuario
   end
 end
