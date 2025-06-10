@@ -57,7 +57,6 @@ end
 
 Entonces('recibo un listado de sus próximos turnos con {int} turno') do |cantidad|
   body = JSON.parse(@response.body)
-  puts "Respuesta de la API: #{body.inspect}"
   expect(body.size).to eq(cantidad)
 end
 
@@ -82,8 +81,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico matricula
       hora: '10:00',
       telegram_id: @paciente_telegram_id
     }
-    response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
-    puts "Respuesta al crear turno: #{response.body}"
+    @response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
   end
 end
 
