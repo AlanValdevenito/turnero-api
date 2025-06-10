@@ -5,6 +5,7 @@ require_relative '../dominio/excepciones/turno_ya_existe_exception'
 require_relative '../dominio/excepciones/no_hay_proximos_turnos_exception'
 require_relative '../dominio/excepciones/fecha_no_valida_exception'
 require_relative '../dominio/calculador_disponibilidad'
+require_relative '../dominio/gestores/gestor_usuarios'
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
@@ -20,24 +21,24 @@ class Turnero
     @proveedor_hora = proveedor_hora
     @proveedor_feriados = proveedor_feriados
     @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora)
-    @registro_usuario = RegistroUsuario.new(repositorio_usuarios)
+    @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios)
   end
   # rubocop:enable Metrics/ParameterLists
 
   def crear_usuario(email, telegram_id = nil)
-    @registro_usuario.crear_usuario(email, telegram_id)
+    @gestor_usuarios.crear_usuario(email, telegram_id)
   end
 
   def usuarios
-    @registro_usuario.usuarios
+    @gestor_usuarios.usuarios
   end
 
   def buscar_usuario_por_email(email)
-    @registro_usuario.buscar_usuario_por_email(email)
+    @gestor_usuarios.buscar_usuario_por_email(email)
   end
 
   def buscar_usuario_por_telegram_id(telegram_id)
-    @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
+    @gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)
   end
 
   def medicos
@@ -49,7 +50,7 @@ class Turnero
   end
 
   def turnos_paciente(email)
-    usuario = @registro_usuario.buscar_usuario_por_email(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     raise UsuarioNoEncontradoException unless usuario
 
     @repositorio_turnos
@@ -71,7 +72,7 @@ class Turnero
 
     raise FechaNoValidaException unless es_fecha_valida?(fecha)
 
-    usuario = @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
+    usuario = @gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)
     raise UsuarioNoEncontradoException unless usuario
 
     turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
@@ -131,7 +132,7 @@ class Turnero
   end
 
   def proximos_turnos_paciente(telegram_id)
-    usuario = @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
+    usuario = @gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)
 
     turnos = @repositorio_turnos
              .buscar_por_usuario(usuario)

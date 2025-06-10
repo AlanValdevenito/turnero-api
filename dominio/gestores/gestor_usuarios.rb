@@ -1,4 +1,6 @@
-class RegistroUsuario
+require_relative '../excepciones/excepciones_registracion'
+
+class GestorUsuarios
   def initialize(repositorio_usuarios)
     @repositorio_usuarios = repositorio_usuarios
   end
