@@ -302,12 +302,12 @@ describe Turnero do
 
     before(:each) do
       especialidad = instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10)
-      medico = instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad: especialidad)
+      medico = instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad:)
       usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: '123456789')
       turnos = [
-        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 1),
-        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Cancelado', id: 2),
-        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T17:00:00'), estado: 'Pendiente', id: 3)
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 1),
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Cancelado', id: 2),
+        instance_double('Turno', medico:, usuario:, fecha_hora: DateTime.parse('2025-06-16T17:00:00'), estado: 'Pendiente', id: 3)
       ]
 
       allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with('123456789').and_return(usuario)

@@ -26,7 +26,7 @@ end
 
 Dado('el médico {string} de la especialidad {string} con matricula {string} dado de alta') do |nombre_completo, especialidad, matricula|
   nombre, apellido = nombre_completo.split(' ', 2)
-  crear_medico(nombre: nombre, apellido: apellido, matricula: matricula, especialidad: especialidad)
+  crear_medico(nombre:, apellido:, matricula:, especialidad:)
 end
 
 Dado('la fecha actual es {string}') do |fecha|
@@ -34,8 +34,9 @@ Dado('la fecha actual es {string}') do |fecha|
   @fecha_actual = Date.parse(fecha)
 end
 
-Dado('el paciente tiene {int} turno con estado {string} con el médico {string} matricula {string} de la especialidad {string}') do |cantidad, estado, medico_nombre, matricula, especialidad|
+Dado('el paciente tiene {int} turno con estado {string} con el médico {string} matricula {string} de la especialidad {string}') do |cantidad, estado, _medico_nombre, matricula, _especialidad|
   raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+
   # TODO: POR AHORA NO SE PUEDE CAMBIAR EL ESTADO DEL TURNO, SE DEBE CREAR CON EL ESTADO QUE SE QUIERA
   # O PODER CAMBIARLO DESDE LA API -> POR ESO USO REPOSITORIOS
   usuario = RepositorioUsuarios.new.buscar_por_telegram_id(@paciente_telegram_id)
@@ -43,7 +44,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico {string} 
   repo_turnos = RepositorioTurnos.new
 
   cantidad.times do
-    fecha_hora = DateTime.parse((@fecha_actual + 1).to_s + 'T10:00:00')
+    fecha_hora = DateTime.parse("#{@fecha_actual + 1}T10:00:00")
     turno = Turno.new(medico, usuario, fecha_hora, estado)
     repo_turnos.save(turno)
   end
