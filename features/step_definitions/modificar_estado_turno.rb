@@ -13,6 +13,8 @@ Dado('hay un turno en el futuro') do
 end
 
 Dado('tiene estado {string}') do |estado|
+  params = { estado: }
+  _res = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
   response = Faraday.get("/turnos/pacientes/#{@paciente_email}")
   expect(response.body).to include(estado)
 end
