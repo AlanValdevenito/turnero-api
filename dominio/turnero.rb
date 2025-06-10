@@ -137,7 +137,7 @@ class Turnero
 
     @repositorio_turnos
       .buscar_por_usuario(usuario)
-      .select { |turno| turno.fecha_hora >= ahora }
+      .select { |turno| turno.fecha_hora >= ahora && turno.estado == Turno::ESTADO_PENDIENTE }
       .sort_by(&:fecha_hora)
       .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end

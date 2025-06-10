@@ -296,4 +296,30 @@ describe Turnero do
       expect(result.map(&:id)).to eq([2, 3])
     end
   end
+
+  describe '#proximos_turnos_paciente excluye cancelados' do
+    let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
+
+    before(:each) do
+      especialidad = instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10)
+      medico = instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad: especialidad)
+      usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: '123456789')
+      turnos = [
+        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 1),
+        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Cancelado', id: 2),
+        instance_double('Turno', medico: medico, usuario: usuario, fecha_hora: DateTime.parse('2025-06-16T17:00:00'), estado: 'Pendiente', id: 3)
+      ]
+
+      allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with('123456789').and_return(usuario)
+      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
+      allow(turnero.instance_variable_get(:@proveedor_hora)).to receive(:ahora).and_return(ahora)
+    end
+
+    it 'devuelve solo los turnos pendientes, no los cancelados' do
+      result = turnero.proximos_turnos_paciente('123456789')
+      expect(result.size).to eq(2)
+      expect(result.map(&:estado)).to all(eq('Pendiente'))
+      expect(result.map(&:id)).to eq([1, 3])
+    end
+  end
 end
