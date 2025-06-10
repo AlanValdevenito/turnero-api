@@ -64,3 +64,9 @@ Entonces('tiene al medico {string} de la especialidad {string}') do |nombre, esp
   body = JSON.parse(@response.body)
   expect(body.any? { |t| t['medico'] == nombre && t['especialidad'] == especialidad }).to be true
 end
+
+Entonces('recibo un mensaje de error {string}') do |mensaje_error|
+  expect(@response.status).to eq(400)
+  body = JSON.parse(@response.body)
+  expect(body['mensaje']).to eq(mensaje_error)
+end

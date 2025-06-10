@@ -27,7 +27,7 @@ Escenario: US-5.2 Ver próximos turnos con 1 turno pendiente y 1 turno cancelado
 Escenario: US-5.3 Ver próximos turnos con 0 turnos pendientes
   Dado la fecha actual es "2026-07-01"
   Y el paciente tiene 0 turnos
-  Cuando solicito los próximos turnos del paciente
+  Cuando solicito los proximos turnos del paciente
   Entonces recibo un mensaje de error "El paciente no tiene próximos turnos"
 
 @wip
