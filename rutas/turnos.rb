@@ -62,8 +62,7 @@ get '/turnos/pacientes/telegram/:telegram_id/proximos' do
         id: e.id,
         'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
         especialidad: e.medico.especialidad.nombre,
-        medico: "#{e.medico.nombre} #{e.medico.apellido}",
-        estado: e.estado
+        medico: "#{e.medico.nombre} #{e.medico.apellido}"
       }
     end
     status 200
