@@ -23,7 +23,6 @@ Escenario: US-5.2 Ver próximos turnos con 1 turno pendiente y 1 turno cancelado
   Entonces recibo un listado de sus próximos turnos con 1 turno
   Y tiene al medico "Juan Perez" de la especialidad "Traumatologia"
 
-@wip
 Escenario: US-5.3 Ver próximos turnos con 0 turnos pendientes
   Dado la fecha actual es "2026-07-01"
   Y el paciente tiene 0 turnos

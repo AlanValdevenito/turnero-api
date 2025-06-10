@@ -322,4 +322,23 @@ describe Turnero do
       expect(result.map(&:id)).to eq([1, 3])
     end
   end
+
+  describe '#proximos_turnos_paciente sin próximos turnos' do
+    let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
+
+    before(:each) do
+      usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: '123456789')
+      turnos = [] # No hay turnos
+
+      allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with('123456789').and_return(usuario)
+      allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
+      allow(turnero.instance_variable_get(:@proveedor_hora)).to receive(:ahora).and_return(ahora)
+    end
+
+    it 'lanza NoHayProximosTurnosException si no hay próximos turnos' do
+      expect do
+        turnero.proximos_turnos_paciente('123456789')
+      end.to raise_error(NoHayProximosTurnosException)
+    end
+  end
 end

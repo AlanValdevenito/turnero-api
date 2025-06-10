@@ -2,6 +2,7 @@ require_relative '../dominio/excepciones/excepciones_registracion'
 require_relative '../dominio/excepciones/medico_no_encontrado_exception'
 require_relative '../dominio/excepciones/usuario_no_encontrado_exception'
 require_relative '../dominio/excepciones/turno_ya_existe_exception'
+require_relative '../dominio/excepciones/no_hay_proximos_turnos_exception'
 require_relative '../dominio/excepciones/fecha_no_valida_exception'
 require_relative '../dominio/calculador_disponibilidad'
 
@@ -79,8 +80,7 @@ class Turnero
       raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
     end
 
-    turno = Turno.crear(medico, usuario, fecha, hora)
-    @repositorio_turnos.save(turno)
+    @repositorio_turnos.save(Turno.crear(medico, usuario, fecha, hora))
   end
 
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
@@ -133,12 +133,14 @@ class Turnero
   def proximos_turnos_paciente(telegram_id)
     usuario = @registro_usuario.buscar_usuario_por_telegram_id(telegram_id)
 
-    ahora = @proveedor_hora.ahora
+    turnos = @repositorio_turnos
+             .buscar_por_usuario(usuario)
+             .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == Turno::ESTADO_PENDIENTE }
+             .sort_by(&:fecha_hora)
+             .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
 
-    @repositorio_turnos
-      .buscar_por_usuario(usuario)
-      .select { |turno| turno.fecha_hora >= ahora && turno.estado == Turno::ESTADO_PENDIENTE }
-      .sort_by(&:fecha_hora)
-      .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+    raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
+
+    turnos
   end
 end
