@@ -72,5 +72,5 @@ end
 
 Entonces('en orden desde el más reciente al más antiguo') do
   fechas = @turnos.map { |t| DateTime.parse("#{t['fecha']} #{t['hora']}") }
-  expect(fechas).to eq(fechas.sort)
+  expect(fechas).to eq(fechas.sort.reverse)
 end

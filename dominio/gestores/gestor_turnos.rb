@@ -25,7 +25,7 @@ class GestorTurnos
   end
 
   def turnos_medico(medico)
-    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end
 
   def crear_turno(medico, usuario, fecha, hora)

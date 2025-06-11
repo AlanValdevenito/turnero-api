@@ -162,7 +162,7 @@ describe GestorTurnos do
     it 'devuelve los turnos de medicos ordenados por fecha' do
       result = contexto[:gestor_turnos].turnos_medico(medico)
       fechas = result.map(&:fecha_hora)
-      expect(fechas).to eq(fechas.sort)
+      expect(fechas).to eq(fechas.sort.reverse)
     end
 
     it 'devuelve solo 20 turnos de un medico' do
