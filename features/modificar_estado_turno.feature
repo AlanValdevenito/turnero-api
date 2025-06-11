@@ -66,7 +66,7 @@ Y el hospital intenta pasar a "Cancelado" el turno
 Entonces el turno queda con estado "Ausente"
 Y recibo un mensaje "No se puede cambiar el estado de un turno que no este pendiente"
 
-@wip
+
 Escenario: US-26.9  Intentar cambiar el estado de un turno con estado asistió es invalido
 Dado hay un turno ya pasado
 Y tiene estado "Asistido"
