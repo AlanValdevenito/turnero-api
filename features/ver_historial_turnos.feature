@@ -10,7 +10,7 @@ Característica: Ver historial de turnos
     Dado que nunca reserve un turno
     Cuando quiero ver mi historial de turnos
     Entonces se muestra el mensaje "El paciente no tiene turnos en su historial"
-  @wip
+
   Escenario: US-6.2 Ver historial de turnos con 1 turno ausente
     Dado que reserve 1 turno con el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología"
     Y no asisti al turno
