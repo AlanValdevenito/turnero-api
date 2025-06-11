@@ -28,7 +28,7 @@ Característica: Ver historial de turnos
     Y cancele el turno
     Cuando quiero ver mi historial de turnos
     Entonces puedo ver mi turno con el médico "Juan Perez" de la especialidad "Cardiología" con estado "Cancelado"
-  @wip
+
   Escenario: US-6.5 Ver historial de turnos con más de 15 turnos
     Dado que reserve 20 turnos a los cuales asisti
     Cuando quiero ver mi historial de turnos
