@@ -25,6 +25,12 @@ Dado('no asisti al turno') do
   expect(@response.status).to eq(200)
 end
 
+Dado('asisti al turno') do
+  params = { estado: 'Asistido' }
+  @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(200)
+end
+
 Entonces('puedo ver mi turno con el médico {string} de la especialidad {string} con estado {string}') do |medico, especialidad, estado|
   @response = Faraday.get("/turnos/pacientes/historial/#{@telegram_id}")
   @turnos = JSON.parse(@response.body)

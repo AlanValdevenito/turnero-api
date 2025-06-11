@@ -21,7 +21,7 @@ Característica: Ver historial de turnos
     Dado que reserve 1 turno con el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología"
     Y asisti al turno
     Cuando quiero ver mi historial de turnos
-    Entonces puedo ver mi turno con el médico "Juan Perez" de la especialidad "Cardiología" con estado "Asistio"
+    Entonces puedo ver mi turno con el médico "Juan Perez" de la especialidad "Cardiología" con estado "Asistido"
   @wip
   Escenario: US-6.4 Ver historial de turnos con 1 turno cancelado
     Dado que reserve 1 turno con el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología"
