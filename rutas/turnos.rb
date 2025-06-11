@@ -99,7 +99,7 @@ get '/turnos/pacientes/historial/:telegram_id' do
     json(respuesta)
   rescue NoHayHistorialTurnosException
     status 400
-    json({ mensaje: 'El paciente no tiene turnos en su historial' })
+    json({ error: 'El paciente no tiene turnos en su historial' })
   end
 end
 
