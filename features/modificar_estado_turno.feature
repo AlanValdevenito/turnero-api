@@ -50,13 +50,13 @@ Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Pendiente"
 Y recibo un mensaje "No se puede marcar como Ausente un turno futuro"
 
-@wip
+
 Escenario: US-26.7 Intentar cambiar el estado de un turno con estado cancelado es invalido
 Dado hay un turno en el futuro
-Y tiene estado "Pendiente"
+Y tiene estado "Cancelado"
 Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Cancelado"
-Y recibo un mensaje "no se puede cambiar el estado de un turno que no este pendiente"
+Y recibo un mensaje "No se puede cambiar el estado de un turno que no este pendiente"
 
 @wip
 Escenario: US-26.8  Intentar cambiar el estado de un turno con estado ausente es invalido
@@ -64,7 +64,7 @@ Dado hay un turno ya pasado
 Y tiene estado "Ausente"
 Y el hospital intenta pasar a "Cancelado" el turno
 Entonces el turno queda con estado "Ausente"
-Y recibo un mensaje "no se puede cambiar el estado de un turno que no este pendiente"
+Y recibo un mensaje "No se puede cambiar el estado de un turno que no este pendiente"
 
 @wip
 Escenario: US-26.9  Intentar cambiar el estado de un turno con estado asistió es invalido
@@ -72,12 +72,4 @@ Dado hay un turno ya pasado
 Y tiene estado "Asistido"
 Y el hospital intenta pasar a "Cancelado" el turno
 Entonces el turno queda con estado "Asistido"
-Y recibo un mensaje "no se puede cambiar el estado de un turno que no este pendiente"
-
-@wip
-Escenario: US-26.10 Intentar cambiar el estado de un turno que no tiene estado pendiente es invalido
-Dado hay un turno en el futuro
-Y tiene estado "Pendiente"
-Y el hospital intenta pasar a "Ausente" el turno
-Entonces el turno queda con estado "Cancelado"
-Y recibo un mensaje "no se puede cambiar el estado de un turno que no este pendiente"
+Y recibo un mensaje "No se puede cambiar el estado de un turno que no este pendiente"
