@@ -9,9 +9,9 @@ class CalculadorDeDisponibilidad
     tiempos_ocupados = Set.new(turnos_existentes.map { |t| t[:fecha_hora].to_i })
 
     turnos_disponibles = []
-
+    feriados = @proveedor_feriados.feriados(fecha_inicio.year)
     (fecha_inicio...fecha_fin).each do |fecha|
-      next unless dia_laboral?(fecha)
+      next unless dia_laboral?(fecha, feriados)
 
       turnos_disponibles.concat(turnos_para_dia(fecha, duracion_turno, tiempos_ocupados))
     end
@@ -34,13 +34,12 @@ class CalculadorDeDisponibilidad
     turnos
   end
 
-  def es_feriado?(fecha)
-    feriados = @proveedor_feriados.feriados(fecha.year)
+  def es_feriado?(fecha, feriados)
     feriados.any? { |feriado| feriado['dia'] == fecha.day && feriado['mes'] == fecha.month }
   end
 
-  def dia_laboral?(fecha)
-    (1..5).include?(fecha.wday) && !es_feriado?(fecha)
+  def dia_laboral?(fecha, feriados)
+    (1..5).include?(fecha.wday) && !es_feriado?(fecha, feriados)
   end
 
   def jornada_laboral(fecha)

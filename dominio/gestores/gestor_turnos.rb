@@ -13,6 +13,7 @@ class GestorTurnos
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
     @proveedor_hora = proveedor_hora
+    @proveedor_feriados = proveedor_feriados
     @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora, proveedor_feriados)
   end
 
@@ -56,17 +57,16 @@ class GestorTurnos
 
   def es_fecha_valida?(fecha)
     fecha = DateTime.parse(fecha)
-    raise FechaNoValidaException if @calculador_disponibilidad.dia_laboral?(fecha) == false
+    feriados = @proveedor_feriados.feriados(fecha.year)
+    raise FechaNoValidaException if @calculador_disponibilidad.dia_laboral?(fecha, feriados) == false
 
     true
   end
 
   def proximos_turnos_paciente(usuario)
-    turnos = @repositorio_turnos
-             .buscar_por_usuario(usuario)
-             .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == Turno::ESTADO_PENDIENTE }
-             .sort_by(&:fecha_hora)
-             .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+    turnos = @repositorio_turnos.buscar_por_usuario(usuario)
+                                .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == Turno::ESTADO_PENDIENTE }
+                                .sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
 
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
 

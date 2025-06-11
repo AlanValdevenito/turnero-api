@@ -99,7 +99,7 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
   fecha_fin = fecha_inicio + 60
 
   (fecha_inicio...fecha_fin).each do |fecha|
-    next unless calculador.dia_laboral?(fecha)
+    next unless calculador.dia_laboral?(fecha, [])
 
     tiempos_ocupados = Set.new
     turnos_del_dia = calculador.turnos_para_dia(fecha, duracion, tiempos_ocupados)

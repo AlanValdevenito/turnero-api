@@ -5,6 +5,10 @@ require_relative '../../dominio/adapters/proveedor_hora'
 require_relative '../../dominio/calculador_disponibilidad'
 
 describe 'CalculadorDeDisponibilidad' do
+  before(:each) do
+    stub_const('CANTIDAD_TURNOS', 3)
+  end
+
   describe '.turnos_para_dia' do
     let(:fecha) { Date.parse('2025-06-12') }
     let(:duracion) { 30 }
@@ -27,11 +31,11 @@ describe 'CalculadorDeDisponibilidad' do
     end
 
     it 'no devuelve turnos en fines de semana' do
+      stub_feriados_api
       sabado = Date.parse('2025-06-07')
       domingo = Date.parse('2025-06-08')
-      cantidad = 3
 
-      turnos = calculador.turnos_disponibles(duracion, [], cantidad, sabado, domingo)
+      turnos = calculador.turnos_disponibles(duracion, [], CANTIDAD_TURNOS, sabado, domingo)
       expect(turnos).to be_empty
     end
 
