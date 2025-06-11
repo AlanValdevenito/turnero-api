@@ -324,5 +324,14 @@ describe GestorTurnos do
 
       expect(historial.first.estado).to eq('Asistido')
     end
+
+    it 'deberia devolver una lista con 1 turno cuyo estado es "Cancelado" si el paciente reservo un turno y lo cancelo' do
+      turno = instance_double('Turno', estado: 'Cancelado')
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
+
+      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
+
+      expect(historial.first.estado).to eq('Cancelado')
+    end
   end
 end
