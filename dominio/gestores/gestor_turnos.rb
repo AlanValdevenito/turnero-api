@@ -3,6 +3,7 @@ require_relative '../excepciones/turno_futuro_exception'
 require_relative '../excepciones/estado_no_permitido_exception'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
+MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES = 15
 ESTADO_PENDIENTE = 'Pendiente'.freeze
 ESTADO_AUSENTE = 'Ausente'.freeze
 ESTADO_CANCELADO = 'Cancelado'.freeze
@@ -75,7 +76,7 @@ class GestorTurnos
     turnos = @repositorio_turnos
              .buscar_por_usuario(usuario)
              .select { |turno| turno.estado == ESTADO_AUSENTE || turno.estado == ESTADO_ASISTIDO || turno.estado == ESTADO_CANCELADO }
-             .sort_by(&:fecha_hora).reverse
+             .sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
 
     raise NoHayHistorialTurnosException if turnos.empty?
 

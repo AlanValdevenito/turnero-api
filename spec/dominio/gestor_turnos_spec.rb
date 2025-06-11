@@ -3,6 +3,10 @@ Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| require file }
 
 describe GestorTurnos do
+  before(:each) do
+    stub_const('MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES', 15)
+  end
+
   let(:contexto) do
     {
       especialidad: Especialidad.new('Traumatologia', 10),
@@ -345,6 +349,15 @@ describe GestorTurnos do
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
       expect(historial).to eq(turnos.sort_by(&:fecha_hora).reverse)
+    end
+
+    it 'deberia devolver como maximo 15 turnos' do
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(
+        (0...20).map { |i| instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.new(2025, 6, 16, 9 + i / 2, (i % 2) * 30, 0)) }
+      )
+
+      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
+      expect(historial.size).to eq(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
     end
   end
 end
