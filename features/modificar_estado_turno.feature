@@ -58,7 +58,7 @@ Y el hospital intenta pasar a "Ausente" el turno
 Entonces el turno queda con estado "Cancelado"
 Y recibo un mensaje "No se puede cambiar el estado de un turno que no este pendiente"
 
-@wip
+
 Escenario: US-26.8  Intentar cambiar el estado de un turno con estado ausente es invalido
 Dado hay un turno ya pasado
 Y tiene estado "Ausente"
