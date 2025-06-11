@@ -12,8 +12,10 @@ Entonces('se muestra el mensaje {string}') do |mensaje|
   expect(@response.body).to include(mensaje)
 end
 
-Dado('que reserve {int} turno con el médico {string} con matrícula {string} de la especialidad {string}') do |_cantidad_turnos, _medico_nombre, matricula, _especialidad|
-  request_body = { matricula:, fecha: '2025-03-06', hora: '09:00', telegram_id: @telegram_id }.to_json
+Dado('que para la fecha {string} reserve 1 turno con el médico con matrícula {string} siendo hoy {string}') do |fecha_turno, matricula, fecha_actual|
+  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha_actual))
+
+  request_body = { matricula:, fecha: fecha_turno, hora: '09:00', telegram_id: @telegram_id }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
   @turno_id = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)
