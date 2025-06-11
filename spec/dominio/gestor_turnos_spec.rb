@@ -302,13 +302,19 @@ describe GestorTurnos do
   describe 'Historial de turnos' do
     let(:usuario) { instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789) }
 
+    let(:turnos) do
+      [instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-13T14:00:00'), id: 1),
+       instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-17T14:00:00'), id: 2),
+       instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-10T14:00:00'), id: 3)]
+    end
+
     it 'deberia lanzar excepcion NoHayHistorialTurnosException si el paciente nunca reservo turnos' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([])
       expect { contexto[:gestor_turnos].historial_turnos_paciente(123_456_789) }.to raise_error(NoHayHistorialTurnosException)
     end
 
     it 'deberia devolver una lista con 1 turno cuyo estado es "Ausente" si el paciente reservo un turno y no asistio' do
-      turno = instance_double('Turno', estado: 'Ausente')
+      turno = instance_double('Turno', estado: 'Ausente', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
@@ -317,7 +323,7 @@ describe GestorTurnos do
     end
 
     it 'deberia devolver una lista con 1 turno cuyo estado es "Asistido" si el paciente reservo un turno y asistio' do
-      turno = instance_double('Turno', estado: 'Asistido')
+      turno = instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
@@ -326,12 +332,19 @@ describe GestorTurnos do
     end
 
     it 'deberia devolver una lista con 1 turno cuyo estado es "Cancelado" si el paciente reservo un turno y lo cancelo' do
-      turno = instance_double('Turno', estado: 'Cancelado')
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
 
       expect(historial.first.estado).to eq('Cancelado')
+    end
+
+    it 'deberia devolver los turnos que ya pasaron ordenados por fecha y hora' do
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(turnos)
+
+      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
+      expect(historial).to eq(turnos.sort_by(&:fecha_hora).reverse)
     end
   end
 end
