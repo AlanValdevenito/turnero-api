@@ -19,9 +19,7 @@ class GestorTurnos
 
   def turnos_paciente(usuario)
     @repositorio_turnos
-      .buscar_por_usuario(usuario)
-      .sort_by(&:fecha_hora).reverse
-      .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+      .buscar_por_usuario(usuario).sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end
 
   def turnos_medico(medico)
@@ -75,7 +73,9 @@ class GestorTurnos
 
   def historial_turnos_paciente(usuario)
     turnos = @repositorio_turnos
-             .buscar_por_usuario(usuario).select { |turno| turno.estado == ESTADO_AUSENTE || turno.estado == ESTADO_ASISTIDO || turno.estado == ESTADO_CANCELADO }
+             .buscar_por_usuario(usuario)
+             .select { |turno| turno.estado == ESTADO_AUSENTE || turno.estado == ESTADO_ASISTIDO || turno.estado == ESTADO_CANCELADO }
+             .sort_by(&:fecha_hora).reverse
 
     raise NoHayHistorialTurnosException if turnos.empty?
 
