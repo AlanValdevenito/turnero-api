@@ -158,8 +158,11 @@ put '/turnos/:id' do
   rescue TurnoNoEncontradoException
     status 404
     json({ mensaje: 'Turno no encontrado' })
+  rescue EstadoNoPermitidoException
+    status 404
+    json({ mensaje: 'No se puede cambiar el estado de un turno que no este pendiente' })
   rescue EstadoInvalidoException
-    status 400
+    status 404
     json({ mensaje: 'Estado inválido para el turno' })
   end
 end
