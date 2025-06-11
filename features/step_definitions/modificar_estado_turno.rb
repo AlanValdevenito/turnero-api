@@ -7,7 +7,6 @@ Dado('hay un turno en el futuro') do
   }
   response = Faraday.post('/turnos', turno.to_json, { 'Content-Type' => 'application/json' })
   json = JSON.parse(response.body)
-  puts json
   expect(response.status).to eq(201)
   @turno_id = json['id']
 end
@@ -33,7 +32,6 @@ Dado('hay un turno ya pasado') do
   }
   response = Faraday.post('/turnos', turno.to_json, { 'Content-Type' => 'application/json' })
   json = JSON.parse(response.body)
-  puts json
   expect(response.status).to eq(201)
   @turno_id = json['id']
 end
