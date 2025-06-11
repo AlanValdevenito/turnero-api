@@ -300,8 +300,20 @@ describe GestorTurnos do
   end
 
   describe 'Historial de turnos' do
+    let(:usuario) { instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789) }
+
     it 'deberia lanzar excepcion NoHayHistorialTurnosException si el paciente nunca reservo turnos' do
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([])
       expect { contexto[:gestor_turnos].historial_turnos_paciente(123_456_789) }.to raise_error(NoHayHistorialTurnosException)
+    end
+
+    it 'deberia devolver una lista con 1 turno cuyo estado es "Ausente" si el paciente reservo un turno y no asistio' do
+      turno = instance_double('Turno', estado: 'Ausente')
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
+
+      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
+
+      expect(historial.first.estado).to eq('Ausente')
     end
   end
 end
