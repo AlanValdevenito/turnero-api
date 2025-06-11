@@ -68,7 +68,7 @@ end
 Entonces('recibo un mensaje de error {string}') do |mensaje_error|
   expect(@response.status).to eq(400)
   body = JSON.parse(@response.body)
-  expect(body['mensaje']).to eq(mensaje_error)
+  expect(body['error']).to eq(mensaje_error)
 end
 
 Dado('el paciente tiene {int} turno con estado {string} con el médico matricula {string} para la fecha {string}') do |cantidad, _estado, matricula, fecha|

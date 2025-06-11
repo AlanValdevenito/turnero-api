@@ -74,7 +74,7 @@ get '/turnos/pacientes/telegram/:telegram_id/proximos' do
     json(respuesta)
   rescue NoHayProximosTurnosException
     status 400
-    json({ mensaje: 'El paciente no tiene próximos turnos' })
+    json({ error: 'El paciente no tiene próximos turnos' })
   end
 end
 
