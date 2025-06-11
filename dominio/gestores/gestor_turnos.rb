@@ -20,7 +20,7 @@ class GestorTurnos
   def turnos_paciente(usuario)
     @repositorio_turnos
       .buscar_por_usuario(usuario)
-      .sort_by(&:fecha_hora)
+      .sort_by(&:fecha_hora).reverse
       .first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
   end
 

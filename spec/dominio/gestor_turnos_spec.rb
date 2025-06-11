@@ -119,13 +119,13 @@ describe GestorTurnos do
     it 'devuelve los turnos ordenados por fecha' do
       result = contexto[:gestor_turnos].turnos_paciente(usuario)
       fechas = result.map(&:fecha_hora)
-      expect(fechas).to eq(fechas.sort)
+      expect(fechas).to eq(fechas.sort.reverse)
     end
 
     it 'devuelve los 20 turnos más próximos' do
       result = contexto[:gestor_turnos].turnos_paciente(usuario)
       fechas = result.map(&:fecha_hora)
-      expect(fechas).to eq(result.map(&:fecha_hora).sort.first(20))
+      expect(fechas).to eq(result.map(&:fecha_hora).sort.reverse.first(20))
     end
 
     def stub_turno_duplicado(contexto, _medico)
