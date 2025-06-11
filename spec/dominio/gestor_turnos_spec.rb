@@ -290,6 +290,13 @@ describe GestorTurnos do
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 1, 1, 9, 0, 0))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(TurnoFuturoException)
     end
+
+    it 'No se puede modificar el estado de un turno que no sea pendiente' do
+      allow(turnos[:futuro]).to receive(:estado).and_return(ESTADO_ASISTIDO)
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO) }.to raise_error(EstadoNoPermitidoException)
+    end
   end
 
   describe 'Historial de turnos' do

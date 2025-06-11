@@ -1,5 +1,6 @@
 require_relative '../excepciones/turno_pasado_exception'
 require_relative '../excepciones/turno_futuro_exception'
+require_relative '../excepciones/estado_no_permitido_exception'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 ESTADO_PENDIENTE = 'Pendiente'.freeze
@@ -115,7 +116,7 @@ class GestorTurnos
   private
 
   def validar_estado_actual(turno)
-    raise EstadoInvalidoException unless turno.estado == ESTADO_PENDIENTE
+    raise EstadoNoPermitidoException unless turno.estado == ESTADO_PENDIENTE
   end
 
   def fecha_y_hora_actual
