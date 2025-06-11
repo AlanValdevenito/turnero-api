@@ -7,6 +7,7 @@ end
 
 Dado('el médico {string} con matrícula {string} de la especialidad {string} dado de alta') do |medico, matricula, especialidad|
   nombre, apellido = medico.split
+  @matricula = matricula
   request_body = { nombre:, apellido:, matricula:, especialidad: }.to_json
   @response = Faraday.post('/medicos', request_body, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(200)

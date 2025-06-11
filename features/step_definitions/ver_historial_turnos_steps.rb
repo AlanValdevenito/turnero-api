@@ -49,3 +49,23 @@ Entonces('puedo ver mi turno con el médico {string} de la especialidad {string}
 
   expect(encontrado).to be true
 end
+
+Dado('que reserve {int} turnos a los cuales asisti') do |cantidad_turnos|
+  cantidad_turnos.times do |i|
+    minuto = (i + 1).to_s.rjust(2, '0')
+    hora = "09:#{minuto}"
+
+    request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, telegram_id: @telegram_id }.to_json
+    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    @turno_id = JSON.parse(@response.body)['id']
+
+    params = { estado: 'Asistido' }
+    @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+  end
+end
+
+Entonces('puedo ver los {int} turnos que ya pasaron más cercanos a la fecha actual ordenados por fecha desde el mas reciente al mas antiguo') do |cantidad_turnos_visibles|
+  fechas = @turnos.map { |t| DateTime.parse((t['fecha y hora']).to_s) }
+  expect(fechas.length).to eq(cantidad_turnos_visibles)
+  expect(fechas).to eq(fechas.sort.reverse)
+end
