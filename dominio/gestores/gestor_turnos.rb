@@ -75,7 +75,7 @@ class GestorTurnos
 
   def historial_turnos_paciente(usuario)
     turnos = @repositorio_turnos
-             .buscar_por_usuario(usuario).select { |turno| turno.estado == ESTADO_AUSENTE }
+             .buscar_por_usuario(usuario).select { |turno| turno.estado == ESTADO_AUSENTE || turno.estado == ESTADO_ASISTIDO }
 
     raise NoHayHistorialTurnosException if turnos.empty?
 

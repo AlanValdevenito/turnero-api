@@ -315,5 +315,14 @@ describe GestorTurnos do
 
       expect(historial.first.estado).to eq('Ausente')
     end
+
+    it 'deberia devolver una lista con 1 turno cuyo estado es "Asistido" si el paciente reservo un turno y asistio' do
+      turno = instance_double('Turno', estado: 'Asistido')
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
+
+      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
+
+      expect(historial.first.estado).to eq('Asistido')
+    end
   end
 end
