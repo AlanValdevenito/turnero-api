@@ -150,19 +150,19 @@ put '/turnos/:id' do
     status 200
     json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
   rescue TurnoYaPasadoException
-    status 404
+    status 400
     json({ mensaje: 'No se puede cancelar un turno ya pasado' })
   rescue TurnoFuturoException
-    status 404
+    status 400
     json({ mensaje: "No se puede marcar como #{estado} un turno futuro" })
   rescue TurnoNoEncontradoException
     status 404
     json({ mensaje: 'Turno no encontrado' })
   rescue EstadoNoPermitidoException
-    status 404
+    status 409
     json({ mensaje: 'No se puede cambiar el estado de un turno que no este pendiente' })
   rescue EstadoInvalidoException
-    status 404
+    status 400
     json({ mensaje: 'Estado inválido para el turno' })
   end
 end
