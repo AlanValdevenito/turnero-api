@@ -3,7 +3,7 @@ Dado('hay un turno en el futuro') do
     matricula: 'ABC123',
     fecha: '2025-11-03',
     hora: '11:00',
-    telegram_id: @paciente_telegram_id
+    email: @paciente_email
   }
   response = Faraday.post('/turnos', turno.to_json, { 'Content-Type' => 'application/json' })
   json = JSON.parse(response.body)
@@ -28,7 +28,7 @@ Dado('hay un turno ya pasado') do
     matricula: 'ABC123',
     fecha: '2025-03-03',
     hora: '12:00',
-    telegram_id: @paciente_telegram_id
+    email: @paciente_email
   }
   response = Faraday.post('/turnos', turno.to_json, { 'Content-Type' => 'application/json' })
   json = JSON.parse(response.body)

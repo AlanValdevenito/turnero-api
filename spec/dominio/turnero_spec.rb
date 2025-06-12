@@ -87,10 +87,10 @@ describe Turnero do
 
   describe 'Historial de turnos' do
     it 'deberia lanzar excepcion NoHayHistorialTurnosException si el paciente nunca reservo turnos' do
-      usuario = instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789)
-      allow(repositorios[:usuario]).to receive(:buscar_por_telegram_id).with(123_456_789).and_return(usuario)
+      usuario = instance_double('Usuario', email: 'pepe@mail.com')
+      allow(repositorios[:usuario]).to receive(:buscar_por_email).with('pepe@mail.com').and_return(usuario)
       allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return([])
-      expect { turnero.historial_turnos_paciente(123_456_789) }.to raise_error(NoHayHistorialTurnosException)
+      expect { turnero.historial_turnos_paciente('pepe@mail.com') }.to raise_error(NoHayHistorialTurnosException)
     end
   end
 end

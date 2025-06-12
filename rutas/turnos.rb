@@ -56,12 +56,12 @@ get '/turnos/pacientes/:email' do
   end
 end
 
-get '/turnos/pacientes/telegram/:telegram_id/proximos' do
-  logger.debug("GET /turnos/pacientes/telegram/:telegram_id/proximos: #{params}")
-  telegram_id = params[:telegram_id]
+get '/turnos/pacientes/proximos/:email' do
+  logger.debug("GET /turnos/pacientes/proximos/:email #{params}")
+  email = params[:email]
   respuesta = []
   begin
-    turnos = turnero.proximos_turnos_paciente(telegram_id)
+    turnos = turnero.proximos_turnos_paciente(email)
     turnos.map do |e|
       respuesta << {
         id: e.id,
@@ -78,13 +78,13 @@ get '/turnos/pacientes/telegram/:telegram_id/proximos' do
   end
 end
 
-get '/turnos/pacientes/historial/:telegram_id' do
-  logger.debug("GET /turnos/pacientes/historial/:telegram_id: #{params}")
-  telegram_id = params[:telegram_id]
+get '/turnos/pacientes/historial/:email' do
+  logger.debug("GET /turnos/pacientes/historial/:email #{params}")
+  email = params[:email]
   respuesta = []
 
   begin
-    turnos = turnero.historial_turnos_paciente(telegram_id)
+    turnos = turnero.historial_turnos_paciente(email)
     turnos.map do |e|
       respuesta << {
         'id': e.id,
@@ -123,7 +123,7 @@ end
 post '/turnos' do
   logger.debug("POST /turnos: #{@params}")
   begin
-    turno = turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
+    turno = turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:email])
     status 201
     json(turno_a_json(turno))
   rescue UsuarioNoEncontradoException

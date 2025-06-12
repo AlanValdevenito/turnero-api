@@ -25,7 +25,7 @@ Dado('el paciente tiene {int} turnos') do |cantidad_turnos|
   allow_any_instance_of(GestorTurnos).to receive(:es_fecha_valida?).and_return(true)
   cantidad_turnos.times do |i|
     dia = (i + 1).to_s.rjust(2, '0')
-    request_body = { matricula: @medico_matricula, fecha: "2025-03-#{dia}", hora: '15:00', telegram_id: @usuario_telegram_id }.to_json
+    request_body = { matricula: @medico_matricula, fecha: "2025-03-#{dia}", hora: '15:00', email: @email }.to_json
     @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
     expect(@response.status).to eq(201)
   end
@@ -44,7 +44,7 @@ end
 Dado('el paciente tiene {int} turno pendiente con el medico Perez de Traumatologia') do |cantidad_turnos|
   cantidad_turnos.times do |i|
     mes = (i + 2).to_s.rjust(2, '0')
-    request_body = { matricula: @medico_matricula, fecha: "2025-#{mes}-03", hora: '15:50', telegram_id: @usuario_telegram_id }.to_json
+    request_body = { matricula: @medico_matricula, fecha: "2025-#{mes}-03", hora: '15:50', email: @email }.to_json
     @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
     expect(@response.status).to eq(201)
   end

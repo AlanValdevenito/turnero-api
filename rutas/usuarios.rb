@@ -24,7 +24,7 @@ get '/usuarios/telegram/:telegram_id' do
   logger.debug("GET /usuarios/telegram/:telegram_id: #{params}")
   telegram_id = params[:telegram_id]
   begin
-    usuario = turnero.buscar_usuario_por_telegram_id(telegram_id)
+    usuario = turnero.usuario_registrado?(telegram_id)
     status 200
     json({ id: usuario.id, email: usuario.email, telegram_id: usuario.telegram_id })
   rescue UsuarioNoEncontradoException

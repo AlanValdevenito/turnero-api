@@ -29,16 +29,16 @@ class Turnero
     @gestor_usuarios.crear_usuario(email, telegram_id)
   end
 
+  def usuario_registrado?(telegram_id)
+    @gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)
+  end
+
   def usuarios
     @gestor_usuarios.usuarios
   end
 
   def buscar_usuario_por_email(email)
     @gestor_usuarios.buscar_usuario_por_email(email)
-  end
-
-  def buscar_usuario_por_telegram_id(telegram_id)
-    @gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)
   end
 
   def medicos
@@ -59,9 +59,9 @@ class Turnero
     @gestor_turnos.turnos_medico(medico)
   end
 
-  def crear_turno(matricula, fecha, hora, telegram_id)
+  def crear_turno(matricula, fecha, hora, email)
     medico = buscar_medico_por_matricula(matricula)
-    usuario = buscar_usuario_por_telegram_id(telegram_id)
+    usuario = buscar_usuario_por_email(email)
     @gestor_turnos.crear_turno(medico, usuario, fecha, hora)
   end
 
@@ -92,13 +92,13 @@ class Turnero
     @gestor_turnos.disponibilidad_de_medico(medico)
   end
 
-  def proximos_turnos_paciente(telegram_id)
-    usuario = buscar_usuario_por_telegram_id(telegram_id)
+  def proximos_turnos_paciente(email)
+    usuario = buscar_usuario_por_email(email)
     @gestor_turnos.proximos_turnos_paciente(usuario)
   end
 
-  def historial_turnos_paciente(telegram_id)
-    usuario = buscar_usuario_por_telegram_id(telegram_id)
+  def historial_turnos_paciente(email)
+    usuario = buscar_usuario_por_email(email)
     @gestor_turnos.historial_turnos_paciente(usuario)
   end
 

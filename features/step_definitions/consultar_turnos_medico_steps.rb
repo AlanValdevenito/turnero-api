@@ -1,5 +1,6 @@
 Dado('existe el paciente con email {string}') do |email|
   @telegram_id = 345_634_634
+  @email = email
   request_body = { email:, telegram_id: @telegram_id }.to_json
   @response = Faraday.post('/usuarios', request_body, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(201)
@@ -22,8 +23,8 @@ Cuando('consulto los turnos del médico con matrícula {string}') do |matricula|
   @turnos = JSON.parse(@response.body)
 end
 
-Dado('el médico con matrícula {string} tiene un turno {string} con el paciente {string} para la fecha {string} durante el horario {string}') do |matricula, _estado_del_turno, _email, fecha, hora|
-  request_body = { matricula:, fecha:, hora:, telegram_id: @telegram_id }.to_json
+Dado('el médico con matrícula {string} tiene un turno {string} con el paciente {string} para la fecha {string} durante el horario {string}') do |matricula, _estado_del_turno, email, fecha, hora|
+  request_body = { matricula:, fecha:, hora:, email: }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
   @id_turno = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)

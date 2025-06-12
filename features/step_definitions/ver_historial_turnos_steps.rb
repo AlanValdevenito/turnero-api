@@ -3,7 +3,7 @@ Dado('que nunca reserve un turno') do
 end
 
 Cuando('quiero ver mi historial de turnos') do
-  @response = Faraday.get("/turnos/pacientes/historial/#{@telegram_id}")
+  @response = Faraday.get("/turnos/pacientes/historial/#{@email}")
   @turnos = JSON.parse(@response.body)
 end
 
@@ -15,7 +15,7 @@ end
 Dado('que para la fecha {string} reserve 1 turno con el médico con matrícula {string} siendo hoy {string}') do |fecha_turno, matricula, fecha_actual|
   allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha_actual))
 
-  request_body = { matricula:, fecha: fecha_turno, hora: '09:00', telegram_id: @telegram_id }.to_json
+  request_body = { matricula:, fecha: fecha_turno, hora: '09:00', email: @email }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
   @turno_id = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)
@@ -40,7 +40,7 @@ Dado('cancele el turno') do
 end
 
 Entonces('puedo ver mi turno con el médico {string} de la especialidad {string} con estado {string}') do |medico, especialidad, estado|
-  @response = Faraday.get("/turnos/pacientes/historial/#{@telegram_id}")
+  @response = Faraday.get("/turnos/pacientes/historial/#{@email}")
   @turnos = JSON.parse(@response.body)
 
   encontrado = @turnos.any? do |turno|
@@ -55,7 +55,7 @@ Dado('que reserve {int} turnos a los cuales asisti') do |cantidad_turnos|
     minuto = (i + 1).to_s.rjust(2, '0')
     hora = "09:#{minuto}"
 
-    request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, telegram_id: @telegram_id }.to_json
+    request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, email: @email }.to_json
     @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
     @turno_id = JSON.parse(@response.body)['id']
 

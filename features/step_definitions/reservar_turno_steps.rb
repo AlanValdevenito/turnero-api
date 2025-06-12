@@ -66,7 +66,7 @@ Cuando('el usuario selecciona un turno') do
     matricula: '1',
     fecha: @turno_seleccionado['fecha'],
     hora: @turno_seleccionado['hora'],
-    telegram_id: 123_456_789
+    email: 'juan@mail.com'
   }
   @response = Faraday.post('/turnos', @params.to_json, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(201)

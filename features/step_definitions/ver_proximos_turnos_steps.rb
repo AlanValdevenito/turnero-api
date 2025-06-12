@@ -39,7 +39,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico {string} 
 
   # TODO: POR AHORA NO SE PUEDE CAMBIAR EL ESTADO DEL TURNO, SE DEBE CREAR CON EL ESTADO QUE SE QUIERA
   # O PODER CAMBIARLO DESDE LA API -> POR ESO USO REPOSITORIOS
-  usuario = RepositorioUsuarios.new.buscar_por_telegram_id(@paciente_telegram_id)
+  usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
   medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
   repo_turnos = RepositorioTurnos.new
 
@@ -51,7 +51,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico {string} 
 end
 
 Cuando('solicito los proximos turnos del paciente') do
-  get "/turnos/pacientes/telegram/#{@paciente_telegram_id}/proximos"
+  get "/turnos/pacientes/proximos/#{@paciente_email}"
   @response = last_response
 end
 
@@ -79,7 +79,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico matricula
       matricula:,
       fecha:,
       hora: '10:00',
-      telegram_id: @paciente_telegram_id
+      email: @paciente_email
     }
     @response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
   end
