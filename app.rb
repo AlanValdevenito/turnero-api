@@ -3,7 +3,9 @@ require 'sinatra/json'
 require 'sequel'
 require 'sinatra/custom_logger'
 require 'dotenv/load'
+require 'uuid'
 require_relative './config/configuration'
+require_relative './config/middleware'
 require_relative './lib/version'
 Dir[File.join(__dir__, 'dominio', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, 'dominio/adapters', '*.rb')].each { |file| require file }
@@ -17,6 +19,7 @@ configure do
   set :default_content_type, :json
   set :environment, ENV['APP_MODE'].to_sym
   set :turnero, Turnero.new(RepositorioUsuarios.new, RepositorioMedicos.new, RepositorioEspecialidades.new, RepositorioTurnos.new, ProveedorDia.new, ProveedorFeriados.new, ProveedorHora.new)
+  use LogMiddleware
   customer_logger.info('Iniciando turnero...')
 end
 
