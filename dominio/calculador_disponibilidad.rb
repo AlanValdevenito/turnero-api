@@ -1,4 +1,6 @@
 class CalculadorDeDisponibilidad
+  attr_reader :proveedor_dia, :proveedor_hora, :proveedor_feriados
+
   def initialize(proveedor_dia, proveedor_hora, proveedor_feriados)
     @proveedor_dia = proveedor_dia
     @proveedor_hora = proveedor_hora

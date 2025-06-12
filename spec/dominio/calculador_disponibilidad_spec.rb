@@ -7,6 +7,7 @@ require_relative '../../dominio/calculador_disponibilidad'
 describe 'CalculadorDeDisponibilidad' do
   before(:each) do
     stub_const('CANTIDAD_TURNOS', 3)
+    allow(calculador.proveedor_dia).to receive(:hoy).and_return(Date.parse('2025-06-11'))
   end
 
   describe '.turnos_para_dia' do
