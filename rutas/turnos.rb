@@ -123,7 +123,7 @@ end
 post '/turnos' do
   logger.debug("POST /turnos: #{@params}")
   begin
-    turno = crear_turno_desde_params(@params)
+    turno = turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
     status 201
     json(turno_a_json(turno))
   rescue UsuarioNoEncontradoException
@@ -143,35 +143,39 @@ end
 
 put '/turnos/:id' do
   logger.debug("PUT /turnos/:id: #{@params}")
+  id = params['id']
+  estado = @params[:estado]
   begin
-    id = params['id']
-    estado = @params[:estado]
     turno = turnero.modificar_estado_turno(id, estado)
     status 200
     json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
-  rescue TurnoYaPasadoException
-    status 400
-    json({ mensaje: 'No se puede cancelar un turno ya pasado' })
-  rescue TurnoFuturoException
-    status 400
-    json({ mensaje: "No se puede marcar como #{estado} un turno futuro" })
-  rescue TurnoNoEncontradoException
-    status 404
-    json({ mensaje: 'Turno no encontrado' })
-  rescue EstadoNoPermitidoException
-    status 409
-    json({ mensaje: 'No se puede cambiar el estado de un turno que no este pendiente' })
-  rescue EstadoInvalidoException
-    status 400
-    json({ mensaje: 'Estado inválido para el turno' })
+  rescue StandardError => e
+    manejar_error_modificacion_turno(e, estado)
   end
 end
 
 helpers do
-  def crear_turno_desde_params(params)
-    turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:telegram_id])
+  def manejar_error_modificacion_turno(error, estado)
+    case error
+    when ArgumentError
+      halt 404, json({ mensaje: 'Id inválido: debe ser un entero' })
+    when TurnoYaPasadoException
+      halt 400, json({ mensaje: 'No se puede cancelar un turno ya pasado' })
+    when TurnoFuturoException
+      halt 400, json({ mensaje: "No se puede marcar como #{estado} un turno futuro" })
+    when TurnoNoEncontradoException
+      halt 404, json({ mensaje: 'Turno no encontrado' })
+    when EstadoNoPermitidoException
+      halt 409, json({ mensaje: 'No se puede cambiar el estado de un turno que no este pendiente' })
+    when EstadoInvalidoException
+      halt 400, json({ mensaje: 'Estado inválido para el turno' })
+    else
+      halt 500, json({ mensaje: 'Error inesperado' })
+    end
   end
+end
 
+helpers do
   def turno_a_json(turno)
     {
       message: 'El turno se reservó exitosamente',

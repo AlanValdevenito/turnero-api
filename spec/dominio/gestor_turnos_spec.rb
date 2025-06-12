@@ -301,6 +301,10 @@ describe GestorTurnos do
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO) }.to raise_error(EstadoNoPermitidoException)
     end
+
+    it 'deberia tirar error si el id no es un entero' do
+      expect { contexto[:gestor_turnos].modificar_estado_turno('abc', ESTADO_CANCELADO) }.to raise_error(ArgumentError)
+    end
   end
 
   describe 'Historial de turnos' do

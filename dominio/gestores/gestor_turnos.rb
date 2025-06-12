@@ -18,14 +18,9 @@ class GestorTurnos
     @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora, proveedor_feriados)
   end
 
-  def turnos_paciente(usuario)
-    @repositorio_turnos
-      .buscar_por_usuario(usuario).sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
-  end
+  def turnos_paciente(usuario) = turnos_recientes(@repositorio_turnos.buscar_por_usuario(usuario))
 
-  def turnos_medico(medico)
-    @repositorio_turnos.buscar_por_medico(medico).sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
-  end
+  def turnos_medico(medico) = turnos_recientes(@repositorio_turnos.buscar_por_medico(medico))
 
   def crear_turno(medico, usuario, fecha, hora)
     raise FechaNoValidaException unless es_fecha_valida?(fecha)
@@ -64,7 +59,7 @@ class GestorTurnos
 
   def proximos_turnos_paciente(usuario)
     turnos = @repositorio_turnos.buscar_por_usuario(usuario)
-                                .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == Turno::ESTADO_PENDIENTE }
+                                .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == ESTADO_PENDIENTE }
                                 .sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
 
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
@@ -75,7 +70,7 @@ class GestorTurnos
   def historial_turnos_paciente(usuario)
     turnos = @repositorio_turnos
              .buscar_por_usuario(usuario)
-             .select { |turno| turno.estado == ESTADO_AUSENTE || turno.estado == ESTADO_ASISTIDO || turno.estado == ESTADO_CANCELADO }
+             .reject { |turno| turno.estado == ESTADO_PENDIENTE }
              .sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
 
     raise NoHayHistorialTurnosException if turnos.empty?
@@ -91,6 +86,8 @@ class GestorTurnos
   end
 
   def modificar_estado_turno(turno_id, nuevo_estado)
+    validar_turno_id(turno_id)
+
     turno = buscar_turno_por_id(turno_id)
 
     validar_estado_actual(turno)
@@ -110,12 +107,22 @@ class GestorTurnos
     else
       raise EstadoInvalidoException
     end
-
     @repositorio_turnos.save(turno)
     turno
   end
 
   private
+
+  def validar_turno_id(turno_id)
+    id = Integer(turno_id)
+    raise ArgumentError if id <= 0 || id > 2**31 - 1
+
+    id
+  end
+
+  def turnos_recientes(turnos)
+    turnos.sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
+  end
 
   def validar_estado_actual(turno)
     raise EstadoNoPermitidoException unless turno.estado == ESTADO_PENDIENTE
@@ -128,16 +135,10 @@ class GestorTurnos
   end
 
   def validar_turno_pasado(turno, ahora)
-    fecha_turno = turno.fecha_hora.to_time
-    fecha_ahora = ahora.to_time
-
-    raise TurnoYaPasadoException if fecha_turno < fecha_ahora
+    raise TurnoYaPasadoException if turno.fecha_hora.to_time < ahora.to_time
   end
 
   def validar_turno_futuro(turno, ahora)
-    fecha_turno = turno.fecha_hora.to_time
-    fecha_ahora = ahora.to_time
-
-    raise TurnoFuturoException if fecha_turno > fecha_ahora
+    raise TurnoFuturoException if turno.fecha_hora.to_time > ahora.to_time
   end
 end
