@@ -25,6 +25,6 @@ class Turno
   end
 
   def proximas_24hs
-    false
+    (@fecha_hora.to_time - ProveedorHora.new.ahora).abs < 24 * 60 * 60
   end
 end

@@ -59,7 +59,6 @@ end
 get '/turnos/pacientes/proximos/:email' do
   logger.debug("GET /turnos/pacientes/proximos/:email #{params}")
   email = params[:email]
-  puts email
   respuesta = []
   begin
     turnos = turnero.proximos_turnos_paciente(email)
@@ -69,7 +68,7 @@ get '/turnos/pacientes/proximos/:email' do
         'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
         especialidad: e.medico.especialidad.nombre,
         medico: "#{e.medico.nombre} #{e.medico.apellido}",
-        proximas_24hs: e.proximas_24hs
+        proximas_24hs: turnero.ocurre_proximas_24hs?(e)
       }
     end
     status 200

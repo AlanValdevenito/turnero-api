@@ -105,4 +105,8 @@ class Turnero
   def modificar_estado_turno(turno_id, nuevo_estado)
     @gestor_turnos.modificar_estado_turno(turno_id, nuevo_estado)
   end
+
+  def ocurre_proximas_24hs?(_turno)
+    false
+  end
 end
