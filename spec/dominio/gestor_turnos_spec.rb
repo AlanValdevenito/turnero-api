@@ -371,7 +371,15 @@ describe GestorTurnos do
     it 'devuelve false si el turno no ocurre en las proximas 24hs' do
       allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(DateTime.parse('2025-06-13T14:00:00'))
       turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-15T14:00:00'))
+      allow(turno).to receive(:proximas_24hs?).with(DateTime.parse('2025-06-13T14:00:00')).and_return(false)
       expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(false)
+    end
+
+    it 'devuelve true si el turno ocurre en las proximas 24hs' do
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(DateTime.parse('2025-06-13T14:00:00'))
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-14T12:00:00'))
+      allow(turno).to receive(:proximas_24hs?).with(DateTime.parse('2025-06-13T14:00:00')).and_return(true)
+      expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
     end
   end
 end

@@ -24,7 +24,7 @@ class Turno
     fecha_hora.strftime('%H:%M')
   end
 
-  def proximas_24hs
-    (@fecha_hora.to_time - ProveedorHora.new.ahora).abs < 24 * 60 * 60
+  def proximas_24hs?(ahora)
+    (@fecha_hora.to_time - ahora).abs < 24 * 60 * 60
   end
 end

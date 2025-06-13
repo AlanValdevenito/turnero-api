@@ -107,8 +107,8 @@ class GestorTurnos
     turno
   end
 
-  def ocurre_proximas_24hs?(_turno)
-    false
+  def ocurre_proximas_24hs?(turno)
+    turno.proximas_24hs?(@proveedor_hora.ahora)
   end
 
   private
