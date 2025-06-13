@@ -67,7 +67,8 @@ get '/turnos/pacientes/proximos/:email' do
         id: e.id,
         'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
         especialidad: e.medico.especialidad.nombre,
-        medico: "#{e.medico.nombre} #{e.medico.apellido}"
+        medico: "#{e.medico.nombre} #{e.medico.apellido}",
+        proximas_24hs: false
       }
     end
     status 200
