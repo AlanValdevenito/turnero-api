@@ -23,4 +23,8 @@ class Turno
   def hora
     fecha_hora.strftime('%H:%M')
   end
+
+  def proximas_24hs
+    false
+  end
 end

@@ -10,12 +10,13 @@ Antecedentes:
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-10'
       Y consulto mis turnos
       Cuando pido cancelar el turno
-      Entonces devuelve el mensaje "Turno cancelado con exito"
+      Entonces devuelve el mensaje "Turno actualizado: estado Cancelado"
     @wip
     Escenario: US-4.2 Cancelar un turno con menos de 24hs de anticipacion
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'
+      Y consulto mis turnos
       Cuando pido cancelar el turno
-      Entonces devuelve el mensaje "Turno cancelado con poca anticipacion, sera tomado como ausente"
+      Entonces devuelve el mensaje "Turno actualizado: estado Ausente"
     @wip
     Escenario: US-4.3 Cancelar un turno con un id que no existe
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'
