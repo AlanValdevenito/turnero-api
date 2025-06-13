@@ -364,4 +364,14 @@ describe GestorTurnos do
       expect(historial.size).to eq(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
     end
   end
+
+  describe 'Cancelar turnos' do
+    let(:usuario) { instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789) }
+
+    it 'devuelve false si el turno no ocurre en las proximas 24hs' do
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(DateTime.parse('2025-06-13T14:00:00'))
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-15T14:00:00'))
+      expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(false)
+    end
+  end
 end

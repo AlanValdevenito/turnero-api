@@ -58,20 +58,16 @@ class GestorTurnos
   end
 
   def proximos_turnos_paciente(usuario)
-    turnos = @repositorio_turnos.buscar_por_usuario(usuario)
-                                .select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == ESTADO_PENDIENTE }
+    turnos = @repositorio_turnos.buscar_por_usuario(usuario).select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == ESTADO_PENDIENTE }
                                 .sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
-
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
 
     turnos
   end
 
   def historial_turnos_paciente(usuario)
-    turnos = @repositorio_turnos
-             .buscar_por_usuario(usuario)
-             .reject { |turno| turno.estado == ESTADO_PENDIENTE }
-             .sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
+    turnos = @repositorio_turnos.buscar_por_usuario(usuario).reject { |turno| turno.estado == ESTADO_PENDIENTE }
+                                .sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
 
     raise NoHayHistorialTurnosException if turnos.empty?
 
@@ -109,6 +105,10 @@ class GestorTurnos
     end
     @repositorio_turnos.save(turno)
     turno
+  end
+
+  def ocurre_proximas_24hs?(_turno)
+    false
   end
 
   private
