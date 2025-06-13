@@ -4,6 +4,7 @@ require_relative '../excepciones/estado_no_permitido_exception'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES = 15
+DIAS_DE_DISPONIBILIDAD = 60
 ESTADO_PENDIENTE = 'Pendiente'.freeze
 ESTADO_AUSENTE = 'Ausente'.freeze
 ESTADO_CANCELADO = 'Cancelado'.freeze
@@ -36,7 +37,7 @@ class GestorTurnos
   def disponibilidad_de_medico(medico)
     duracion_turno = medico.especialidad.duracion_de_turnos
     fecha_inicio = @proveedor_dia.hoy
-    fecha_fin = fecha_inicio + 60
+    fecha_fin = fecha_inicio + DIAS_DE_DISPONIBILIDAD
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
 
