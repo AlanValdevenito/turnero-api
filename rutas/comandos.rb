@@ -1,5 +1,6 @@
 get '/version' do
   logger.info('GET /version')
+  turnero.usuarios
   json({ version: Version.current })
 end
 
