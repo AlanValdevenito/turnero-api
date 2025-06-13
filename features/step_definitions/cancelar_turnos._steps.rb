@@ -1,6 +1,7 @@
 Dado('que para la fecha {string} reserve {int} turno con el medico con matricula {string} siendo hoy {string}') do |fecha_turno, _cantidad_turnos, matricula, fecha_hoy|
   allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha_hoy))
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(Time.local(2025, 0o6, 10, 8, 0, 0))
+  anio, mes, dia = fecha_hoy.split('-')
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
   medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
   usuario = RepositorioUsuarios.new.buscar_por_email(@email)
   turno = Turno.new(medico, usuario, Date.parse(fecha_turno), 'Pendiente')
@@ -18,7 +19,7 @@ Cuando('pido cancelar el turno') do
   @response = Faraday.put("/turnos/#{@turno['id']}", request_body, { 'Content-Type' => 'application/json' })
 end
 
-Entonces('devuelve el mensaje {string}') do |_mensaje|
+Entonces('devuelve el mensaje {string}') do |mensaje|
   expect(@response.status).to eq 200
-  expect(JSON.parse(@response.body)['mensaje']).to include 'Cancelado'
+  expect(JSON.parse(@response.body)['mensaje']).to include mensaje
 end
