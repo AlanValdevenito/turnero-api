@@ -37,16 +37,24 @@ end
 Dado('el paciente tiene {int} turno con estado {string} con el médico {string} matricula {string} de la especialidad {string}') do |cantidad, estado, _medico_nombre, matricula, _especialidad|
   raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
 
-  # TODO: POR AHORA NO SE PUEDE CAMBIAR EL ESTADO DEL TURNO, SE DEBE CREAR CON EL ESTADO QUE SE QUIERA
-  # O PODER CAMBIARLO DESDE LA API -> POR ESO USO REPOSITORIOS
-  usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
-  medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
-  repo_turnos = RepositorioTurnos.new
-
   cantidad.times do
-    fecha_hora = DateTime.parse("#{@fecha_actual + 1}T10:00:00")
-    turno = Turno.new(medico, usuario, fecha_hora, estado)
-    repo_turnos.save(turno)
+    turno_hash = {
+      matricula:,
+      fecha: (@fecha_actual + 1).strftime('%Y-%m-%d'),
+      hora: '10:00',
+      email: @paciente_email
+    }
+    response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+    turno_id = JSON.parse(response.body)['id']
+
+    # Solo cambiar el estado si no es 'Pendiente'
+    next unless estado != 'Pendiente'
+
+    Faraday.put(
+      "/turnos/#{turno_id}",
+      { estado: }.to_json,
+      { 'Content-Type' => 'application/json' }
+    )
   end
 end
 
