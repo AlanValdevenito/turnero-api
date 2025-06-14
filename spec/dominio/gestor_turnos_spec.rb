@@ -10,28 +10,65 @@ describe GestorTurnos do
   let(:contexto) do
     {
       especialidad: Especialidad.new('Traumatologia', 10),
-      usuario: Usuario.new('Juan@mail.com'),
-      turno_mock: {
-        fecha_hora: Time.now + 3600 # Un turno ficticio para pruebas
-      }
+      usuario: Usuario.new('Juan@mail.com')
     }.tap do |ctx|
       ctx[:medico] = Medico.new('Michael', 'Jordan', 1, ctx[:especialidad])
-      turno = Turno.crear(
-        Medico.new('Medico1', 'Apellido1', 'ABC123', ctx[:especialidad]),
-        ctx[:usuario],
-        '2025-06-05',
-        '10:00'
-      )
-      ctx[:repositorio_turnos] = instance_double('RepositorioTurnos',
-                                                 all: [],
-                                                 buscar_por_usuario: [turno],
-                                                 buscar_por_medico: [turno])
+
+      # ProveedorHora mock
+      ctx[:hora_base] = Time.utc(2025, 6, 16, 10, 0, 0)
+      ctx[:proveedor_hora] = instance_double('ProveedorHora', ahora: ctx[:hora_base])
+      allow(ctx[:proveedor_hora]).to receive(:construir_hora_utc) do |anio, mes, dia, hora, min|
+        Time.utc(anio, mes, dia, hora, min)
+      end
+
+      allow(ctx[:proveedor_hora]).to receive(:construir_hora_desde_local) do |anio, mes, dia, hora, min|
+        # Simula conversión de horario local a UTC (ejemplo: UTC-3)
+        Time.utc(anio, mes, dia, hora + 3, min)
+      end
+
+      allow(ctx[:proveedor_hora]).to receive(:cambiar_a_huso_horario_local) do |fecha_utc|
+        # Simula conversión de UTC a hora local (ejemplo: UTC-3)
+        fecha_utc - 3 * 60 * 60
+      end
+
+      # ProveedorDia mock
       ctx[:proveedor_dia] = instance_double('ProveedorDia', hoy: Date.parse('2025-06-16'))
+      allow(ctx[:proveedor_dia]).to receive(:cambiar_a_huso_horario_local) do |fecha_utc|
+        # para simular hora local solo restamos 3 horas (UTC-3)
+        fecha_utc - 3 * 60 * 60
+      end
+
+      # Turno mock ocupado a las 10:30 UTC
+      turno_mock_utc = ctx[:proveedor_hora].construir_hora_utc(2025, 6, 16, 10, 30)
+      ctx[:turno_mock] = { fecha_hora: turno_mock_utc }
+
+      # Turno registrado para usuario
+      turno_usuario = Turno.new(
+        ctx[:medico],
+        ctx[:usuario],
+        ctx[:proveedor_hora].construir_hora_utc(2025, 6, 5, 10, 0)
+      )
+
+      ctx[:repositorio_turnos] = instance_double(
+        'RepositorioTurnos',
+        all: [],
+        buscar_por_usuario: [turno_usuario],
+        buscar_por_medico: [turno_usuario]
+      )
+
       ctx[:proveedor_feriados] = instance_double('ProveedorFeriadosDummy', feriados: [{ dia: 16, mes: 6 }])
-      ctx[:hora_base] = Time.new(2025, 6, 16, 10, 0, 0)
-      ctx[:proveedor_hora] = instance_double('ProveedorHora', ahora: ctx[:hora_base], construir_hora: ctx[:hora_base])
-      ctx[:gestor_turnos] = described_class.new(ctx[:repositorio_turnos], ctx[:proveedor_dia], ctx[:proveedor_feriados], ctx[:proveedor_hora])
+
+      ctx[:gestor_turnos] = described_class.new(
+        ctx[:repositorio_turnos],
+        ctx[:proveedor_dia],
+        ctx[:proveedor_feriados],
+        ctx[:proveedor_hora]
+      )
     end
+  end
+
+  def hora_utc(anio, mes, dia, hora, minuto = 0)
+    contexto[:proveedor_hora].construir_hora_utc(anio, mes, dia, hora, minuto)
   end
 
   def stub_turnos_existentes(turnos)
@@ -39,41 +76,36 @@ describe GestorTurnos do
   end
 
   it 'deberia devolver turnos disponibles para el médico' do
-    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
-
     stub_turnos_existentes([])
-
-    turnos_disponibles = contexto[:gestor_turnos].disponibilidad_de_medico(medico)
-    expect(turnos_disponibles.size).to be <= TURNOS_DISPONIBLES
+    turnos = contexto[:gestor_turnos].disponibilidad_de_medico(contexto[:medico])
+    expect(turnos).not_to be_empty
+    expect(turnos.size).to be <= TURNOS_DISPONIBLES
   end
 
-  it 'deberia devolver turnos disponibles cuando algunos turnos ya están ocupados' do
-    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
-
+  it 'deberia excluir turnos ya ocupados del listado de disponibles' do
     stub_turnos_existentes([contexto[:turno_mock]])
-    turnos_disponibles = contexto[:gestor_turnos].disponibilidad_de_medico(medico)
-    expect(turnos_disponibles).not_to include(contexto[:turno_mock][:fecha_hora])
+    turnos = contexto[:gestor_turnos].disponibilidad_de_medico(contexto[:medico])
+    expect(turnos).not_to include(contexto[:proveedor_dia].cambiar_a_huso_horario_local(contexto[:turno_mock][:fecha_hora]))
   end
 
-  it 'deberia devolver turnos disponibles de un usuario' do
-    usuario = Usuario.new('Juan@mail.com')
-    turnos = contexto[:gestor_turnos].turnos_paciente(usuario.email)
-    expect(turnos.first.usuario.email).to eq(usuario.email)
+  it 'deberia devolver los turnos de un usuario' do
+    turnos = contexto[:gestor_turnos].turnos_paciente(contexto[:usuario].email)
+    expect(turnos.size).to eq(1)
+    expect(turnos.first.usuario.email).to eq(contexto[:usuario].email)
   end
 
-  it 'deberia devolver 0 turnos disponibles de un medico si no tiene turnos' do
-    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
-    allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(medico).and_return([])
-    turnos = contexto[:gestor_turnos].turnos_medico(medico)
-    expect(turnos.size).to eq(0)
+  it 'deberia devolver 0 turnos si el medico no tiene turnos registrados' do
+    allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(contexto[:medico]).and_return([])
+    turnos = contexto[:gestor_turnos].turnos_medico(contexto[:medico])
+    expect(turnos).to be_empty
   end
 
-  it 'deberia devolver 1 turno disponible de un medico que tiene 1 turno' do
-    especialidad = Especialidad.new('Traumatologia', 10)
-    medico = Medico.new('Medico1', 'Apellido1', 'ABC123', especialidad)
-    turnos = contexto[:gestor_turnos].turnos_medico(medico)
+  it 'deberia devolver 1 turno si el medico tiene 1 turno' do
+    turnos = contexto[:gestor_turnos].turnos_medico(contexto[:medico])
     expect(turnos.size).to eq(1)
   end
+
+  #=======================================================================================================#
 
   def stub_buscar_turnos_por_medico(medico, turnos)
     allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(medico).and_return(turnos)
@@ -100,51 +132,57 @@ describe GestorTurnos do
   end
 
   context 'when hay más de 20 turnos para un usuario' do
-    let(:usuario) { Usuario.new('pepe@mail.com') }
+    let(:usuario) { Usuario.new('otro@mail.com') }
+
     let(:turnos) do
       (1..30).map do |i|
         Turno.new(
           Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10)),
           usuario,
-          DateTime.now + i
+          Time.utc(2025, 6, 1) + i * 3600
         )
       end
     end
 
     before(:each) do
-      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(turnos)
     end
 
     it 'devuelve como máximo 20 turnos' do
-      result = contexto[:gestor_turnos].turnos_paciente(usuario)
+      result = contexto[:gestor_turnos].turnos_paciente(usuario.email)
       expect(result.size).to be <= 20
     end
 
-    it 'devuelve los turnos ordenados por fecha' do
-      result = contexto[:gestor_turnos].turnos_paciente(usuario)
+    it 'devuelve los turnos ordenados por fecha descendente' do
+      result = contexto[:gestor_turnos].turnos_paciente(usuario.email)
       fechas = result.map(&:fecha_hora)
       expect(fechas).to eq(fechas.sort.reverse)
     end
 
     it 'devuelve los 20 turnos más próximos' do
-      result = contexto[:gestor_turnos].turnos_paciente(usuario)
-      fechas = result.map(&:fecha_hora)
-      expect(fechas).to eq(result.map(&:fecha_hora).sort.reverse.first(20))
+      result = contexto[:gestor_turnos].turnos_paciente(usuario.email)
+      fechas_esperadas = turnos.map(&:fecha_hora).sort.reverse.first(20)
+      expect(result.map(&:fecha_hora)).to eq(fechas_esperadas)
     end
 
-    def stub_turno_duplicado(contexto, _medico)
-      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(instance_of(Medico)).and_return([])
-      allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno)).and_raise(TurnoYaExisteException)
+    def stub_turno_duplicado(contexto, medico, fecha_hora_utc)
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(medico).and_return([
+                                                                                                    Turno.new(medico, usuario, fecha_hora_utc)
+                                                                                                  ])
     end
 
     it 'no deberia guardar turnos duplicados' do
       medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
-      stub_turno_duplicado(contexto, medico)
+
+      stub_turno_duplicado(contexto, medico, hora_utc(2025, 6, 5, 10, 0))
+
       expect do
         contexto[:gestor_turnos].crear_turno(medico, usuario, '2025-06-05', '10:00')
       end.to raise_error(TurnoYaExisteException)
     end
   end
+
+  #=======================================================================================================#
 
   context 'when hay más de 20 turnos para un medico' do
     let(:especialidad) { Especialidad.new('Traumatologia', 10) }
@@ -154,7 +192,7 @@ describe GestorTurnos do
         Turno.new(
           medico,
           Usuario.new('usuario@prueba.com'),
-          DateTime.now + i
+          Time.utc(2025, 6, 1) + i * 3600
         )
       end
     end
@@ -175,68 +213,68 @@ describe GestorTurnos do
     end
   end
 
+  #=======================================================================================================#
   describe '#proximos_turnos_paciente' do
     let(:especialidad) { instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10) }
     let(:medico) { instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad:) }
+    let(:usuario) { instance_double('Usuario', email: 'paciente@mail.com') }
 
-    context 'when cuando hay turnos antes y después de la hora actual' do
-      let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
+    before(:each) do
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 16, 15))
+    end
+
+    context 'when hay turnos antes y después de la hora actual' do
       let(:turnos) do
         [
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T14:00:00'), estado: 'Pendiente', id: 1),
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 2),
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Pendiente', id: 3)
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 14), estado: 'Pendiente', id: 1),
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 15), estado: 'Pendiente', id: 2),
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 16), estado: 'Pendiente', id: 3)
         ]
       end
 
       before(:each) do
-        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(contexto[:usuario]).and_return(turnos)
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
       end
 
       it 'devuelve solo los turnos desde la hora actual en adelante, ordenados por fecha y hora' do
-        result = contexto[:gestor_turnos].proximos_turnos_paciente(contexto[:usuario])
+        result = contexto[:gestor_turnos].proximos_turnos_paciente(usuario)
         expect(result.size).to eq(2)
-        expect(result.map(&:fecha_hora)).to eq([DateTime.parse('2025-06-16T15:00:00'), DateTime.parse('2025-06-16T16:00:00')])
+        expect(result.map(&:fecha_hora)).to eq([hora_utc(2025, 6, 16, 15), hora_utc(2025, 6, 16, 16)])
         expect(result.map(&:id)).to eq([2, 3])
       end
     end
 
-    context 'when cuando hay turnos cancelados' do
-      let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
+    context 'when hay turnos cancelados' do
       let(:turnos) do
         [
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T15:00:00'), estado: 'Pendiente', id: 1),
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T16:00:00'), estado: 'Cancelado', id: 2),
-          instance_double('Turno', medico:, usuario: contexto[:usuario], fecha_hora: DateTime.parse('2025-06-16T17:00:00'), estado: 'Pendiente', id: 3)
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 15), estado: 'Pendiente', id: 1),
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 16), estado: 'Cancelado', id: 2),
+          instance_double('Turno', medico:, usuario:, fecha_hora: hora_utc(2025, 6, 16, 17), estado: 'Pendiente', id: 3)
         ]
       end
 
       before(:each) do
-        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(contexto[:usuario]).and_return(turnos)
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
       end
 
       it 'devuelve solo los turnos pendientes, no los cancelados' do
-        result = contexto[:gestor_turnos].proximos_turnos_paciente(contexto[:usuario])
+        result = contexto[:gestor_turnos].proximos_turnos_paciente(usuario)
         expect(result.size).to eq(2)
         expect(result.map(&:estado)).to all(eq('Pendiente'))
         expect(result.map(&:id)).to eq([1, 3])
       end
     end
 
-    context 'when cuando no hay próximos turnos' do
-      let(:ahora) { DateTime.parse('2025-06-16T15:00:00') }
+    context 'when no hay próximos turnos' do
       let(:turnos) { [] }
 
       before(:each) do
-        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(contexto[:usuario]).and_return(turnos)
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(usuario).and_return(turnos)
       end
 
       it 'lanza NoHayProximosTurnosException si no hay próximos turnos' do
         expect do
-          contexto[:gestor_turnos].proximos_turnos_paciente(contexto[:usuario])
+          contexto[:gestor_turnos].proximos_turnos_paciente(usuario)
         end.to raise_error(NoHayProximosTurnosException)
       end
     end
@@ -249,13 +287,13 @@ describe GestorTurnos do
           'Turno',
           id: 2,
           estado: ESTADO_PENDIENTE,
-          fecha_hora: DateTime.parse('2025-11-01T10:00:00')
+          fecha_hora: hora_utc(2025, 11, 1, 10)
         ),
         pasado: instance_double(
           'Turno',
           id: 3,
           estado: ESTADO_PENDIENTE,
-          fecha_hora: DateTime.parse('2025-01-01T10:00:00')
+          fecha_hora: hora_utc(2025, 1, 1, 10)
         )
       }
     end
@@ -269,7 +307,7 @@ describe GestorTurnos do
 
     it 'permite cancelar un turno futuro' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
       expect(turnos[:futuro]).to receive(:estado=).with(ESTADO_CANCELADO)
       result = contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO)
       expect(result).to eq(turnos[:futuro])
@@ -277,13 +315,13 @@ describe GestorTurnos do
 
     it 'no permite cancelar un turno pasado' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
       expect { contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_CANCELADO) }.to raise_error(TurnoYaPasadoException)
     end
 
     it 'permite marcar como asistido un turno pasado' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
       expect(turnos[:pasado]).to receive(:estado=).with(ESTADO_ASISTIDO)
       result = contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_ASISTIDO)
       expect(result).to eq(turnos[:pasado])
@@ -291,18 +329,18 @@ describe GestorTurnos do
 
     it 'no permite marcar como asistido un turno futuro' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 1, 1, 9, 0, 0))
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 1, 1, 9))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(TurnoFuturoException)
     end
 
-    it 'No se puede modificar el estado de un turno que no sea pendiente' do
+    it 'no se puede modificar el estado de un turno que no sea pendiente' do
       allow(turnos[:futuro]).to receive(:estado).and_return(ESTADO_ASISTIDO)
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(Time.new(2025, 6, 10, 9, 0, 0))
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO) }.to raise_error(EstadoNoPermitidoException)
     end
 
-    it 'deberia tirar error si el id no es un entero' do
+    it 'debería tirar error si el id no es un entero' do
       expect { contexto[:gestor_turnos].modificar_estado_turno('abc', ESTADO_CANCELADO) }.to raise_error(ArgumentError)
     end
   end
@@ -311,74 +349,81 @@ describe GestorTurnos do
     let(:usuario) { instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789) }
 
     let(:turnos) do
-      [instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-13T14:00:00'), id: 1),
-       instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-17T14:00:00'), id: 2),
-       instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-10T14:00:00'), id: 3)]
+      [
+        instance_double('Turno', estado: 'Asistido', fecha_hora: hora_utc(2025, 6, 13, 14), id: 1),
+        instance_double('Turno', estado: 'Asistido', fecha_hora: hora_utc(2025, 6, 17, 14), id: 2),
+        instance_double('Turno', estado: 'Asistido', fecha_hora: hora_utc(2025, 6, 10, 14), id: 3)
+      ]
     end
 
-    it 'deberia lanzar excepcion NoHayHistorialTurnosException si el paciente nunca reservo turnos' do
+    it 'lanza NoHayHistorialTurnosException si el paciente nunca reservó turnos' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([])
-      expect { contexto[:gestor_turnos].historial_turnos_paciente(123_456_789) }.to raise_error(NoHayHistorialTurnosException)
+      expect do
+        contexto[:gestor_turnos].historial_turnos_paciente(123_456_789)
+      end.to raise_error(NoHayHistorialTurnosException)
     end
 
-    it 'deberia devolver una lista con 1 turno cuyo estado es "Ausente" si el paciente reservo un turno y no asistio' do
-      turno = instance_double('Turno', estado: 'Ausente', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
+    it 'devuelve un turno con estado "Ausente" si el paciente no asistió' do
+      turno = instance_double('Turno', estado: 'Ausente', fecha_hora: hora_utc(2025, 6, 13, 14))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
-
       expect(historial.first.estado).to eq('Ausente')
     end
 
-    it 'deberia devolver una lista con 1 turno cuyo estado es "Asistido" si el paciente reservo un turno y asistio' do
-      turno = instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
+    it 'devuelve un turno con estado "Asistido" si el paciente asistió' do
+      turno = instance_double('Turno', estado: 'Asistido', fecha_hora: hora_utc(2025, 6, 13, 14))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
-
       expect(historial.first.estado).to eq('Asistido')
     end
 
-    it 'deberia devolver una lista con 1 turno cuyo estado es "Cancelado" si el paciente reservo un turno y lo cancelo' do
-      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-13T14:00:00'))
+    it 'devuelve un turno con estado "Cancelado" si el paciente lo canceló' do
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: hora_utc(2025, 6, 13, 14))
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return([turno])
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
-
       expect(historial.first.estado).to eq('Cancelado')
     end
 
-    it 'deberia devolver los turnos que ya pasaron ordenados por fecha y hora' do
+    it 'devuelve los turnos pasados ordenados por fecha descendente' do
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(turnos)
 
       historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
       expect(historial).to eq(turnos.sort_by(&:fecha_hora).reverse)
     end
 
-    it 'deberia devolver como maximo 15 turnos' do
-      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(
-        (0...20).map { |i| instance_double('Turno', estado: 'Asistido', fecha_hora: DateTime.new(2025, 6, 16, 9 + i / 2, (i % 2) * 30, 0)) }
-      )
+    it 'devuelve como máximo 15 turnos' do
+      muchos_turnos = (0...20).map do |i|
+        instance_double('Turno', estado: 'Asistido', fecha_hora: hora_utc(2025, 6, 16, 9 + i / 2, (i % 2) * 30))
+      end
 
-      historial = contexto[:gestor_turnos].historial_turnos_paciente(usuario)
-      expect(historial.size).to eq(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).and_return(muchos_turnos)
+      expect(contexto[:gestor_turnos].historial_turnos_paciente(usuario).size).to eq(MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES)
     end
   end
 
   describe 'Cancelar turnos' do
     let(:usuario) { instance_double('Usuario', email: 'pepe@mail.com', telegram_id: 123_456_789) }
 
-    it 'devuelve false si el turno no ocurre en las proximas 24hs' do
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(DateTime.parse('2025-06-13T14:00:00'))
-      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-15T14:00:00'))
-      allow(turno).to receive(:proximas_24hs?).with(DateTime.parse('2025-06-13T14:00:00')).and_return(false)
+    it 'devuelve false si el turno no ocurre en las próximas 24hs' do
+      ahora = hora_utc(2025, 6, 13, 14)
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: hora_utc(2025, 6, 15, 14))
+
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+      allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(false)
+
       expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(false)
     end
 
-    it 'devuelve true si el turno ocurre en las proximas 24hs' do
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(DateTime.parse('2025-06-13T14:00:00'))
-      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: DateTime.parse('2025-06-14T12:00:00'))
-      allow(turno).to receive(:proximas_24hs?).with(DateTime.parse('2025-06-13T14:00:00')).and_return(true)
+    it 'devuelve true si el turno ocurre en las próximas 24hs' do
+      ahora = hora_utc(2025, 6, 13, 14)
+      turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: hora_utc(2025, 6, 14, 12))
+
+      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+      allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(true)
+
       expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
     end
   end
