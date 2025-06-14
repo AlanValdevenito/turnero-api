@@ -14,6 +14,10 @@ class RepositorioMedicos < AbstractRepository
     load_object(row) unless row.nil?
   end
 
+  def buscar_por_especialidad(especialidad)
+    load_collection dataset.where(especialidad_id: especialidad.id)
+  end
+
   protected
 
   def load_object(a_hash)

@@ -1,5 +1,3 @@
-ESPECIALIDADAS_ALTAS = 2
-
 Dado('que el usuario pide un turno por especialidad') do
   @response = Faraday.get('/especialidades')
   expect(@response.status).to eq(200)

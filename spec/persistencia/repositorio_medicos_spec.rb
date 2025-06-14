@@ -18,7 +18,7 @@ describe RepositorioMedicos do
     expect(medico_encontrado.especialidad.nombre).to eq(especialidad.nombre)
   end
 
-  it 'deberia buscar especialidad por matricula' do
+  it 'deberia buscar medico por matricula' do
     especialidad = RepositorioEspecialidades.new.save(Especialidad.new('Traumatologia', 10))
     medico = Medico.new('Michael', 'Jordan', '112324', especialidad)
     described_class.new.save(medico)
@@ -32,5 +32,13 @@ describe RepositorioMedicos do
     repositorio.save(medico)
     recuperado = repositorio.buscar_por_id(medico.id)
     expect(recuperado.matricula).to eq('ABC123')
+  end
+
+  it 'deberia buscar medicos por especialidad' do
+    especialidad = RepositorioEspecialidades.new.save(Especialidad.new('Traumatologia', 10))
+    medico = Medico.new('Juan', 'Perez', 'ABC123', especialidad)
+    described_class.new.save(medico)
+    recuperado = described_class.new.buscar_por_especialidad(especialidad)
+    expect(recuperado.first.especialidad.nombre).to eq('Traumatologia')
   end
 end
