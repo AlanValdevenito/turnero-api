@@ -40,12 +40,12 @@ Cuando('el usuario selecciona el turno con el medico de matricula {string}') do 
 end
 
 Entonces('se muestra el mensaje de exito {string}') do |mensaje|
-  # Nada
+  @turno = JSON.parse(@response.body)
+  expect(@turno['message']).to eq(mensaje)
 end
 
 Entonces('se muestra la fecha, hora, medico y especialidad del turno reservado') do
-  turno = JSON.parse(@response.body)
-  expect(turno).to have_key('fecha')
-  expect(turno).to have_key('medico')
-  expect(turno['medico']).to have_key('especialidad')
+  expect(@turno).to have_key('fecha')
+  expect(@turno).to have_key('medico')
+  expect(@turno['medico']).to have_key('especialidad')
 end
