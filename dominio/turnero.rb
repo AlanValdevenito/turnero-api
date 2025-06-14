@@ -54,13 +54,13 @@ class Turnero
   def turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.turnos_paciente(usuario)
-    @adaptador_zona_horaria.parsear_turnos(turnos)
+    @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def turnos_medico(matricula)
     medico = buscar_medico_por_matricula(matricula)
     turnos = @gestor_turnos.turnos_medico(medico)
-    @adaptador_zona_horaria.parsear_turnos(turnos)
+    @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def crear_turno(matricula, fecha, hora, email)
@@ -68,7 +68,7 @@ class Turnero
     usuario = buscar_usuario_por_email(email)
     fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
     turno = @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
-    @adaptador_zona_horaria.parsear_turno(turno)
+    @adaptador_zona_horaria.adaptar_zona_horaria(turno)
   end
 
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
@@ -101,19 +101,19 @@ class Turnero
   def disponibilidad_de_medico(matricula)
     medico = buscar_medico_por_matricula(matricula)
     horarios = @gestor_turnos.disponibilidad_de_medico(medico)
-    @adaptador_zona_horaria.parsear_horarios(horarios)
+    @adaptador_zona_horaria.adaptar_zona_horarios(horarios)
   end
 
   def proximos_turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.proximos_turnos_paciente(usuario)
-    @adaptador_zona_horaria.parsear_turnos(turnos)
+    @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def historial_turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.historial_turnos_paciente(usuario)
-    @adaptador_zona_horaria.parsear_turnos(turnos)
+    @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def modificar_estado_turno(turno_id, nuevo_estado)

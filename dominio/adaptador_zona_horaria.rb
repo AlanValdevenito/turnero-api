@@ -12,33 +12,18 @@ class AdaptadorZonaHoraria
     [fecha_utc_str, hora_utc_str]
   end
 
-  def parsear_turno(turno)
-    TurnoParseado.new(
-      id: turno.id,
-      medico: turno.medico,
-      usuario: turno.usuario,
-      estado: turno.estado,
-      fecha_hora: @proveedor_hora.cambiar_a_huso_horario_local(turno.fecha_hora)
-    )
+  def adaptar_zona_horaria(turno)
+    fecha_hora_local = @proveedor_hora.cambiar_a_huso_horario_local(turno.fecha_hora)
+    fecha_hora_local = fecha_hora_local.to_datetime unless fecha_hora_local.is_a?(DateTime)
+    turno.cambiar_fecha_hora(fecha_hora_local)
+    turno
   end
 
-  def parsear_turnos(turnos)
-    Array(turnos).map { |turno| parsear_turno(turno) }
+  def adaptar_zona_horaria_turnos(turnos)
+    Array(turnos).map { |turno| adaptar_zona_horaria(turno) }
   end
 
-  def parsear_horarios(horarios_utc)
+  def adaptar_zona_horarios(horarios_utc)
     Array(horarios_utc).map { |dt| @proveedor_hora.cambiar_a_huso_horario_local(dt) }
-  end
-end
-
-class TurnoParseado
-  attr_reader :id, :medico, :usuario, :estado, :fecha_hora
-
-  def initialize(id:, medico:, usuario:, estado:, fecha_hora:)
-    @id = id
-    @medico = medico
-    @usuario = usuario
-    @estado = estado
-    @fecha_hora = fecha_hora
   end
 end

@@ -20,7 +20,7 @@ RSpec.describe AdaptadorZonaHoraria do
     end
   end
 
-  describe '#parsear_turno' do
+  describe '#adaptar_zona_horaria' do
     let(:turno) do
       instance_double(
         'Turno',
@@ -32,14 +32,20 @@ RSpec.describe AdaptadorZonaHoraria do
       )
     end
 
-    it 'devuelve un TurnoParseado con los datos correctos' do
-      turno_parseado = adaptador.parsear_turno(turno)
-      expect(turno_parseado).to have_attributes(id: 1, medico: 'Dr. House', usuario: 'Paciente', estado: 'pendiente',
-                                                fecha_hora: Time.new(2023, 3, 3, 10, 20, 0, '-03:00'))
+    before(:each) do
+      allow(turno).to receive(:cambiar_fecha_hora) do |nueva_fecha_hora|
+        allow(turno).to receive(:fecha_hora).and_return(nueva_fecha_hora)
+      end
+    end
+
+    it 'modifica la fecha_hora del mismo turno' do
+      result = adaptador.adaptar_zona_horaria(turno)
+      expect(result).to eq(turno)
+      expect(turno.fecha_hora).to eq(Time.new(2023, 3, 3, 10, 20, 0, '-03:00').to_datetime)
     end
   end
 
-  describe '#parsear_turnos' do
+  describe '#adaptar_zona_horaria_turnos' do
     let(:turno1) do
       instance_double('Turno', id: 1, medico: 'A', usuario: 'U', estado: 'ok', fecha_hora: Time.utc(2023, 3, 3, 13, 20))
     end
@@ -48,24 +54,36 @@ RSpec.describe AdaptadorZonaHoraria do
     end
 
     before(:each) do
+      [turno1, turno2].each do |t|
+        allow(t).to receive(:cambiar_fecha_hora) do |nueva_fecha_hora|
+          allow(t).to receive(:fecha_hora).and_return(nueva_fecha_hora)
+        end
+      end
       allow(proveedor_hora).to receive(:cambiar_a_huso_horario_local).and_return(
         Time.new(2023, 3, 3, 10, 20, 0, '-03:00'),
         Time.new(2023, 3, 4, 10, 20, 0, '-03:00')
       )
     end
 
-    it 'devuelve un array de TurnoParseado' do
-      result = adaptador.parsear_turnos([turno1, turno2])
-      expect(result.size).to eq(2)
-      expect(result.first).to be_a(TurnoParseado)
-      expect(result.last).to be_a(TurnoParseado)
+    def expect_mismos_turnos(turnos)
+      expect(turnos.size).to eq(2)
+      expect(turnos.first).to eq(turno1)
+      expect(turnos.last).to eq(turno2)
+    end
+
+    it 'devuelve los mismos turnos pero con la fecha_hora adaptada' do
+      turnos = [turno1, turno2]
+      result = adaptador.adaptar_zona_horaria_turnos(turnos)
+      expect_mismos_turnos(result)
+      expect(result.first.fecha_hora).to eq(Time.new(2023, 3, 3, 10, 20, 0, '-03:00').to_datetime)
+      expect(result.last.fecha_hora).to eq(Time.new(2023, 3, 4, 10, 20, 0, '-03:00').to_datetime)
     end
   end
 
-  describe '#parsear_horarios' do
+  describe '#adaptar_zona_horarios' do
     it 'convierte un array de horarios UTC a horarios locales' do
       horarios_utc = [Time.utc(2023, 3, 3, 13, 20)]
-      expect(adaptador.parsear_horarios(horarios_utc)).to eq([Time.new(2023, 3, 3, 10, 20, 0, '-03:00')])
+      expect(adaptador.adaptar_zona_horarios(horarios_utc)).to eq([Time.new(2023, 3, 3, 10, 20, 0, '-03:00')])
     end
   end
 end
