@@ -77,12 +77,12 @@ class Turnero
   end
 
   def medicos_disponibles
-    @repositorio_medicos.all.first(MEDICOS_DISPONIBLES)
+    @repositorio_medicos.all.sample(MEDICOS_DISPONIBLES)
   end
 
   def medicos_disponibles_especialidad(especialidad_nombre)
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)
-    @repositorio_medicos.buscar_por_especialidad(especialidad)
+    @repositorio_medicos.buscar_por_especialidad(especialidad).sample(MEDICOS_DISPONIBLES)
   end
 
   def buscar_medico_por_matricula(matricula)
