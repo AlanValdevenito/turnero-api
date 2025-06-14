@@ -3,6 +3,18 @@ require_relative '../dominio/excepciones/estado_invalido_exception'
 require_relative '../dominio/excepciones/no_hay_historial_turnos_exception'
 require_relative '../dominio/excepciones/turno_pasado_exception'
 
+get '/turnos/medicos-disponibles/:especialidad' do
+  logger.debug("GET /turnos/medicos-disponibles/:especialidad: #{@params}")
+  especialidad = params[:especialidad]
+  medicos = turnero.medicos_disponibles_especialidad(especialidad)
+  respuesta = []
+  medicos.each do |medico|
+    respuesta << { id: medico.id, nombre: medico.nombre, apellido: medico.apellido, matricula: medico.matricula, especialidad: medico.especialidad.nombre }
+  end
+  status 200
+  json(respuesta)
+end
+
 get '/turnos/medicos-disponibles' do
   logger.debug('GET /turnos/medicos-disponibles')
   medicos = turnero.medicos_disponibles
