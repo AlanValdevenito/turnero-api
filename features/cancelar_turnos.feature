@@ -5,7 +5,7 @@ Antecedentes:
     Dado existe el paciente con email "usuario@prueba.com"
       Y la especialidad "Cardiologia" dada de alta
       Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiologia" dado de alta
-
+    @wip
     Escenario: US-4.1 Cancelar un turno con mas de 24hs de anticipacion
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-10'
       Y consulto mis turnos

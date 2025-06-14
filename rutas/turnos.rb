@@ -167,6 +167,15 @@ put '/turnos/:id' do
   end
 end
 
+put '/turnos/:id/cancelacion' do
+  logger.debug("PUT /turnos/:id/cancelacion: #{@params}")
+  id = params['id']
+  proximas_24hs = @params[:proximas_24hs]
+  turno = turnero.cancelar_turno(id, proximas_24hs)
+  status 200
+  json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+end
+
 helpers do
   def manejar_error_modificacion_turno(error, estado)
     case error
