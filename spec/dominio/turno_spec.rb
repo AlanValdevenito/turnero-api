@@ -26,4 +26,27 @@ describe Turno do
     turno = described_class.new(medico, usuario, fecha_hora)
     expect(turno.proximas_24hs?(ProveedorHora.new.ahora)).to eq(true)
   end
+
+  def expect_fecha_y_hora(turno, fecha_esperada, hora_esperada)
+    expect(turno.fecha).to eq(fecha_esperada)
+    expect(turno.hora).to eq(hora_esperada)
+  end
+
+  it 'puede cambiar la fecha del turno' do
+    medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10))
+    usuario = Usuario.new('usuario@prueba.com')
+    turno = described_class.new(medico, usuario, DateTime.parse('2025-06-05T10:00:00'))
+
+    turno.cambiar_fecha('2025-07-01')
+    expect_fecha_y_hora(turno, '2025-07-01', '10:00')
+  end
+
+  it 'puede cambiar la hora del turno' do
+    medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10))
+    usuario = Usuario.new('usuario@prueba.com')
+    turno = described_class.new(medico, usuario, DateTime.parse('2025-06-05T10:00:00'))
+
+    turno.cambiar_hora('15:30')
+    expect_fecha_y_hora(turno, '2025-06-05', '15:30')
+  end
 end

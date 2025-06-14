@@ -6,7 +6,7 @@ require_relative '../dominio/excepciones/no_hay_proximos_turnos_exception'
 require_relative '../dominio/excepciones/fecha_no_valida_exception'
 require_relative '../dominio/gestores/gestor_usuarios'
 require_relative '../dominio/gestores/gestor_turnos'
-require_relative 'parser_horarios_turnero'
+require_relative 'adaptador_zona_horaria'
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
@@ -23,7 +23,7 @@ class Turnero
       proveedor_feriados,
       proveedor_hora
     )
-    @parser_horarios = ParserHorariosTurnero.new(proveedor_hora)
+    @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_hora)
   end
   # rubocop:enable Metrics/ParameterLists
 
@@ -54,21 +54,21 @@ class Turnero
   def turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.turnos_paciente(usuario)
-    @parser_horarios.parsear_turnos(turnos)
+    @adaptador_zona_horaria.parsear_turnos(turnos)
   end
 
   def turnos_medico(matricula)
     medico = buscar_medico_por_matricula(matricula)
     turnos = @gestor_turnos.turnos_medico(medico)
-    @parser_horarios.parsear_turnos(turnos)
+    @adaptador_zona_horaria.parsear_turnos(turnos)
   end
 
   def crear_turno(matricula, fecha, hora, email)
     medico = buscar_medico_por_matricula(matricula)
     usuario = buscar_usuario_por_email(email)
-    fecha_utc, hora_utc = @parser_horarios.parsear_a_utc(fecha, hora)
+    fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
     turno = @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
-    @parser_horarios.parsear_turno(turno)
+    @adaptador_zona_horaria.parsear_turno(turno)
   end
 
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
@@ -101,19 +101,19 @@ class Turnero
   def disponibilidad_de_medico(matricula)
     medico = buscar_medico_por_matricula(matricula)
     horarios = @gestor_turnos.disponibilidad_de_medico(medico)
-    @parser_horarios.parsear_horarios(horarios)
+    @adaptador_zona_horaria.parsear_horarios(horarios)
   end
 
   def proximos_turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.proximos_turnos_paciente(usuario)
-    @parser_horarios.parsear_turnos(turnos)
+    @adaptador_zona_horaria.parsear_turnos(turnos)
   end
 
   def historial_turnos_paciente(email)
     usuario = buscar_usuario_por_email(email)
     turnos = @gestor_turnos.historial_turnos_paciente(usuario)
-    @parser_horarios.parsear_turnos(turnos)
+    @adaptador_zona_horaria.parsear_turnos(turnos)
   end
 
   def modificar_estado_turno(turno_id, nuevo_estado)

@@ -1,8 +1,8 @@
 require 'rspec'
 require 'time'
-require_relative '../../dominio/parser_horarios_turnero'
+require_relative '../../dominio/adaptador_zona_horaria'
 
-RSpec.describe ParserHorariosTurnero do
+RSpec.describe AdaptadorZonaHoraria do
   let(:proveedor_hora) do
     instance_double(
       'ProveedorHora',
@@ -12,11 +12,11 @@ RSpec.describe ParserHorariosTurnero do
     )
   end
 
-  let(:parser) { described_class.new(proveedor_hora) }
+  let(:adaptador) { described_class.new(proveedor_hora) }
 
   describe '#parsear_a_utc' do
     it 'convierte fecha y hora local a dos strings en UTC' do
-      expect(parser.parsear_a_utc('2023-03-03', '10:20')).to eq(['2023-03-03', '13:20'])
+      expect(adaptador.parsear_a_utc('2023-03-03', '10:20')).to eq(['2023-03-03', '13:20'])
     end
   end
 
@@ -33,7 +33,7 @@ RSpec.describe ParserHorariosTurnero do
     end
 
     it 'devuelve un TurnoParseado con los datos correctos' do
-      turno_parseado = parser.parsear_turno(turno)
+      turno_parseado = adaptador.parsear_turno(turno)
       expect(turno_parseado).to have_attributes(id: 1, medico: 'Dr. House', usuario: 'Paciente', estado: 'pendiente',
                                                 fecha_hora: Time.new(2023, 3, 3, 10, 20, 0, '-03:00'))
     end
@@ -55,7 +55,7 @@ RSpec.describe ParserHorariosTurnero do
     end
 
     it 'devuelve un array de TurnoParseado' do
-      result = parser.parsear_turnos([turno1, turno2])
+      result = adaptador.parsear_turnos([turno1, turno2])
       expect(result.size).to eq(2)
       expect(result.first).to be_a(TurnoParseado)
       expect(result.last).to be_a(TurnoParseado)
@@ -65,7 +65,7 @@ RSpec.describe ParserHorariosTurnero do
   describe '#parsear_horarios' do
     it 'convierte un array de horarios UTC a horarios locales' do
       horarios_utc = [Time.utc(2023, 3, 3, 13, 20)]
-      expect(parser.parsear_horarios(horarios_utc)).to eq([Time.new(2023, 3, 3, 10, 20, 0, '-03:00')])
+      expect(adaptador.parsear_horarios(horarios_utc)).to eq([Time.new(2023, 3, 3, 10, 20, 0, '-03:00')])
     end
   end
 end

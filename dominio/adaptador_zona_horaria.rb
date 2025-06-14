@@ -1,4 +1,4 @@
-class ParserHorariosTurnero
+class AdaptadorZonaHoraria
   def initialize(proveedor_hora)
     @proveedor_hora = proveedor_hora
   end
