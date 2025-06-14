@@ -101,3 +101,12 @@ Entonces('tiene el turno para la fecha {string} con el médico {string} de la es
     end
   ).to be true
 end
+
+Entonces('el turno tiene la fecha {string} y hora local {string}') do |fecha_esperada, hora_esperada|
+  body = JSON.parse(@response.body)
+  turno = body.find { |t| t['fecha y hora'].start_with?(fecha_esperada) }
+  expect(turno).not_to be_nil, "No se encontró un turno con fecha #{fecha_esperada} en la respuesta: #{body.inspect}"
+  fecha, hora = turno['fecha y hora'].split(' ')
+  expect(fecha).to eq(fecha_esperada)
+  expect(hora).to eq(hora_esperada)
+end
