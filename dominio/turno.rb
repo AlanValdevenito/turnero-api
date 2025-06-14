@@ -36,6 +36,12 @@ class Turno
     @fecha_hora = nueva_fecha_hora
   end
 
+  def cambiar_fecha_hora(fecha_hora)
+    raise ArgumentError, 'Fecha y hora deben ser un objeto DateTime' unless fecha_hora.is_a?(DateTime)
+
+    @fecha_hora = fecha_hora
+  end
+
   def proximas_24hs?(ahora)
     (@fecha_hora.to_time - ahora).abs < 24 * 60 * 60
   end

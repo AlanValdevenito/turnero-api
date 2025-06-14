@@ -49,4 +49,13 @@ describe Turno do
     turno.cambiar_hora('15:30')
     expect_fecha_y_hora(turno, '2025-06-05', '15:30')
   end
+
+  it 'puede cambiar la fecha y hora del turno con un DateTime' do
+    medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10))
+    usuario = Usuario.new('usuario@prueba.com')
+    turno = described_class.new(medico, usuario, DateTime.parse('2025-06-05T10:00:00'))
+
+    turno.cambiar_fecha_hora(DateTime.parse('2025-08-10T18:45:00'))
+    expect_fecha_y_hora(turno, '2025-08-10', '18:45')
+  end
 end
