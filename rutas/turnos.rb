@@ -89,7 +89,7 @@ get '/turnos/pacientes/historial/:email' do
     turnos.map do |e|
       respuesta << {
         'id': e.id,
-        'fecha y hora': "#{e.fecha} #{e.hora}",
+        'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
         'especialidad': e.medico.especialidad.nombre,
         'medico': "#{e.medico.nombre} #{e.medico.apellido}",
         'estado': e.estado
