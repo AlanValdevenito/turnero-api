@@ -13,7 +13,9 @@ describe Turnero do
     {
       usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
       medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
-                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10))]),
+                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10))],
+                                                      buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10)),
+                                                                                Medico.new('Medico3', 'Apellido3', 'LMN456', Especialidad.new('Traumatologia', 10))]),
       especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
                                                                  buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
       turnos: instance_double('RepositorioTurnos')
@@ -83,6 +85,12 @@ describe Turnero do
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('ABC123').and_return(nil)
 
     expect { turnero.turnos_medico('ABC123') }.to raise_error(MedicoNoEncontradoException)
+  end
+
+  it 'deberia devolver los medicos disponibles de una especialidad' do
+    traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
+    expect(traumatologos_disponibles.first.matricula).to eq('XYZ123')
+    expect(traumatologos_disponibles.first.especialidad.nombre).to eq('Traumatologia')
   end
 
   describe 'Historial de turnos' do
