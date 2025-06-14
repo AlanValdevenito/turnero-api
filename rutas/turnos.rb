@@ -181,8 +181,8 @@ helpers do
     {
       message: 'El turno se reservó exitosamente',
       id: turno.id,
-      fecha: turno.fecha,
-      hora: turno.hora,
+      fecha: turno.fecha_hora.strftime('%Y-%m-%d'),
+      hora: turno.fecha_hora.strftime('%H:%M'),
       medico: {
         nombre: turno.medico.nombre,
         apellido: turno.medico.apellido,

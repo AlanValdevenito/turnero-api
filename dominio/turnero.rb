@@ -67,7 +67,8 @@ class Turnero
     medico = buscar_medico_por_matricula(matricula)
     usuario = buscar_usuario_por_email(email)
     fecha_utc, hora_utc = @parser_horarios.parsear_a_utc(fecha, hora)
-    @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
+    turno = @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
+    @parser_horarios.parsear_turno(turno)
   end
 
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
