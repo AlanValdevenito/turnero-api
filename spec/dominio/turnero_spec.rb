@@ -93,4 +93,13 @@ describe Turnero do
       expect { turnero.historial_turnos_paciente('pepe@mail.com') }.to raise_error(NoHayHistorialTurnosException)
     end
   end
+
+  describe 'Cancelar turnos' do
+    it 'devuelve true si turno ocurre en las proximas 24hs' do
+      usuario = instance_double('Usuario')
+      medico = instance_double('Medico')
+      fecha_hora = proveedores[:hora].ahora + 12 * 60 * 60
+      expect(turnero.ocurre_proximas_24hs?(Turno.new(medico, usuario, fecha_hora))).to eq(true)
+    end
+  end
 end

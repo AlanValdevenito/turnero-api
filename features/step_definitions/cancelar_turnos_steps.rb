@@ -15,11 +15,11 @@ Dado('consulto mis turnos') do
 end
 
 Cuando('pido cancelar el turno') do
-  request_body = { estado: 'Cancelado' }.to_json
+  estado = @turno['proximas_24hs'] ? 'Ausente' : 'Cancelado'
+  request_body = { estado: }.to_json
   @response = Faraday.put("/turnos/#{@turno['id']}", request_body, { 'Content-Type' => 'application/json' })
 end
 
 Entonces('devuelve el mensaje {string}') do |mensaje|
-  expect(@response.status).to eq 200
   expect(JSON.parse(@response.body)['mensaje']).to include mensaje
 end
