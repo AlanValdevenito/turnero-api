@@ -34,5 +34,11 @@ class GestorEstadoTurno
     turno
   end
 
-  def self.cancelar_turno; end
+  def self.cancelar_turno(turno)
+    turno.estado = if proximas_24hs
+                     ESTADO_AUSENTE
+                   else
+                     ESTADO_CANCELADO
+                   end
+  end
 end

@@ -6,6 +6,8 @@ describe GestorTurnos do
   before(:each) do
     stub_const('MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES', 15)
     stub_const('TURNO_ID', 1)
+    stub_const('PROXIMAS_24HS_TRUE', true)
+    stub_const('PROXIMAS_24HS_FALSE', false)
   end
 
   let(:contexto) do
@@ -433,7 +435,7 @@ describe GestorTurnos do
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
-      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, usuario.email).estado).to eq('Cancelado')
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
     end
 
     it ' lo deja con estado Ausente si se hace con menos de 24hs de anticipacion' do
@@ -441,13 +443,13 @@ describe GestorTurnos do
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
-      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, usuario.email).estado).to eq('Ausente')
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, usuario.email).estado).to eq('Ausente')
     end
 
     it ' lanza excepcion si el email no coincide con el del turno' do
       fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', Usuario.new('usuario@mail.com'), fecha_turno))
-      expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, 'otroUsuario@mail.com') }.to raise_error(TurnoNoPerteneceAUsuarioException)
+      expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, 'otroUsuario@mail.com') }.to raise_error(TurnoNoPerteneceAUsuarioException)
     end
   end
 end

@@ -97,13 +97,13 @@ class GestorTurnos
     turno
   end
 
-  def cancelar_turno(turno_id, email)
+  def cancelar_turno(turno_id, proximas_24hs, email)
     validar_turno_id(turno_id)
     turno = buscar_turno_por_id(turno_id)
     raise TurnoNoPerteneceAUsuarioException unless turno.usuario.email == email
 
     validar_estado_actual(turno)
-    turno.estado = if ocurre_proximas_24hs?(turno)
+    turno.estado = if proximas_24hs
                      ESTADO_AUSENTE
                    else
                      ESTADO_CANCELADO

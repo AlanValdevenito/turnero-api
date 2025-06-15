@@ -7,6 +7,10 @@ describe Turnero do
     described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados], proveedores[:hora])
   end
 
+  before(:each) do
+    stub_const('PROXIMAS_24HS_FALSE', false)
+  end
+
   let(:email) { 'test@email.com' }
 
   let(:repositorios) do
@@ -123,7 +127,7 @@ describe Turnero do
       usuario = Usuario.new('usuario@mail.com')
       allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
-      expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Cancelado')
+      expect(turnero.cancelar_turno(1, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
     end
 
     it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
