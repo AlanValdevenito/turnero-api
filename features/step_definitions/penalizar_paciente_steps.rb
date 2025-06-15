@@ -93,6 +93,7 @@ end
 
 Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos|
   raise 'No hay hora de penalización definida' unless @hora_de_penalizacion
+
   hora_mock = @hora_de_penalizacion + (minutos * 60) - 1 # justo antes de que termine la penalización
   allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(hora_mock)
 
