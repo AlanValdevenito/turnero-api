@@ -103,12 +103,10 @@ class GestorTurnos
     raise TurnoNoPerteneceAUsuarioException unless turno.usuario.email == email
 
     validar_estado_actual(turno)
-    turno.estado = if proximas_24hs
-                     ESTADO_AUSENTE
-                   else
-                     ESTADO_CANCELADO
-                   end
+    turno = GestorEstadoTurno.cancelar_turno(turno, proximas_24hs)
+    puts turno
     @repositorio_turnos.save(turno)
+    puts 'caca'
     turno
   end
 
