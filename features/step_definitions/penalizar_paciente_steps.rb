@@ -8,6 +8,8 @@ ESTADOS_VALIDOS = {
   'asistido' => 'Asistido'
 }.freeze
 
+MENSAJE_PENALIZACION = 'Penalización por porcentaje de asistencia abajo del 80%'.freeze
+
 Dado('un paciente con email {string} registrado') do |email|
   telegram_id = rand(100_000..999_999)
   usuario_hash = { email:, telegram_id: }
@@ -81,4 +83,32 @@ Entonces('puede hacerlo exitosamente') do
   expect(@response.status).to eq(201)
   body = JSON.parse(@response.body)
   expect(body['message']).to eq('El turno se reservó exitosamente')
+end
+
+Entonces('debe mostrarse un mensaje de penalización') do
+  expect(@response.status).to eq(400)
+  body = JSON.parse(@response.body)
+  expect(body['error']).to match(MENSAJE_DE_PENALIZACION)
+end
+
+Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos|
+  raise 'No hay hora de penalización definida' unless @hora_de_penalizacion
+  hora_mock = @hora_de_penalizacion + (minutos * 60) - 1 # justo antes de que termine la penalización
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(hora_mock)
+
+  @dias_para_nuevo_turno ||= 100
+  fecha_turno = @fecha_actual + @dias_para_nuevo_turno
+  @dias_para_nuevo_turno += 1
+
+  turno_hash = {
+    matricula: 'ABC123',
+    fecha: fecha_turno.strftime('%Y-%m-%d'),
+    hora: '12:00',
+    email: @paciente_email
+  }
+  response = Faraday.post('turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+
+  expect(response.status).to eq(400)
+  body = JSON.parse(response.body)
+  expect(body['error']).to match(MENSAJE_DE_PENALIZACION)
 end
