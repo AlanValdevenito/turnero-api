@@ -3,6 +3,7 @@ require_relative '../dominio/excepciones/estado_invalido_exception'
 require_relative '../dominio/excepciones/no_hay_historial_turnos_exception'
 require_relative '../dominio/excepciones/turno_pasado_exception'
 require_relative '../dominio/excepciones/especialidad_sin_medicos_exception'
+require_relative '../dominio/excepciones/penalizacion_exception'
 
 get '/turnos/medicos-disponibles/:especialidad' do
   logger.debug("GET /turnos/medicos-disponibles/:especialidad: #{@params}")
@@ -157,6 +158,9 @@ post '/turnos' do
   rescue TurnoYaExisteException
     status 400
     json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
+  rescue PenalizacionPorReputacionException
+    status 400
+    json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' })
   end
 end
 
