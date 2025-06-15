@@ -1,6 +1,9 @@
+DURACION_PENALIDAD = 3
+
 class Penalizador
-  def initialize(repositorio_turnos)
+  def initialize(repositorio_turnos, proveedor_hora)
     @repositorio_turnos = repositorio_turnos
+    @proveedor_hora = proveedor_hora
   end
 
   def calcular_reputacion(usuario)
@@ -20,5 +23,13 @@ class Penalizador
     pendientes = turnos.count { |t| t.estado == ESTADO_PENDIENTE }
     total = turnos.count
     { asistidos:, cancelados:, pendientes:, total: }
+  end
+
+  def chequeo_penalizacion_vigente(usuario)
+    # si intenta sacar turno y tiene una penalización vigente, lanzo excepción
+    if usuario.ultima_penalizacion &&
+       (@proveedor_hora.ahora - usuario.ultima_penalizacion.to_time < DURACION_PENALIDAD * 60)
+      raise PenalizacionPorReputacionException
+    end
   end
 end
