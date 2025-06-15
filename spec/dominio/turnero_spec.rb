@@ -9,6 +9,8 @@ describe Turnero do
 
   before(:each) do
     stub_const('PROXIMAS_24HS_FALSE', false)
+    allow_any_instance_of(GestorUsuarios).to receive(:actualizar).and_return(nil)
+    allow_any_instance_of(RepositorioUsuarios).to receive(:save).and_return(nil)
   end
 
   let(:email) { 'test@email.com' }

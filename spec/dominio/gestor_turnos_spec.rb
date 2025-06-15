@@ -9,6 +9,7 @@ describe GestorTurnos do
     stub_const('PROXIMAS_24HS_TRUE', true)
     stub_const('PROXIMAS_24HS_FALSE', false)
     allow_any_instance_of(Penalizador).to receive(:penalizar_si_corresponde).and_return(nil)
+    allow_any_instance_of(Penalizador).to receive(:actualizar_flag_penalizable).and_return(nil)
   end
 
   let(:contexto) do
@@ -308,6 +309,8 @@ describe GestorTurnos do
       allow(turnos[:pasado]).to receive(:estado=)
       allow(contexto[:repositorio_turnos]).to receive(:save).with(turnos[:futuro]).and_return(turnos[:futuro])
       allow(contexto[:repositorio_turnos]).to receive(:save).with(turnos[:pasado]).and_return(turnos[:pasado])
+      allow(turnos[:futuro]).to receive(:usuario).and_return(contexto[:usuario])
+      allow(turnos[:pasado]).to receive(:usuario).and_return(contexto[:usuario])
     end
 
     it 'permite cancelar un turno futuro' do

@@ -147,11 +147,16 @@ Dado('saco un turno exitosamente') do
 end
 
 Cuando('el estado del turno Pendiente se cambia a Ausente') do
-  # Busca el último turno pendiente del paciente y lo marca como Ausente
   usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
   turno = RepositorioTurnos.new.buscar_por_usuario(usuario).select { |t| t.estado == 'Pendiente' }.last
   raise 'No hay turno pendiente para marcar como Ausente' unless turno
 
-  turno.estado = 'Ausente'
-  RepositorioTurnos.new.save(turno)
+  # Avanza el tiempo simulado a después del turno
+  nueva_hora = turno.fecha_hora + 60 # 1 minuto después del turno
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(nueva_hora)
+  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(nueva_hora.to_date)
+
+  body = { estado: 'Ausente' }.to_json
+  response = Faraday.put("turnos/#{turno.id}", body, { 'Content-Type' => 'application/json' })
+  expect(response.status).to eq(200)
 end

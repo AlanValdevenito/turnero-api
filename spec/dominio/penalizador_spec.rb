@@ -81,4 +81,19 @@ describe Penalizador do
       end.not_to raise_error
     end
   end
+
+  describe '#actualizar_flag_penalizable' do
+    it 'actualiza el flag penalizable a true si el estado es ausente' do
+      allow(usuario).to receive(:penalizable=)
+      expect(gestor_usuarios).to receive(:actualizar).with(usuario)
+      penalizador.actualizar_flag_penalizable(usuario, ESTADO_AUSENTE)
+      expect(usuario.penalizable).to be true
+    end
+
+    it 'no actualiza el flag penalizable si el estado no es ausente' do
+      allow(usuario).to receive(:penalizable=)
+      expect(gestor_usuarios).not_to receive(:actualizar)
+      penalizador.actualizar_flag_penalizable(usuario, ESTADO_PENDIENTE)
+    end
+  end
 end

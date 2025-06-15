@@ -42,7 +42,6 @@ Característica: Penalización temporal por bajo porcentaje de asistencia
     Entonces debe mostrarse un mensaje de penalización
     Y no puede reservar turnos por los próximos 3 minutos
 
-  @wip
   Escenario: 11.6 Penalización se mantiene al empeorar historial luego del tiempo
     Dado que el paciente tuvo 5 turnos: 1 Asistido, 2 Cancelado, 1 Ausente y 1 Pendiente #75%
     Y que el paciente fue penalizado por bajo porcentaje

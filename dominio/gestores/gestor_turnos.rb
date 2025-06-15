@@ -4,10 +4,6 @@ require_relative 'gestor_estado_turno'
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES = 15
 DIAS_DE_DISPONIBILIDAD = 60
-ESTADO_PENDIENTE = 'Pendiente'.freeze
-ESTADO_AUSENTE = 'Ausente'.freeze
-ESTADO_CANCELADO = 'Cancelado'.freeze
-ESTADO_ASISTIDO = 'Asistido'.freeze
 
 class GestorTurnos
   def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, penalizador)
@@ -98,6 +94,8 @@ class GestorTurnos
 
     @repositorio_turnos.save(turno)
 
+    @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
+
     turno
   end
 
@@ -108,9 +106,8 @@ class GestorTurnos
 
     validar_estado_actual(turno)
     turno = GestorEstadoTurno.cancelar_turno(turno, proximas_24hs)
-    puts turno
     @repositorio_turnos.save(turno)
-    puts 'caca'
+    @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
     turno
   end
 

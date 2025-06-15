@@ -32,4 +32,11 @@ class Penalizador
       raise PenalizacionPorReputacionException
     end
   end
+
+  def actualizar_flag_penalizable(usuario, estado)
+    if estado == ESTADO_AUSENTE
+      usuario.penalizable = true
+      @gestor_usuarios.actualizar(usuario)
+    end
+  end
 end
