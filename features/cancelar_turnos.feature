@@ -17,13 +17,14 @@ Antecedentes:
       Y consulto mis turnos
       Cuando pido cancelar el turno
       Entonces devuelve el mensaje "Turno actualizado: estado Ausente"
-    @wip
+
     Escenario: US-4.3 Cancelar un turno con un id que no existe
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'
+      Y consulto mis turnos
       Cuando pido cancelar un turno con un id inexistente
-      Entonces devuelve el mensaje de error "No puedes cancelar este turno"
+      Entonces devuelve el mensaje "No puedes cancelar este turno"
     @wip
     Escenario: US-4.4 Cancelar un turno con un id de un turno que no me pertenece
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'
       Cuando pido cancelar el turno de otro paciente
-      Entonces devuelve el mensaje de error "No puedes cancelar este turno"
+      Entonces devuelve el mensaje "No puedes cancelar este turno"

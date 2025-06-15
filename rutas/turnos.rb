@@ -181,9 +181,14 @@ put '/turnos/:id/cancelacion' do
   logger.debug("PUT /turnos/:id/cancelacion: #{@params}")
   id = params['id']
   proximas_24hs = @params[:proximas_24hs]
-  turno = turnero.cancelar_turno(id, proximas_24hs)
-  status 200
-  json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  begin
+    turno = turnero.cancelar_turno(id, proximas_24hs)
+    status 200
+    json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  rescue TurnoNoEncontradoException
+    status 404
+    json({ mensaje: 'No puedes cancelar este turno' })
+  end
 end
 
 helpers do

@@ -22,3 +22,10 @@ end
 Entonces('devuelve el mensaje {string}') do |mensaje|
   expect(JSON.parse(@response.body)['mensaje']).to include mensaje
 end
+
+Cuando('pido cancelar un turno con un id inexistente') do
+  id_inexistente = 100
+  request_body = { proximas_24hs: @turno['proximas_24hs'] }.to_json
+  @response = Faraday.put("/turnos/#{id_inexistente}/cancelacion", request_body, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(404)
+end
