@@ -116,4 +116,13 @@ describe Turnero do
       expect { turnero.historial_turnos_paciente('pepe@mail.com') }.to raise_error(NoHayHistorialTurnosException)
     end
   end
+
+  describe 'Cancelar turnos' do
+    it 'cancelar turno devuelve un turno cancelado si se hace con mas de 24hs de anticipacion' do
+      fecha_turno = proveedores[:hora].ahora + 36 * 60 * 60
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', 'usuario', fecha_turno))
+      allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
+      expect(turnero.cancelar_turno(1, 'proximas').estado).to eq('Cancelado')
+    end
+  end
 end

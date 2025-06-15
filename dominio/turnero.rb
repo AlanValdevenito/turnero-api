@@ -123,6 +123,10 @@ class Turnero
     @gestor_turnos.modificar_estado_turno(turno_id, nuevo_estado)
   end
 
+  def cancelar_turno(id, _proximas24)
+    @gestor_turnos.cancelar_turno(id)
+  end
+
   def ocurre_proximas_24hs?(turno)
     @gestor_turnos.ocurre_proximas_24hs?(turno)
   end

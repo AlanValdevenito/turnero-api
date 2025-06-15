@@ -104,9 +104,9 @@ class GestorTurnos
     turno = buscar_turno_por_id(turno_id)
     validar_estado_actual(turno)
     turno.estado = if ocurre_proximas_24hs?(turno)
-                     ESTADO_CANCELADO
-                   else
                      ESTADO_AUSENTE
+                   else
+                     ESTADO_CANCELADO
                    end
     @repositorio_turnos.save(turno)
     turno

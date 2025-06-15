@@ -427,8 +427,8 @@ describe GestorTurnos do
       expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
     end
 
-    it 'cancelar turno lo deja con estado Cancelado si se hace con 24hs de anticipacion' do
-      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
+    it 'cancelar turno lo deja con estado Cancelado si se hace con mas de 24hs de anticipacion' do
+      fecha_turno = contexto[:proveedor_hora].ahora + 36 * 60 * 60
       turno_id = 1
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medicoDummy', 'usuarioDummy', fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
@@ -436,7 +436,7 @@ describe GestorTurnos do
     end
 
     it 'cancelar turno lo deja con estado Ausente si se hace con menos de 24hs de anticipacion' do
-      fecha_turno = contexto[:proveedor_hora].ahora + 36 * 60 * 60
+      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
       turno_id = 1
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medicoDummy', 'usuarioDummy', fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
