@@ -8,7 +8,7 @@ ESTADOS_VALIDOS = {
   'asistido' => 'Asistido'
 }.freeze
 
-MENSAJE_PENALIZACION = 'Penalización por porcentaje de asistencia abajo del 80%'.freeze
+MENSAJE_DE_PENALIZACION = 'Penalización por porcentaje de asistencia abajo del 80%'.freeze
 
 Dado('un paciente con email {string} registrado') do |email|
   telegram_id = rand(100_000..999_999)
@@ -35,16 +35,13 @@ Dado(/^que el paciente tuvo (\d+) turnos: (.+)$/) do |_total, lista|
     estado = ESTADOS_VALIDOS.fetch(Regexp.last_match(2).downcase) { raise "Estado inválido: #{Regexp.last_match(2)}" }
     cantidad.times { estados << estado }
   end
-
   fecha_pasada = @fecha_actual - estados.count { |e| e != 'Pendiente' }
   fecha_futura = @fecha_actual + 1
 
   repo_turnos = RepositorioTurnos.new
-  repo_medicos = RepositorioMedicos.new
-  repo_usuarios = RepositorioUsuarios.new
 
-  medico = repo_medicos.buscar_por_matricula('ABC123')
-  usuario = repo_usuarios.buscar_por_email(@paciente_email)
+  medico = RepositorioMedicos.new.buscar_por_matricula('ABC123')
+  usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
 
   estados.each do |estado|
     fecha_turno =
@@ -54,7 +51,8 @@ Dado(/^que el paciente tuvo (\d+) turnos: (.+)$/) do |_total, lista|
         fecha_pasada.tap { fecha_pasada += 1 }
       end
 
-    turno = repo_turnos.save(Turno.crear(medico, usuario, fecha_turno.strftime('%Y-%m-%d'), '10:00'))
+    turno = Turno.crear(medico, usuario, fecha_turno.strftime('%Y-%m-%d'), '10:00')
+    turno.estado = estado
     repo_turnos.save(turno)
   end
 end
