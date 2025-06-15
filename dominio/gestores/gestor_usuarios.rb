@@ -11,7 +11,7 @@ class GestorUsuarios
     raise EmailEnUsoException if @repositorio_usuarios.buscar_por_email(email)
 
     begin
-      usuario = Usuario.new(email, nil, telegram_id)
+      usuario = Usuario.new(email, id: nil, telegram_id:)
     rescue ArgumentError
       raise EmailObligatorioException
     end

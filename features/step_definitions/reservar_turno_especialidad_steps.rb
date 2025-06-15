@@ -49,3 +49,11 @@ Entonces('se muestra la fecha, hora, medico y especialidad del turno reservado')
   expect(@turno).to have_key('medico')
   expect(@turno['medico']).to have_key('especialidad')
 end
+
+Entonces('se muestra un error {int}') do |codigo_error|
+  expect(@response.status).to eq(codigo_error)
+end
+
+Entonces('se muestra el mensaje de error {string}') do |mensaje_error|
+  expect(JSON.parse(@response.body)['error']).to eq(mensaje_error)
+end

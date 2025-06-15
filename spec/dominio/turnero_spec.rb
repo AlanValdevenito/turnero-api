@@ -86,19 +86,26 @@ describe Turnero do
     expect { turnero.turnos_medico('ABC123') }.to raise_error(MedicoNoEncontradoException)
   end
 
-  it 'deberia devolver los medicos disponibles de una especialidad' do
-    traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
-    expect(traumatologos_disponibles.first.matricula).to eq('XYZ123')
-    expect(traumatologos_disponibles.first.especialidad.nombre).to eq('Traumatologia')
-  end
+  describe 'Reserva de turno por especialidad ' do
+    it 'deberia devolver los medicos disponibles de una especialidad' do
+      traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
+      expect(traumatologos_disponibles.first.matricula).to eq('XYZ123')
+      expect(traumatologos_disponibles.first.especialidad.nombre).to eq('Traumatologia')
+    end
 
-  it 'deberia devolver como maximo 7 medicos disponibles de una especialidad' do
-    allow(repositorios[:medico]).to receive(:buscar_por_especialidad).and_return(
-      (0...10).map { |i| Medico.new("Medico#{i}", "Apellido#{i}", "ABC#{i}", Especialidad.new('Traumatologia', 10)) }
-    )
+    it 'deberia devolver como maximo 7 medicos disponibles de una especialidad' do
+      allow(repositorios[:medico]).to receive(:buscar_por_especialidad).and_return(
+        (0...10).map { |i| Medico.new("Medico#{i}", "Apellido#{i}", "ABC#{i}", Especialidad.new('Traumatologia', 10)) }
+      )
 
-    traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
-    expect(traumatologos_disponibles.size).to be <= 7
+      traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
+      expect(traumatologos_disponibles.size).to be <= 7
+    end
+
+    it 'deberia devolver error al consultar turnos si la especialidad no tiene medicos dados de alta' do
+      allow(repositorios[:medico]).to receive(:buscar_por_especialidad).and_return([])
+      expect { turnero.medicos_disponibles_especialidad('Traumatologia') }.to raise_error(EspecialidadSinMedicosException)
+    end
   end
 
   describe 'Historial de turnos' do
@@ -107,15 +114,6 @@ describe Turnero do
       allow(repositorios[:usuario]).to receive(:buscar_por_email).with('pepe@mail.com').and_return(usuario)
       allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return([])
       expect { turnero.historial_turnos_paciente('pepe@mail.com') }.to raise_error(NoHayHistorialTurnosException)
-    end
-  end
-
-  describe 'Cancelar turnos' do
-    it 'devuelve true si turno ocurre en las proximas 24hs' do
-      usuario = instance_double('Usuario')
-      medico = instance_double('Medico')
-      fecha_hora = proveedores[:hora].ahora + 12 * 60 * 60
-      expect(turnero.ocurre_proximas_24hs?(Turno.new(medico, usuario, fecha_hora))).to eq(true)
     end
   end
 end

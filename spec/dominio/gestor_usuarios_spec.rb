@@ -22,13 +22,13 @@ describe GestorUsuarios do
   end
 
   it 'lanza error si el email ya existe' do
-    allow(repositorio).to receive(:buscar_por_email).with(email).and_return(Usuario.new(email, 1))
+    allow(repositorio).to receive(:buscar_por_email).with(email).and_return(Usuario.new(email, id: 1))
     expect { gestor_usuarios.crear_usuario(email) }.to raise_error(EmailEnUsoException)
   end
 
   it 'lanza error si el telegram_id ya existe' do
     allow(repositorio).to receive(:buscar_por_email).with(email).and_return(nil)
-    allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(Usuario.new(email, 1, telegram_id))
+    allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(Usuario.new(email, id: 1, telegram_id:))
     expect { gestor_usuarios.crear_usuario(email, telegram_id) }.to raise_error(TelegramIdEnUsoException)
   end
 
@@ -43,19 +43,19 @@ describe GestorUsuarios do
   end
 
   it 'devuelve todos los usuarios' do
-    usuarios = [Usuario.new(email, 1)]
+    usuarios = [Usuario.new(email, id: 1)]
     allow(repositorio).to receive(:all).and_return(usuarios)
     expect(gestor_usuarios.usuarios).to eq(usuarios)
   end
 
   it 'busca usuario por email' do
-    usuario = Usuario.new(email, 1)
+    usuario = Usuario.new(email, id: 1)
     allow(repositorio).to receive(:buscar_por_email).with(email).and_return(usuario)
     expect(gestor_usuarios.buscar_usuario_por_email(email)).to eq(usuario)
   end
 
   it 'busca usuario por telegram_id' do
-    usuario = Usuario.new(email, 1, telegram_id)
+    usuario = Usuario.new(email, id: 1, telegram_id:)
     allow(repositorio).to receive(:buscar_por_telegram_id).with(telegram_id).and_return(usuario)
     expect(gestor_usuarios.buscar_usuario_por_telegram_id(telegram_id)).to eq(usuario)
   end

@@ -2,17 +2,24 @@ require_relative '../dominio/excepciones/turno_no_encontrado_exception'
 require_relative '../dominio/excepciones/estado_invalido_exception'
 require_relative '../dominio/excepciones/no_hay_historial_turnos_exception'
 require_relative '../dominio/excepciones/turno_pasado_exception'
+require_relative '../dominio/excepciones/especialidad_sin_medicos_exception'
+require_relative '../dominio/excepciones/penalizacion_exception'
 
 get '/turnos/medicos-disponibles/:especialidad' do
   logger.debug("GET /turnos/medicos-disponibles/:especialidad: #{@params}")
   especialidad = params[:especialidad]
-  medicos = turnero.medicos_disponibles_especialidad(especialidad)
-  respuesta = []
-  medicos.each do |medico|
-    respuesta << { id: medico.id, nombre: medico.nombre, apellido: medico.apellido, matricula: medico.matricula, especialidad: medico.especialidad.nombre }
+  begin
+    medicos = turnero.medicos_disponibles_especialidad(especialidad)
+    respuesta = []
+    medicos.each do |medico|
+      respuesta << { id: medico.id, nombre: medico.nombre, apellido: medico.apellido, matricula: medico.matricula, especialidad: medico.especialidad.nombre }
+    end
+    status 200
+    json(respuesta)
+  rescue EspecialidadSinMedicosException
+    status 404
+    json({ error: 'Especialidad sin medicos dados de alta' })
   end
-  status 200
-  json(respuesta)
 end
 
 get '/turnos/medicos-disponibles' do
@@ -151,6 +158,9 @@ post '/turnos' do
   rescue TurnoYaExisteException
     status 400
     json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
+  rescue PenalizacionPorReputacionException
+    status 400
+    json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' })
   end
 end
 
