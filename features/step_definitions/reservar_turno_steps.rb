@@ -17,7 +17,7 @@ def crear_medicos_disponibles
 end
 
 def crear_usuario
-  @usuario = Usuario.new('juan@mail.com', nil, 123_456_789)
+  @usuario = Usuario.new('juan@mail.com', id: nil, telegram_id: 123_456_789)
   @repositorio_usuarios = RepositorioUsuarios.new
   @repositorio_usuarios.save(@usuario)
 end
@@ -88,7 +88,7 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
   RepositorioEspecialidades.new.save(especialidad)
   medico = Medico.new('Lucas', 'Martinez', '25', especialidad)
   RepositorioMedicos.new.save(medico)
-  usuario = Usuario.new('pepe@pepito.com', nil, 123_456_789)
+  usuario = Usuario.new('pepe@pepito.com', id: nil, telegram_id: 123_456_789)
   RepositorioUsuarios.new.save(usuario)
   calculador = CalculadorDeDisponibilidad.new(ProveedorDia.new, ProveedorHora.new, ProveedorFeriados.new)
 
