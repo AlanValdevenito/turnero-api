@@ -88,7 +88,10 @@ class Turnero
 
   def medicos_disponibles_especialidad(especialidad_nombre)
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)
-    @repositorio_medicos.buscar_por_especialidad(especialidad).sample(MEDICOS_DISPONIBLES)
+    medicos = @repositorio_medicos.buscar_por_especialidad(especialidad).sample(MEDICOS_DISPONIBLES)
+    raise EspecialidadSinMedicosException if medicos.empty?
+
+    medicos
   end
 
   def buscar_medico_por_matricula(matricula)
