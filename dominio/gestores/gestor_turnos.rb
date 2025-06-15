@@ -101,10 +101,14 @@ class GestorTurnos
 
   def cancelar_turno(turno_id)
     validar_turno_id(turno_id)
-
     turno = buscar_turno_por_id(turno_id)
-    turno.estado = ESTADO_CANCELADO
-
+    validar_estado_actual(turno)
+    turno.estado = if ocurre_proximas_24hs?(turno)
+                     ESTADO_CANCELADO
+                   else
+                     ESTADO_AUSENTE
+                   end
+    @repositorio_turnos.save(turno)
     turno
   end
 
