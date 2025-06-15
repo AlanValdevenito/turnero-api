@@ -8,6 +8,7 @@ describe GestorTurnos do
     stub_const('TURNO_ID', 1)
     stub_const('PROXIMAS_24HS_TRUE', true)
     stub_const('PROXIMAS_24HS_FALSE', false)
+    allow_any_instance_of(Penalizador).to receive(:penalizar_si_corresponde).and_return(nil)
   end
 
   let(:contexto) do
@@ -65,7 +66,8 @@ describe GestorTurnos do
         ctx[:repositorio_turnos],
         ctx[:proveedor_dia],
         ctx[:proveedor_feriados],
-        ctx[:proveedor_hora]
+        ctx[:proveedor_hora],
+        Penalizador.new(ctx[:proveedor_hora], instance_double('GestorUsuarios'))
       )
     end
   end

@@ -16,7 +16,8 @@ class Turnero
       repositorio_turnos,
       proveedor_dia,
       proveedor_feriados,
-      proveedor_hora
+      proveedor_hora,
+      Penalizador.new(proveedor_hora, @gestor_usuarios)
     )
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_hora)
   end

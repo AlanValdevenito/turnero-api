@@ -10,12 +10,14 @@ ESTADO_CANCELADO = 'Cancelado'.freeze
 ESTADO_ASISTIDO = 'Asistido'.freeze
 
 class GestorTurnos
-  def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
+  def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, penalizador)
     @repositorio_turnos = repositorio_turnos
     @proveedor_dia = proveedor_dia
     @proveedor_hora = proveedor_hora
     @proveedor_feriados = proveedor_feriados
     @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora, proveedor_feriados)
+    @calculador_reputacion = CalculadorReputacion.new(@repositorio_turnos)
+    @penalizador = penalizador
   end
 
   def turnos_paciente(usuario) = turnos_recientes(@repositorio_turnos.buscar_por_usuario(usuario))
@@ -24,6 +26,8 @@ class GestorTurnos
 
   def crear_turno(medico, usuario, fecha, hora)
     raise FechaNoValidaException unless es_fecha_valida?(fecha)
+
+    @penalizador.penalizar_si_corresponde(usuario, @calculador_reputacion.calcular_reputacion(usuario))
 
     turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
     turnos_existentes.each do |turno|
