@@ -37,4 +37,13 @@ class GestorUsuarios
 
     usuario
   end
+
+  def actualizar(usuario)
+    raise UsuarioNoEncontradoException unless usuario.id
+
+    existing_user = @repositorio_usuarios.buscar_por_id(usuario.id)
+    raise UsuarioNoEncontradoException unless existing_user
+
+    @repositorio_usuarios.save(usuario)
+  end
 end
