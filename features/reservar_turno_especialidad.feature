@@ -17,7 +17,7 @@ Característica: Reserva de turno por especialidad
     Cuando el usuario selecciona el turno con el medico de matricula "ABC123"
     Entonces se muestra el mensaje de exito "El turno se reservó exitosamente"
     Y se muestra la fecha, hora, medico y especialidad del turno reservado
-  @wip
+
   Escenario: US-2.2 Reserva de turno con especialidad sin medicos dados de alta
     Dado que el usuario pide un turno por especialidad
     Entonces se muestra un listado de todas las especialidades con su con nombre
