@@ -28,7 +28,6 @@ Característica: Penalización temporal por bajo porcentaje de asistencia
     Entonces debe mostrarse un mensaje de penalización
     Y no puede reservar turnos por los próximos 3 minutos
 
-  @wip
   Escenario: 11.4 Fin de la penalización después del tiempo
     Dado que el paciente fue penalizado por bajo porcentaje
     Y han pasado 3 minutos desde su último intento

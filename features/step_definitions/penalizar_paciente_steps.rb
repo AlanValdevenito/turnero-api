@@ -111,3 +111,22 @@ Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos
   body = JSON.parse(response.body)
   expect(body['error']).to match(MENSAJE_DE_PENALIZACION)
 end
+
+Dado('que el paciente fue penalizado por bajo porcentaje') do
+  # Simula que el paciente ya fue penalizado en este instante
+  @hora_de_penalizacion = @hora_mock
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(@hora_de_penalizacion)
+
+  usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
+  usuario.ultima_penalizacion = @hora_de_penalizacion.to_datetime
+  usuario.penalizable = false
+  RepositorioUsuarios.new.save(usuario)
+end
+
+Dado('han pasado {int} minutos desde su último intento') do |minutos|
+  # Avanza el tiempo simulado la cantidad de minutos indicada
+  raise 'No hay hora de penalización definida' unless @hora_de_penalizacion
+
+  nueva_hora = @hora_de_penalizacion + (minutos * 60)
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(nueva_hora)
+end
