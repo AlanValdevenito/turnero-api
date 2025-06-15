@@ -18,7 +18,7 @@ Dado('consulto mis turnos') do
 end
 
 Cuando('pido cancelar el turno') do
-  request_body = { proximas_24hs: @turno['proximas_24hs'] }.to_json
+  request_body = { proximas_24hs: @turno['proximas_24hs'], email: @email }.to_json
   @response = Faraday.put("/turnos/#{@turno['id']}/cancelacion", request_body, { 'Content-Type' => 'application/json' })
 end
 
@@ -28,7 +28,7 @@ end
 
 Cuando('pido cancelar un turno con un id inexistente') do
   id_inexistente = 100
-  request_body = { proximas_24hs: @turno['proximas_24hs'] }.to_json
+  request_body = { proximas_24hs: @turno['proximas_24hs'], email: @email }.to_json
   @response = Faraday.put("/turnos/#{id_inexistente}/cancelacion", request_body, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(404)
 end
@@ -41,8 +41,8 @@ Cuando('pido cancelar el turno de otro paciente') do
   RepositorioUsuarios.new.save(usuario)
   medico = RepositorioMedicos.new.buscar_por_matricula(@matricula)
   turno = Turno.new(medico, usuario, Date.parse(@fecha_turno), 'Pendiente')
-  id_turno_otro_paciente = RepositorioTurnos.new.save(turno).id
-  request_body = { proximas_24hs: @turno['proximas_24hs'] }.to_json
-  response = Faraday.put("/turnos/#{id_turno_otro_paciente}/cancelacion", request_body, { 'Content-Type' => 'application/json' })
-  expect(response.status).to eq(403)
+  RepositorioTurnos.new.save(turno)
+  request_body = { proximas_24hs: @turno['proximas_24hs'], email: usuario.email }.to_json
+  @response = Faraday.put("/turnos/#{@turno['id']}/cancelacion", request_body, { 'Content-Type' => 'application/json' })
+  expect(@response.status).to eq(403)
 end

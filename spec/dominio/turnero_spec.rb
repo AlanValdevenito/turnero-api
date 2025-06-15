@@ -1,6 +1,6 @@
 require 'integration_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
-require_relative '../../dominio/excepciones/estado_invalido_exception'
+Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| require file }
 
 describe Turnero do
   subject(:turnero) do
@@ -120,16 +120,18 @@ describe Turnero do
   describe 'Cancelar turnos' do
     it 'cancelar turno devuelve un turno cancelado si se hace con mas de 24hs de anticipacion' do
       fecha_turno = proveedores[:hora].ahora + 36 * 60 * 60
-      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', 'usuario', fecha_turno))
+      usuario = Usuario.new('usuario@mail.com')
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
-      expect(turnero.cancelar_turno(1, 'proximas').estado).to eq('Cancelado')
+      expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Cancelado')
     end
 
     it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
       fecha_turno = proveedores[:hora].ahora + 12 * 60 * 60
-      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', 'usuario', fecha_turno))
+      usuario = Usuario.new('usuario@mail.com')
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
-      expect(turnero.cancelar_turno(1, 'proximas').estado).to eq('Ausente')
+      expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Ausente')
     end
   end
 end

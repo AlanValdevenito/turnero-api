@@ -1,6 +1,4 @@
-require_relative '../excepciones/turno_pasado_exception'
-require_relative '../excepciones/turno_futuro_exception'
-require_relative '../excepciones/estado_no_permitido_exception'
+Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 require_relative 'gestor_estado_turno'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
@@ -99,9 +97,11 @@ class GestorTurnos
     turno
   end
 
-  def cancelar_turno(turno_id)
+  def cancelar_turno(turno_id, email)
     validar_turno_id(turno_id)
     turno = buscar_turno_por_id(turno_id)
+    raise TurnoNoPerteneceAUsuarioException unless turno.usuario.email == email
+
     validar_estado_actual(turno)
     turno.estado = if ocurre_proximas_24hs?(turno)
                      ESTADO_AUSENTE
