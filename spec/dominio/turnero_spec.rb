@@ -124,5 +124,12 @@ describe Turnero do
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
       expect(turnero.cancelar_turno(1, 'proximas').estado).to eq('Cancelado')
     end
+
+    it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
+      fecha_turno = proveedores[:hora].ahora + 12 * 60 * 60
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', 'usuario', fecha_turno))
+      allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
+      expect(turnero.cancelar_turno(1, 'proximas').estado).to eq('Ausente')
+    end
   end
 end
