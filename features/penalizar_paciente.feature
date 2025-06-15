@@ -34,24 +34,23 @@ Característica: Penalización temporal por bajo porcentaje de asistencia
     Cuando intenta reservar un nuevo turno
     Entonces puede hacerlo exitosamente
 
-  @wip
   Escenario: 11.5 Penalización al empeorar el historial
     Dado que el paciente tuvo 3 turnos: 2 Asistido y 1 Pendiente #100%
     Y saco un turno exitosamente
-    Cuando el estado del turno Pendiente se cambia a Ausente #75%
-    Y vuelve a intentar sacar un turno
+    Cuando el estado del turno Pendiente se cambia a Ausente
+    Y intenta reservar un nuevo turno
     Entonces debe mostrarse un mensaje de penalización
     Y no puede reservar turnos por los próximos 3 minutos
 
   @wip
   Escenario: 11.6 Penalización se mantiene al empeorar historial luego del tiempo
-    Dado que el paciente tuvo 5 turnos: 1 Asistido, 2 Cancelados, 1 Ausente y 1 Pendiente #75%
+    Dado que el paciente tuvo 5 turnos: 1 Asistido, 2 Cancelado, 1 Ausente y 1 Pendiente #75%
     Y que el paciente fue penalizado por bajo porcentaje
     Y han pasado 3 minutos desde su último intento
-    Cuando el estado del turno Pendiente se cambia a Ausente #60%
-    Y vuelve a intentar sacar un turno
+    Cuando el estado del turno Pendiente se cambia a Ausente
+    Y intenta reservar un nuevo turno
     Entonces debe mostrarse un mensaje de penalización
-    Y no puede reservar turnos por los próximos 3 minutos adicionales
+    Y no puede reservar turnos por los próximos 3 minutos
 
 
 
