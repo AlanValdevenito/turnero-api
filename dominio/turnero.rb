@@ -1,9 +1,4 @@
-require_relative '../dominio/excepciones/excepciones_registracion'
-require_relative '../dominio/excepciones/medico_no_encontrado_exception'
-require_relative '../dominio/excepciones/usuario_no_encontrado_exception'
-require_relative '../dominio/excepciones/turno_ya_existe_exception'
-require_relative '../dominio/excepciones/no_hay_proximos_turnos_exception'
-require_relative '../dominio/excepciones/fecha_no_valida_exception'
+Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 require_relative '../dominio/gestores/gestor_usuarios'
 require_relative '../dominio/gestores/gestor_turnos'
 require_relative 'adaptador_zona_horaria'
@@ -121,6 +116,10 @@ class Turnero
 
   def modificar_estado_turno(turno_id, nuevo_estado)
     @gestor_turnos.modificar_estado_turno(turno_id, nuevo_estado)
+  end
+
+  def cancelar_turno(id, proximas_24hs, email)
+    @gestor_turnos.cancelar_turno(id, proximas_24hs, email)
   end
 
   def ocurre_proximas_24hs?(turno)

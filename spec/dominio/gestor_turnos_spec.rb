@@ -5,6 +5,9 @@ Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| requi
 describe GestorTurnos do
   before(:each) do
     stub_const('MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES', 15)
+    stub_const('TURNO_ID', 1)
+    stub_const('PROXIMAS_24HS_TRUE', true)
+    stub_const('PROXIMAS_24HS_FALSE', false)
   end
 
   let(:contexto) do
@@ -425,6 +428,28 @@ describe GestorTurnos do
       allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(true)
 
       expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
+    end
+
+    it ' lo deja con estado Cancelado si se hace con mas de 24hs de anticipacion' do
+      fecha_turno = contexto[:proveedor_hora].ahora + 36 * 60 * 60
+      usuario = Usuario.new('usuario@mail.com')
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
+      allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
+    end
+
+    it ' lo deja con estado Ausente si se hace con menos de 24hs de anticipacion' do
+      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
+      usuario = Usuario.new('usuario@mail.com')
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
+      allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, usuario.email).estado).to eq('Ausente')
+    end
+
+    it ' lanza excepcion si el email no coincide con el del turno' do
+      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
+      allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', Usuario.new('usuario@mail.com'), fecha_turno))
+      expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, 'otroUsuario@mail.com') }.to raise_error(TurnoNoPerteneceAUsuarioException)
     end
   end
 end

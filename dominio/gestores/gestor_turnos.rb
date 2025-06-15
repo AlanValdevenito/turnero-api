@@ -1,6 +1,5 @@
-require_relative '../excepciones/turno_pasado_exception'
-require_relative '../excepciones/turno_futuro_exception'
-require_relative '../excepciones/estado_no_permitido_exception'
+Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
+require_relative 'gestor_estado_turno'
 
 MAXIMA_CANTIDAD_TURNOS_VISIBLES = 20
 MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES = 15
@@ -91,20 +90,23 @@ class GestorTurnos
 
     ahora = fecha_y_hora_actual
 
-    case nuevo_estado
-    when ESTADO_CANCELADO
-      validar_turno_pasado(turno, ahora)
-      turno.estado = ESTADO_CANCELADO
-    when ESTADO_ASISTIDO
-      validar_turno_futuro(turno, ahora)
-      turno.estado = ESTADO_ASISTIDO
-    when ESTADO_AUSENTE
-      validar_turno_futuro(turno, ahora)
-      turno.estado = ESTADO_AUSENTE
-    else
-      raise EstadoInvalidoException
-    end
+    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, ahora)
+
     @repositorio_turnos.save(turno)
+
+    turno
+  end
+
+  def cancelar_turno(turno_id, proximas_24hs, email)
+    validar_turno_id(turno_id)
+    turno = buscar_turno_por_id(turno_id)
+    raise TurnoNoPerteneceAUsuarioException unless turno.usuario.email == email
+
+    validar_estado_actual(turno)
+    turno = GestorEstadoTurno.cancelar_turno(turno, proximas_24hs)
+    puts turno
+    @repositorio_turnos.save(turno)
+    puts 'caca'
     turno
   end
 
@@ -133,13 +135,5 @@ class GestorTurnos
     hoy = @proveedor_dia.hoy
     ahora = @proveedor_hora.ahora
     DateTime.parse("#{hoy} #{ahora}")
-  end
-
-  def validar_turno_pasado(turno, ahora)
-    raise TurnoYaPasadoException if turno.fecha_hora.to_time < ahora.to_time
-  end
-
-  def validar_turno_futuro(turno, ahora)
-    raise TurnoFuturoException if turno.fecha_hora.to_time > ahora.to_time
   end
 end

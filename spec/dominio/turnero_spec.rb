@@ -1,10 +1,14 @@
 require 'integration_helper'
 Dir[File.join(__dir__, '../../dominio', '*.rb')].each { |file| require file }
-require_relative '../../dominio/excepciones/estado_invalido_exception'
+Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| require file }
 
 describe Turnero do
   subject(:turnero) do
     described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados], proveedores[:hora])
+  end
+
+  before(:each) do
+    stub_const('PROXIMAS_24HS_FALSE', false)
   end
 
   let(:email) { 'test@email.com' }
@@ -114,6 +118,24 @@ describe Turnero do
       allow(repositorios[:usuario]).to receive(:buscar_por_email).with('pepe@mail.com').and_return(usuario)
       allow(repositorios[:turnos]).to receive(:buscar_por_usuario).with(usuario).and_return([])
       expect { turnero.historial_turnos_paciente('pepe@mail.com') }.to raise_error(NoHayHistorialTurnosException)
+    end
+  end
+
+  describe 'Cancelar turnos' do
+    it 'cancelar turno devuelve un turno cancelado si se hace con mas de 24hs de anticipacion' do
+      fecha_turno = proveedores[:hora].ahora + 36 * 60 * 60
+      usuario = Usuario.new('usuario@mail.com')
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
+      allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
+      expect(turnero.cancelar_turno(1, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
+    end
+
+    it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
+      fecha_turno = proveedores[:hora].ahora + 12 * 60 * 60
+      usuario = Usuario.new('usuario@mail.com')
+      allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
+      allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
+      expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Ausente')
     end
   end
 end

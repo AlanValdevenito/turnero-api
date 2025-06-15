@@ -1,9 +1,4 @@
-require_relative '../dominio/excepciones/turno_no_encontrado_exception'
-require_relative '../dominio/excepciones/estado_invalido_exception'
-require_relative '../dominio/excepciones/no_hay_historial_turnos_exception'
-require_relative '../dominio/excepciones/turno_pasado_exception'
-require_relative '../dominio/excepciones/especialidad_sin_medicos_exception'
-require_relative '../dominio/excepciones/penalizacion_exception'
+Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 
 get '/turnos/medicos-disponibles/:especialidad' do
   logger.debug("GET /turnos/medicos-disponibles/:especialidad: #{@params}")
@@ -181,9 +176,20 @@ put '/turnos/:id/cancelacion' do
   logger.debug("PUT /turnos/:id/cancelacion: #{@params}")
   id = params['id']
   proximas_24hs = @params[:proximas_24hs]
-  turno = turnero.cancelar_turno(id, proximas_24hs)
-  status 200
-  json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  email = @params[:email]
+  begin
+    turno = turnero.cancelar_turno(id, proximas_24hs, email)
+    status 200
+    json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
+  rescue TurnoNoEncontradoException
+    puts 'turno no encontrado'
+    status 404
+    json({ mensaje: 'No puedes cancelar este turno' })
+  rescue TurnoNoPerteneceAUsuarioException
+    puts 'turno no te pertenece'
+    status 403
+    json({ mensaje: 'No puedes cancelar este turno' })
+  end
 end
 
 helpers do
