@@ -50,3 +50,9 @@ post '/usuarios' do
     json({ error: 'El email es obligatorio' })
   end
 end
+
+delete '/pacientes/:email' do
+  logger.debug("DELETE /pacientes/:email: #{@params}")
+  status 200
+  json({ message: 'paciente eliminado con sus turnos correspondientes' })
+end

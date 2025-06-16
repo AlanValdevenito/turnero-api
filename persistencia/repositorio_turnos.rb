@@ -26,6 +26,10 @@ class RepositorioTurnos < AbstractRepository
     load_object(row) unless row.nil?
   end
 
+  def eliminar_por_usuario(usuario)
+    dataset.where(usuario_id: usuario.id).delete
+  end
+
   protected
 
   def load_object(a_hash)

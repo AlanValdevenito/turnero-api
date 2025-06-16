@@ -2,8 +2,9 @@ require_relative '../excepciones/excepciones_registracion'
 require_relative '../excepciones/usuario_no_encontrado_exception'
 
 class GestorUsuarios
-  def initialize(repositorio_usuarios)
+  def initialize(repositorio_usuarios, repositorio_turnos)
     @repositorio_usuarios = repositorio_usuarios
+    @repositorio_turnos = repositorio_turnos
   end
 
   def crear_usuario(email, telegram_id = nil)
