@@ -1,21 +1,20 @@
 require 'spec_helper'
 require 'date'
-require_relative '../../dominio/adapters/proveedor_dia'
-require_relative '../../dominio/adapters/proveedor_hora'
+require_relative '../../dominio/adapters/proveedor_fecha'
 require_relative '../../dominio/calculador_disponibilidad'
 
 describe 'CalculadorDeDisponibilidad' do
   before(:each) do
     stub_const('CANTIDAD_TURNOS', 3)
-    allow(calculador.proveedor_dia).to receive(:hoy).and_return(Date.parse('2025-06-11'))
+    allow(calculador.proveedor_fecha).to receive(:hoy).and_return(Date.parse('2025-06-11'))
   end
 
   describe '.turnos_para_dia' do
     let(:fecha) { Date.parse('2025-06-12') }
     let(:duracion) { 30 }
     let(:fecha_fin) { fecha + 3 }
-    let(:calculador) { CalculadorDeDisponibilidad.new(ProveedorDia.new('-03:00'), ProveedorHora.new('-03:00'), ProveedorFeriados.new) }
-    let(:inicio_jornada) { calculador.proveedor_hora.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 8, 0).to_datetime }
+    let(:calculador) { CalculadorDeDisponibilidad.new(ProveedorFecha.new('-03:00'), ProveedorFeriados.new) }
+    let(:inicio_jornada) { calculador.proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 8, 0).to_datetime }
 
     def stub_feriados_api
       stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
@@ -49,7 +48,7 @@ describe 'CalculadorDeDisponibilidad' do
     end
 
     it 'no ofrece los turnos ocupados' do
-      ocupado = calculador.proveedor_hora.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 9, 0)
+      ocupado = calculador.proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 9, 0)
       tiempos_ocupados = Set.new([ocupado.to_i])
 
       turnos = calculador.turnos_para_dia(fecha, duracion, tiempos_ocupados)

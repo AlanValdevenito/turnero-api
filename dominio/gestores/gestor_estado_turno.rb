@@ -10,11 +10,11 @@ ESTADO_ASISTIDO = 'Asistido'.freeze
 
 class GestorEstadoTurno
   def self.validar_turno_pasado(turno, ahora)
-    raise TurnoYaPasadoException if turno.fecha_hora.to_time < ahora
+    raise TurnoYaPasadoException if turno.fecha_hora.to_time < ahora.to_time
   end
 
   def self.validar_turno_futuro(turno, ahora)
-    raise TurnoFuturoException if turno.fecha_hora.to_time > ahora
+    raise TurnoFuturoException if turno.fecha_hora.to_time > ahora.to_time
   end
 
   def self.modificar_estado_turno(turno, nuevo_estado, ahora)

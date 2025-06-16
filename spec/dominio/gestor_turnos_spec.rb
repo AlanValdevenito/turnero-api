@@ -19,39 +19,34 @@ describe GestorTurnos do
     }.tap do |ctx|
       ctx[:medico] = Medico.new('Michael', 'Jordan', 1, ctx[:especialidad])
 
-      # ProveedorHora mock
+      # ProveedorFecha mock
       ctx[:hora_base] = Time.utc(2025, 6, 16, 10, 0, 0)
-      ctx[:proveedor_hora] = instance_double('ProveedorHora', ahora: ctx[:hora_base])
-      allow(ctx[:proveedor_hora]).to receive(:construir_hora_utc) do |anio, mes, dia, hora, min|
+      ctx[:proveedor_fecha] = instance_double('ProveedorFecha', ahora: ctx[:hora_base])
+      allow(ctx[:proveedor_fecha]).to receive(:construir_hora_utc) do |anio, mes, dia, hora, min|
         Time.utc(anio, mes, dia, hora, min)
       end
 
-      allow(ctx[:proveedor_hora]).to receive(:construir_hora_desde_local) do |anio, mes, dia, hora, min|
+      allow(ctx[:proveedor_fecha]).to receive(:construir_hora_desde_local) do |anio, mes, dia, hora, min|
         # Simula conversión de horario local a UTC (ejemplo: UTC-3)
         Time.utc(anio, mes, dia, hora + 3, min)
       end
 
-      allow(ctx[:proveedor_hora]).to receive(:cambiar_a_huso_horario_local) do |fecha_utc|
+      allow(ctx[:proveedor_fecha]).to receive(:cambiar_a_huso_horario_local) do |fecha_utc|
         # Simula conversión de UTC a hora local (ejemplo: UTC-3)
         fecha_utc - 3 * 60 * 60
       end
 
-      # ProveedorDia mock
-      ctx[:proveedor_dia] = instance_double('ProveedorDia', hoy: Date.parse('2025-06-16'))
-      allow(ctx[:proveedor_dia]).to receive(:cambiar_a_huso_horario_local) do |fecha_utc|
-        # para simular hora local solo restamos 3 horas (UTC-3)
-        fecha_utc - 3 * 60 * 60
-      end
+      allow(ctx[:proveedor_fecha]).to receive(:hoy).and_return(Date.parse('2025-06-16'))
 
       # Turno mock ocupado a las 10:30 UTC
-      turno_mock_utc = ctx[:proveedor_hora].construir_hora_utc(2025, 6, 16, 10, 30)
+      turno_mock_utc = ctx[:proveedor_fecha].construir_hora_utc(2025, 6, 16, 10, 30)
       ctx[:turno_mock] = { fecha_hora: turno_mock_utc }
 
       # Turno registrado para usuario
       turno_usuario = Turno.new(
         ctx[:medico],
         ctx[:usuario],
-        ctx[:proveedor_hora].construir_hora_utc(2025, 6, 5, 10, 0)
+        ctx[:proveedor_fecha].construir_hora_utc(2025, 6, 5, 10, 0)
       )
 
       ctx[:repositorio_turnos] = instance_double(
@@ -65,16 +60,15 @@ describe GestorTurnos do
 
       ctx[:gestor_turnos] = described_class.new(
         ctx[:repositorio_turnos],
-        ctx[:proveedor_dia],
+        ctx[:proveedor_fecha],
         ctx[:proveedor_feriados],
-        ctx[:proveedor_hora],
-        Penalizador.new(ctx[:proveedor_hora], instance_double('GestorUsuarios'))
+        Penalizador.new(ctx[:proveedor_fecha], instance_double('GestorUsuarios'))
       )
     end
   end
 
   def hora_utc(anio, mes, dia, hora, minuto = 0)
-    contexto[:proveedor_hora].construir_hora_utc(anio, mes, dia, hora, minuto)
+    contexto[:proveedor_fecha].construir_hora_utc(anio, mes, dia, hora, minuto)
   end
 
   def stub_turnos_existentes(turnos)
@@ -92,7 +86,7 @@ describe GestorTurnos do
     it 'deberia excluir turnos ya ocupados del listado de disponibles' do
       stub_turnos_existentes([contexto[:turno_mock]])
       turnos = contexto[:gestor_turnos].disponibilidad_de_medico(contexto[:medico])
-      expect(turnos).not_to include(contexto[:proveedor_dia].cambiar_a_huso_horario_local(contexto[:turno_mock][:fecha_hora]))
+      expect(turnos).not_to include(contexto[:proveedor_fecha].cambiar_a_huso_horario_local(contexto[:turno_mock][:fecha_hora]))
     end
   end
 
@@ -256,7 +250,7 @@ describe GestorTurnos do
     let(:usuario) { instance_double('Usuario', email: 'paciente@mail.com') }
 
     before(:each) do
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 16, 15))
+      allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 6, 16, 15))
     end
 
     context 'when hay turnos antes y después de la hora actual' do
@@ -346,7 +340,7 @@ describe GestorTurnos do
     context 'with turnos futuros' do
       it 'permite cancelar un turno futuro' do
         allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
         expect(turnos[:futuro]).to receive(:estado=).with(ESTADO_CANCELADO)
         result = contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO)
         expect(result).to eq(turnos[:futuro])
@@ -354,7 +348,7 @@ describe GestorTurnos do
 
       it 'no permite marcar como asistido un turno futuro' do
         allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 1, 1, 9))
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 1, 1, 9))
         expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_ASISTIDO) }.to raise_error(TurnoFuturoException)
       end
     end
@@ -362,13 +356,13 @@ describe GestorTurnos do
     context 'with turnos pasados' do
       it 'no permite cancelar un turno pasado' do
         allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
         expect { contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_CANCELADO) }.to raise_error(TurnoYaPasadoException)
       end
 
       it 'permite marcar como asistido un turno pasado' do
         allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(3).and_return(turnos[:pasado])
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
         expect(turnos[:pasado]).to receive(:estado=).with(ESTADO_ASISTIDO)
         result = contexto[:gestor_turnos].modificar_estado_turno(3, ESTADO_ASISTIDO)
         expect(result).to eq(turnos[:pasado])
@@ -378,7 +372,7 @@ describe GestorTurnos do
     it 'no se puede modificar el estado de un turno que no sea pendiente' do
       allow(turnos[:futuro]).to receive(:estado).and_return(ESTADO_ASISTIDO)
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(2).and_return(turnos[:futuro])
-      allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
+      allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(hora_utc(2025, 6, 10, 9))
       expect { contexto[:gestor_turnos].modificar_estado_turno(2, ESTADO_CANCELADO) }.to raise_error(EstadoNoPermitidoException)
     end
 
@@ -454,7 +448,7 @@ describe GestorTurnos do
         ahora = hora_utc(2025, 6, 13, 14)
         turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: hora_utc(2025, 6, 15, 14))
 
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(ahora)
         allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(false)
 
         expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(false)
@@ -464,7 +458,7 @@ describe GestorTurnos do
         ahora = hora_utc(2025, 6, 13, 14)
         turno = instance_double('Turno', estado: 'Cancelado', fecha_hora: hora_utc(2025, 6, 14, 12))
 
-        allow(contexto[:proveedor_hora]).to receive(:ahora).and_return(ahora)
+        allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(ahora)
         allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(true)
 
         expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
@@ -472,7 +466,7 @@ describe GestorTurnos do
     end
 
     it 'lo deja con estado Cancelado si se hace con mas de 24hs de anticipacion' do
-      fecha_turno = contexto[:proveedor_hora].ahora + 36 * 60 * 60
+      fecha_turno = contexto[:proveedor_fecha].ahora + 36 * 60 * 60
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
@@ -480,7 +474,7 @@ describe GestorTurnos do
     end
 
     it 'lo deja con estado Ausente si se hace con menos de 24hs de anticipacion' do
-      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
+      fecha_turno = contexto[:proveedor_fecha].ahora + 12 * 60 * 60
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
@@ -488,7 +482,7 @@ describe GestorTurnos do
     end
 
     it 'lanza excepcion si el email no coincide con el del turno' do
-      fecha_turno = contexto[:proveedor_hora].ahora + 12 * 60 * 60
+      fecha_turno = contexto[:proveedor_fecha].ahora + 12 * 60 * 60
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', Usuario.new('usuario@mail.com'), fecha_turno))
       expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, 'otroUsuario@mail.com') }.to raise_error(TurnoNoPerteneceAUsuarioException)
     end

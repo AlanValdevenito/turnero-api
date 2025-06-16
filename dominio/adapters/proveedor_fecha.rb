@@ -36,7 +36,7 @@ class ProveedorFecha
   end
 
   # Cancela el mock de fecha y hora
-  def cancelar_mock
+  def cancelar_fecha_mock
     @fecha_hora_mock = nil
   end
 

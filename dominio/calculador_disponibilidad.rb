@@ -98,7 +98,7 @@ class CalculadorDeDisponibilidad
   #   Si son las 15:43 UTC y `duracion = 20`, el próximo turno es a las 16:00 UTC
   #   y se devuelve ese valor si está dentro de la jornada.
   def hora_inicio(fecha, inicio_jornada, duracion)
-    if fecha == @proveedor_dia.hoy
+    if fecha == @proveedor_fecha.hoy
       proximo_turno = calcular_proximo_turno(fecha, duracion)
       [proximo_turno, inicio_jornada].max
     else

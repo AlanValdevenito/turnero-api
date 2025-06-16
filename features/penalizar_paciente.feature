@@ -53,7 +53,7 @@ Característica: Penalización temporal por bajo porcentaje de asistencia
 
   Escenario: [TEST]: mock de horario funciona
     Dado que el paciente fue penalizado por bajo porcentaje
-    Y mockeo la hora actual a "10:04"
+    Y mockeo la fecha actual a "2025-06-01" con hora "10:04"
     Cuando intenta reservar un nuevo turno
     Entonces puede hacerlo exitosamente
     Y cancelo el mock de hora

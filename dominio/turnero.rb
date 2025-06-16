@@ -128,7 +128,7 @@ class Turnero
   end
 
   def cancelar_fecha_mock
-    @proveedor_fecha.cancelar_hora_mock
+    @proveedor_fecha.cancelar_fecha_mock
     @gestor_usuarios.limpiar_penalizaciones
   end
 

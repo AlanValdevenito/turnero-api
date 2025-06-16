@@ -19,8 +19,9 @@ end
 # PARA TESTEAR LA US-11 (USO EXCLUSIVO)
 post '/test/fecha_mock' do
   # halt 403 unless settings.environment == :test
-  fecha, hora = params[:fecha], params[:hora]
-  raise ArgumentError, 'Debe enviar el campo "hora"' unless Hora
+  fecha = params[:fecha]
+  hora = params[:hora]
+  raise ArgumentError, 'Debe enviar el campo "hora"' unless hora
   raise ArgumentError, 'Debe enviar el campo "fecha"' unless fecha
 
   turnero.setear_fecha_mock(fecha, hora)

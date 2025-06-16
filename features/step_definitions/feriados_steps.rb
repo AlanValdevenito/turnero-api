@@ -3,7 +3,7 @@ require 'rspec/mocks'
 World(RSpec::Mocks::ExampleMethods)
 
 Dado('el usuario pide los turnos disponibles del médico con matrícula {string} siendo {string}') do |matricula, fecha|
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse('2025-06-16'))
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse('2025-06-16'))
   @fecha = fecha
   @response = Faraday.get("/turnos/#{matricula}/disponibilidad")
   expect(@response.status).to eq(200)

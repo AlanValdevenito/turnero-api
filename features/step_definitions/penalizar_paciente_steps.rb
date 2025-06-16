@@ -21,7 +21,7 @@ end
 Dado('la fecha y hora actual es {string} {string}') do |fecha, hora|
   @fecha_actual = Date.parse(fecha)
   @hora_mock = Time.parse("#{fecha} #{hora}")
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(@hora_mock)
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(@hora_mock)
 end
 
 Dado(/^que el paciente tuvo (\d+) turnos: (.+)$/) do |_total, lista|
@@ -73,7 +73,7 @@ Cuando('intenta reservar un nuevo turno') do
   # Si la respuesta es penalización, guardamos y mockeamos la hora de penalización
   if @response.status == 400
     @hora_de_penalizacion = @hora_mock
-    allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(@hora_de_penalizacion)
+    allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(@hora_de_penalizacion)
   end
 end
 
@@ -93,7 +93,7 @@ Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos
   raise 'No hay hora de penalización definida' unless @hora_de_penalizacion
 
   hora_mock = @hora_de_penalizacion + (minutos * 60) - 1 # justo antes de que termine la penalización
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(hora_mock)
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(hora_mock)
 
   @dias_para_nuevo_turno ||= 100
   fecha_turno = @fecha_actual + @dias_para_nuevo_turno
@@ -115,7 +115,7 @@ end
 Dado('que el paciente fue penalizado por bajo porcentaje') do
   # Simula que el paciente ya fue penalizado en este instante
   @hora_de_penalizacion = @hora_mock
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(@hora_de_penalizacion)
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(@hora_de_penalizacion)
 
   usuario = RepositorioUsuarios.new.buscar_por_email(@paciente_email)
   usuario.ultima_penalizacion = @hora_de_penalizacion.to_datetime
@@ -128,7 +128,7 @@ Dado('han pasado {int} minutos desde su último intento') do |minutos|
   raise 'No hay hora de penalización definida' unless @hora_de_penalizacion
 
   nueva_hora = @hora_de_penalizacion + (minutos * 60)
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(nueva_hora)
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(nueva_hora)
 end
 
 Dado('saco un turno exitosamente') do
@@ -153,24 +153,25 @@ Cuando('el estado del turno Pendiente se cambia a Ausente') do
 
   # Avanza el tiempo simulado a después del turno
   nueva_hora = turno.fecha_hora + 60 # 1 minuto después del turno
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(nueva_hora)
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(nueva_hora.to_date)
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(nueva_hora)
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(nueva_hora.to_date)
 
   body = { estado: 'Ausente' }.to_json
   response = Faraday.put("turnos/#{turno.id}", body, { 'Content-Type' => 'application/json' })
   expect(response.status).to eq(200)
 end
 
-Dado('mockeo la hora actual a {string}') do |hora_str|
+Dado('mockeo la fecha actual a {string} con hora {string}') do |fecha_str, hora_str|
   puts "Mockeando la hora actual a: #{hora_str}"
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_call_original
-  body = { hora: hora_str }.to_json
-  response = Faraday.post('test/hora_mock', body, { 'Content-Type' => 'application/json' })
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_call_original
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_call_original
+  body = { fecha: fecha_str, hora: hora_str }.to_json
+  response = Faraday.post('test/fecha_mock', body, { 'Content-Type' => 'application/json' })
   puts response.body
   expect(response.status).to eq(200)
 end
 
 Entonces('cancelo el mock de hora') do
-  response = Faraday.delete('test/hora_mock')
+  response = Faraday.delete('test/fecha_mock')
   expect(response.status).to eq(200)
 end

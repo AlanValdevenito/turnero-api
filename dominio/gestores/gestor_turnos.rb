@@ -6,12 +6,11 @@ MAXIMA_CANTIDAD_TURNOS_HISTORIAL_VISIBLES = 15
 DIAS_DE_DISPONIBILIDAD = 60
 
 class GestorTurnos
-  def initialize(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, penalizador)
+  def initialize(repositorio_turnos, proveedor_fecha, proveedor_feriados, penalizador)
     @repositorio_turnos = repositorio_turnos
-    @proveedor_dia = proveedor_dia
-    @proveedor_hora = proveedor_hora
+    @proveedor_fecha = proveedor_fecha
     @proveedor_feriados = proveedor_feriados
-    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_dia, @proveedor_hora, proveedor_feriados)
+    @calculador_disponibilidad = CalculadorDeDisponibilidad.new(@proveedor_fecha, proveedor_feriados)
     @calculador_reputacion = CalculadorReputacion.new(@repositorio_turnos)
     @penalizador = penalizador
   end
@@ -44,7 +43,7 @@ class GestorTurnos
 
   def disponibilidad_de_medico(medico)
     duracion_turno = medico.especialidad.duracion_de_turnos
-    fecha_inicio = @proveedor_dia.hoy
+    fecha_inicio = @proveedor_fecha.hoy
     fecha_fin = fecha_inicio + DIAS_DE_DISPONIBILIDAD
 
     turnos_existentes = @repositorio_turnos.obtener_turnos_existentes(medico.id, fecha_inicio, fecha_fin)
@@ -65,7 +64,7 @@ class GestorTurnos
   end
 
   def proximos_turnos_paciente(usuario)
-    turnos = @repositorio_turnos.buscar_por_usuario(usuario).select { |turno| turno.fecha_hora >= @proveedor_hora.ahora && turno.estado == ESTADO_PENDIENTE }
+    turnos = @repositorio_turnos.buscar_por_usuario(usuario).select { |turno| turno.fecha_hora >= @proveedor_fecha.ahora && turno.estado == ESTADO_PENDIENTE }
                                 .sort_by(&:fecha_hora).first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
     raise NoHayProximosTurnosException if turnos.nil? || (turnos.respond_to?(:empty?) && turnos.empty?)
 
@@ -92,7 +91,7 @@ class GestorTurnos
     validar_turno_id(turno_id)
     turno = buscar_turno_por_id(turno_id)
     validar_estado_actual(turno)
-    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, fecha_y_hora_actual)
+    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, @proveedor_fecha.ahora)
     @repositorio_turnos.save(turno)
     @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
     turno
@@ -111,7 +110,7 @@ class GestorTurnos
   end
 
   def ocurre_proximas_24hs?(turno)
-    turno.proximas_24hs?(@proveedor_hora.ahora)
+    turno.proximas_24hs?(@proveedor_fecha.ahora)
   end
 
   private
@@ -129,11 +128,5 @@ class GestorTurnos
 
   def validar_estado_actual(turno)
     raise EstadoNoPermitidoException unless turno.estado == ESTADO_PENDIENTE
-  end
-
-  def fecha_y_hora_actual
-    hoy = @proveedor_dia.hoy
-    ahora = @proveedor_hora.ahora
-    DateTime.parse("#{hoy} #{ahora}")
   end
 end

@@ -14,17 +14,17 @@ describe Turno do
   it 'devuelve false si no ocurre en las proximas 24hs' do
     medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5))
     usuario = Usuario.new('usuario@prueba.com')
-    fecha_hora = DateTime.parse((ProveedorHora.new.ahora + 48 * 60 * 60).to_s)
+    fecha_hora = DateTime.parse((ProveedorFecha.new.ahora + 48 * 60 * 60).to_s)
     turno = described_class.new(medico, usuario, fecha_hora)
-    expect(turno.proximas_24hs?(ProveedorHora.new.ahora)).to eq(false)
+    expect(turno.proximas_24hs?(ProveedorFecha.new.ahora)).to eq(false)
   end
 
   it 'devuelve true si ocurre en las proximas 24hs' do
     medico = Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5))
     usuario = Usuario.new('usuario@prueba.com')
-    fecha_hora = DateTime.parse((ProveedorHora.new.ahora + 10 * 60 * 60).to_s)
+    fecha_hora = DateTime.parse((ProveedorFecha.new.ahora + 10 * 60 * 60).to_s)
     turno = described_class.new(medico, usuario, fecha_hora)
-    expect(turno.proximas_24hs?(ProveedorHora.new.ahora)).to eq(true)
+    expect(turno.proximas_24hs?(ProveedorFecha.new.ahora)).to eq(true)
   end
 
   def expect_fecha_y_hora(turno, fecha_esperada, hora_esperada)
