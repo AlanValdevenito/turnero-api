@@ -3,8 +3,6 @@ Característica: Restricción de turnos por paciente y especialidad
 
 Antecedentes:
   Dado existe el paciente con email "usuario@prueba.com"
-  Y existe el paciente con email "pepito@prueba.com"
-  Y existe el paciente con email "pepe@prueba.com"
 
   Y la especialidad "Dermatologia" dada de alta con límite de 2 turnos
   Y la especialidad "Cardiologia" dada de alta con límite de 2 turnos
@@ -18,7 +16,7 @@ Antecedentes:
 
 @wip
 Escenario: US16.1 Solicitar un turno dentro del limite permitido
-    Dado que el paciente con email "usuario@prueba.com" tiene 1 turno pendientes en la especialidad "Dermatologia"
+    Dado que el paciente con email "usuario@prueba.com" tiene 1 turnos pendientes en la especialidad "Dermatologia"
     Y el limite de turnos en "Dermatologia" es de 2
     Cuando solicita un nuevo turno en "Dermatologia"
     Entonces el turno es creado exitosamente
@@ -40,7 +38,7 @@ Escenario: US16.3 Paciente tiene turnos en estados no pendientes y puede reserva
 
 @wip
 Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
-    Dado que el paciente con email "pepito@prueba.com" tiene 2 turnos pendientes en "Cardiologia"
+    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en "Cardiologia"
     Y el limite de turnos en "Cardiologia" es de 2
     Y cancela un turno en "Cardiologia"
     Cuando solicita un nuevo turno en "Cardiologia"
@@ -48,7 +46,7 @@ Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
 
 @wip
 Escenario: US16.5 Paciente reserva turnos en diferentes especialidades
-    Dado que el paciente con email "pepe@prueba.com" tiene 2 turnos pendientes en "Traumatologia"
+    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en "Traumatologia"
     Y el limite de turnos en "Traumatologia" es de 2
     Cuando solicita un nuevo turno en "Oncologia"
     Entonces el turno es creado exitosamente
