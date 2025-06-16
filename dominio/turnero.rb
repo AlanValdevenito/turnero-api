@@ -8,14 +8,13 @@ TURNOS_DISPONIBLES = 3
 # rubocop:disable Metrics/ClassLength
 class Turnero
   # rubocop:disable Metrics/ParameterLists
-  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
+  def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_fecha, proveedor_feriados)
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
-    @proveedor_hora = proveedor_hora
-    @proveedor_dia = proveedor_dia
-    @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, Penalizador.new(proveedor_hora, @gestor_usuarios))
-    @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_hora)
+    @proveedor_fecha = proveedor_fecha
+    @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_fecha, proveedor_feriados, Penalizador.new(proveedor_fecha, @gestor_usuarios))
+    @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_fecha)
   end
   # rubocop:enable Metrics/ParameterLists
 
@@ -123,14 +122,13 @@ class Turnero
     @gestor_turnos.ocurre_proximas_24hs?(turno)
   end
 
-  def setear_hora_mock(hora)
-    fecha = @proveedor_dia.hoy.strftime('%Y-%m-%d')
+  def setear_fecha_mock(fecha, hora)
     fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
-    @proveedor_hora.setear_hora_mock(Time.parse("#{fecha_utc} #{hora_utc}"))
+    @proveedor_fecha.setear_fecha_mock(Time.parse("#{fecha_utc} #{hora_utc}"))
   end
 
-  def cancelar_hora_mock
-    @proveedor_hora.cancelar_hora_mock
+  def cancelar_fecha_mock
+    @proveedor_fecha.cancelar_hora_mock
     @gestor_usuarios.limpiar_penalizaciones
   end
 

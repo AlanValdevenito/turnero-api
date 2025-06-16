@@ -1,9 +1,8 @@
 class CalculadorDeDisponibilidad
-  attr_reader :proveedor_dia, :proveedor_hora, :proveedor_feriados
+  attr_reader :proveedor_fecha
 
-  def initialize(proveedor_dia, proveedor_hora, proveedor_feriados)
-    @proveedor_dia = proveedor_dia
-    @proveedor_hora = proveedor_hora
+  def initialize(proveedor_fecha, proveedor_feriados)
+    @proveedor_fecha = proveedor_fecha
     @proveedor_feriados = proveedor_feriados
   end
 
@@ -78,8 +77,8 @@ class CalculadorDeDisponibilidad
   #   resultado[1] # => 2025-06-14 21:00:00 UTC (equivalente a 18:00 -03:00)
   def jornada_laboral(fecha)
     [
-      @proveedor_hora.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 8, 0),  # 08:00 local → UTC
-      @proveedor_hora.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 18, 0)  # 18:00 local → UTC
+      @proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 8, 0),  # 08:00 local → UTC
+      @proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 18, 0)  # 18:00 local → UTC
     ]
   end
 
@@ -118,11 +117,11 @@ class CalculadorDeDisponibilidad
   #   Si ahora es 2025-06-14 15:43:00 UTC y `duracion = 20`,
   #   el próximo turno es a las 16:00:00 UTC.
   def calcular_proximo_turno(fecha, duracion)
-    ahora = @proveedor_hora.ahora
+    ahora = @proveedor_fecha.ahora
     minutos = proximo_minuto_turno(ahora.min, duracion)
     hora = proxima_hora_turno(ahora.hour, ahora.min, duracion)
 
-    @proveedor_hora.construir_hora_utc(fecha.year, fecha.month, fecha.day, hora, minutos)
+    @proveedor_fecha.construir_hora_utc(fecha.year, fecha.month, fecha.day, hora, minutos)
   end
 
   def proximo_minuto_turno(min_actual, duracion)

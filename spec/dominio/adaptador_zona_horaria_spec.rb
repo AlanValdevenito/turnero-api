@@ -3,16 +3,16 @@ require 'time'
 require_relative '../../dominio/adaptador_zona_horaria'
 
 RSpec.describe AdaptadorZonaHoraria do
-  let(:proveedor_hora) do
+  let(:proveedor_fecha) do
     instance_double(
-      'ProveedorHora',
+      'ProveedorFecha',
       huso_horario: '-03:00',
       construir_hora_desde_local: Time.utc(2023, 3, 3, 13, 20),
       cambiar_a_huso_horario_local: Time.new(2023, 3, 3, 10, 20, 0, '-03:00')
     )
   end
 
-  let(:adaptador) { described_class.new(proveedor_hora) }
+  let(:adaptador) { described_class.new(proveedor_fecha) }
 
   describe '#parsear_a_utc' do
     it 'convierte fecha y hora local a dos strings en UTC' do
@@ -59,7 +59,7 @@ RSpec.describe AdaptadorZonaHoraria do
           allow(t).to receive(:fecha_hora).and_return(nueva_fecha_hora)
         end
       end
-      allow(proveedor_hora).to receive(:cambiar_a_huso_horario_local).and_return(
+      allow(proveedor_fecha).to receive(:cambiar_a_huso_horario_local).and_return(
         Time.new(2023, 3, 3, 10, 20, 0, '-03:00'),
         Time.new(2023, 3, 4, 10, 20, 0, '-03:00')
       )
