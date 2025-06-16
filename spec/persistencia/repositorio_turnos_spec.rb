@@ -18,7 +18,7 @@ describe RepositorioTurnos do
     }
   end
 
-  let(:especialidad) { repositorios[:repo_especialidades].save(Especialidad.new('Cardiología', 20)) }
+  let(:especialidad) { repositorios[:repo_especialidades].save(Especialidad.new('Cardiología', 20, 3)) }
   let(:medico)       { repositorios[:repo_medicos].save(Medico.new('Ana', 'García', '123456', especialidad)) }
   let(:usuario)      { repositorios[:repo_usuarios].save(Usuario.new('ana@gmail.com')) }
 

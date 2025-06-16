@@ -1,7 +1,7 @@
 def crear_medicos_disponibles
   response = Faraday.get('/turnos/medicos-disponibles')
   if JSON.parse(response.body).size < 7
-    especialidad = { nombre: 'Cardiologia', duracion_de_turnos: 20 }
+    especialidad = { nombre: 'Cardiologia', duracion_de_turnos: 20, limite_turnos_por_usuario: 5 }
     Faraday.post('/especialidades', especialidad.to_json, { 'Content-Type' => 'application/json' })
 
     (1..7).each do |i|
@@ -41,7 +41,7 @@ Entonces('se retorna un listado numerado de {int} médicos con nombre, apellido,
 end
 
 Cuando('el usuario selecciona un médico de la lista') do
-  especialidad = Especialidad.new('Cardiologia', 20)
+  especialidad = Especialidad.new('Cardiologia', 20, 5)
   RepositorioEspecialidades.new.save(especialidad)
 
   medico = Medico.new('Michael', 'Jackson', '1', especialidad)
@@ -84,7 +84,7 @@ Entonces('se muestra la información del turno: fecha y médico') do
 end
 
 Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
-  especialidad = Especialidad.new('Cardiologia', 30)
+  especialidad = Especialidad.new('Cardiologia', 30, 5)
   RepositorioEspecialidades.new.save(especialidad)
   medico = Medico.new('Lucas', 'Martinez', '25', especialidad)
   RepositorioMedicos.new.save(medico)

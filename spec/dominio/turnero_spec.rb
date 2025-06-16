@@ -18,11 +18,11 @@ describe Turnero do
   let(:repositorios) do
     {
       usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
-      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
-                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10))],
-                                                      buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10))]),
-      especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10), all: [Especialidad.new('Traumatologia', 10)],
-                                                                 buscar_por_nombre: Especialidad.new('Traumatologia', 10)),
+      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
+                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10, 5))],
+                                                      buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10, 5))]),
+      especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10, 5), all: [Especialidad.new('Traumatologia', 10, 5)],
+                                                                 buscar_por_nombre: Especialidad.new('Traumatologia', 10, 5)),
       turnos: instance_double('RepositorioTurnos')
     }
   end
@@ -46,7 +46,7 @@ describe Turnero do
   end
 
   it 'deberia crear una especialidad' do
-    especialidad = turnero.crear_especialidad('Traumatologia', 10)
+    especialidad = turnero.crear_especialidad('Traumatologia', 10, 5)
     expect(especialidad.nombre).to eq('Traumatologia')
   end
 
@@ -68,7 +68,7 @@ describe Turnero do
   end
 
   it 'deberia buscar un medico por matricula' do
-    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
+    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5))
     allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
     encontrado = turnero.buscar_medico_por_matricula(1)
     expect(encontrado).to eq(medico)
@@ -101,7 +101,7 @@ describe Turnero do
 
     it 'deberia devolver como maximo 7 medicos disponibles de una especialidad' do
       allow(repositorios[:medico]).to receive(:buscar_por_especialidad).and_return(
-        (0...10).map { |i| Medico.new("Medico#{i}", "Apellido#{i}", "ABC#{i}", Especialidad.new('Traumatologia', 10)) }
+        (0...10).map { |i| Medico.new("Medico#{i}", "Apellido#{i}", "ABC#{i}", Especialidad.new('Traumatologia', 10, 5)) }
       )
 
       traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')

@@ -14,7 +14,7 @@ describe GestorTurnos do
 
   let(:contexto) do
     {
-      especialidad: Especialidad.new('Traumatologia', 10),
+      especialidad: Especialidad.new('Traumatologia', 10, 5),
       usuario: Usuario.new('Juan@mail.com')
     }.tap do |ctx|
       ctx[:medico] = Medico.new('Michael', 'Jordan', 1, ctx[:especialidad])
@@ -143,7 +143,7 @@ describe GestorTurnos do
     let(:turnos) do
       (1..30).map do |i|
         Turno.new(
-          Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10)),
+          Medico.new('Medico', 'Apellido', i, Especialidad.new('Traumatologia', 10, 5)),
           usuario,
           Time.utc(2025, 6, 1) + i * 3600
         )
@@ -178,7 +178,7 @@ describe GestorTurnos do
     end
 
     it 'no deberia guardar turnos duplicados' do
-      medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10))
+      medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5))
 
       stub_turno_duplicado(contexto, medico, hora_utc(2025, 6, 5, 10, 0))
 
@@ -191,7 +191,7 @@ describe GestorTurnos do
   #=======================================================================================================#
 
   context 'when hay más de 20 turnos para un medico' do
-    let(:especialidad) { Especialidad.new('Traumatologia', 10) }
+    let(:especialidad) { Especialidad.new('Traumatologia', 10, 5) }
     let(:medico) { Medico.new('Michael', 'Jordan', '1', especialidad) }
     let(:turnos) do
       (1..30).reverse_each.map do |i|
@@ -221,7 +221,7 @@ describe GestorTurnos do
 
   #=======================================================================================================#
   describe '#proximos_turnos_paciente' do
-    let(:especialidad) { instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10) }
+    let(:especialidad) { instance_double('Especialidad', nombre: 'Traumatologia', duracion_de_turnos: 10, limite_turnos_por_usuario: 5) }
     let(:medico) { instance_double('Medico', nombre: 'Medico', apellido: 'Apellido', matricula: 1, especialidad:) }
     let(:usuario) { instance_double('Usuario', email: 'paciente@mail.com') }
 

@@ -69,8 +69,8 @@ class Turnero
     @repositorio_medicos.save(medico)
   end
 
-  def crear_especialidad(nombre, duracion_de_turnos)
-    especialidad = Especialidad.new(nombre, duracion_de_turnos)
+  def crear_especialidad(nombre, duracion_de_turnos, limite_turnos_por_usuario)
+    especialidad = Especialidad.new(nombre, duracion_de_turnos, limite_turnos_por_usuario)
     @repositorio_especialidades.save(especialidad)
   end
 

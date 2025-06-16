@@ -2,7 +2,7 @@ require 'faraday'
 require 'json'
 
 def crear_medico(nombre:, apellido:, matricula:, especialidad:)
-  especialidad_hash = { nombre: especialidad, duracion_de_turnos: 20 }
+  especialidad_hash = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_usuario: 5 }
   Faraday.post('/especialidades', especialidad_hash.to_json, { 'Content-Type' => 'application/json' })
   medico_hash = {
     nombre:,

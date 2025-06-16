@@ -1,6 +1,6 @@
 post '/especialidades' do
   logger.debug("POST /especialidades: #{@params}")
-  especialidad = turnero.crear_especialidad(@params[:nombre], @params[:duracion_de_turnos])
+  especialidad = turnero.crear_especialidad(@params[:nombre], @params[:duracion_de_turnos], @params[:limite_turnos_por_usuario])
   status 200
   { message: 'La especialidad fue dada de alta correctamente.', id: especialidad.id }.to_json
 end

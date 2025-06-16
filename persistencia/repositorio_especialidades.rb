@@ -17,13 +17,14 @@ class RepositorioEspecialidades < AbstractRepository
   protected
 
   def load_object(a_hash)
-    Especialidad.new(a_hash[:nombre], a_hash[:duracion_de_turnos], a_hash[:id])
+    Especialidad.new(a_hash[:nombre], a_hash[:duracion_de_turnos], a_hash[:limite_turnos_por_usuario], a_hash[:id])
   end
 
   def changeset(especialidad)
     {
       nombre: especialidad.nombre,
-      duracion_de_turnos: especialidad.duracion_de_turnos
+      duracion_de_turnos: especialidad.duracion_de_turnos,
+      limite_turnos_por_usuario: especialidad.limite_turnos_por_usuario
     }
   end
 end
