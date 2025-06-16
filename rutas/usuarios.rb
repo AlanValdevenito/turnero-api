@@ -53,6 +53,12 @@ end
 
 delete '/pacientes/:email' do
   logger.debug("DELETE /pacientes/:email: #{@params}")
-  status 200
-  json({ message: 'paciente eliminado con sus turnos correspondientes' })
+  begin
+    turnero.eliminar_usuario_por_email(@params[:email])
+    status 200
+    json({ message: 'paciente eliminado con sus turnos correspondientes' })
+  rescue UsuarioNoEncontradoException
+    status 404
+    json({ message: "Paciente con email #{@params[:email]} inexistente" })
+  end
 end

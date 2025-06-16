@@ -140,4 +140,13 @@ describe Turnero do
       expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Ausente')
     end
   end
+
+  describe 'Eliminar usuario' do
+    it 'deberia delegar al gestor de usuarios para eliminar el usuario por email' do
+      gestor_mock = instance_double('GestorUsuarios')
+      turnero.instance_variable_set(:@gestor_usuarios, gestor_mock)
+      expect(gestor_mock).to receive(:eliminar_usuario_por_email).with(email)
+      turnero.eliminar_usuario_por_email(email)
+    end
+  end
 end

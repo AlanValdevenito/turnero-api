@@ -6,7 +6,7 @@ Característica: Baja de pacientes
       Dado existe el paciente con email "usuario@prueba.com"
       Dado la especialidad "Cardiologia" dada de alta
       Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiologia" dado de alta
-  @wip
+
   Escenario: US-22.1 Dar de baja un paciente sin turnos
     Dado que el paciente tiene 0 turnos
     Cuando quiero dar de baja al paciente

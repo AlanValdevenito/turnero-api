@@ -12,7 +12,8 @@ end
 
 Entonces('no hay turnos correspondientes al paciente') do
   response = Faraday.get("/turnos/pacientes/#{@email}")
-  expect(response.body['message']).to eq("Paciente con email #{@email} inexistente")
+  puts JSON.parse(response.body)
+  expect(JSON.parse(response.body)['error']).to eq("Paciente con email #{@email} inexistente")
 end
 
 Entonces('el paciente no esta dado de alta') do
