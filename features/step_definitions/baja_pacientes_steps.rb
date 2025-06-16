@@ -30,7 +30,10 @@ Entonces('el paciente no esta dado de alta') do
 end
 
 Cuando('quiero dar de baja un paciente inexistente') do
+  email_inexistente = 'email@inexistente.com'
+  @response = Faraday.delete("/pacientes/#{email_inexistente}")
 end
 
-Entonces('se devuelve el error {string}') do |string|
+Entonces('se devuelve el error {int}') do |error_code|
+  expect(@response.status).to eq(error_code)
 end

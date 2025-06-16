@@ -20,7 +20,7 @@ Característica: Baja de pacientes
     Entonces se muestra el mensaje de exitoo "paciente eliminado con sus turnos correspondientes"
     Y no hay turnos correspondientes al paciente
     Y el paciente no esta dado de alta
-  @wip
+
   Escenario: US-22.3 Dar de baja un paciente que no existe
     Cuando quiero dar de baja un paciente inexistente
-    Entonces se devuelve el error "404"
+    Entonces se devuelve el error 404
