@@ -20,7 +20,6 @@ Escenario: US16.1 Solicitar un turno dentro del limite permitido
     Cuando solicita un nuevo turno en "Dermatologia"
     Entonces el turno es creado exitosamente
 
-@wip
 Escenario: US16.2 Reservar un turno superando el limite
     Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en la especialidad "Dermatologia"
     Y el limite de turnos en "Dermatologia" es de 2
