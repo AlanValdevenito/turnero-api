@@ -13,11 +13,11 @@ Característica: Baja de pacientes
     Entonces se muestra el mensaje de exitoo "paciente eliminado con sus turnos correspondientes"
     Y no hay turnos correspondientes al paciente
     Y el paciente no esta dado de alta
-  @wip
+
   Escenario: US-22.2 Dar de baja un paciente con turnos
     Dado que el paciente tiene 2 turnos
     Cuando quiero dar de baja al paciente
-    Entonces se muestra el mensaje "paciente eliminado con sus turnos correspondientes"
+    Entonces se muestra el mensaje de exitoo "paciente eliminado con sus turnos correspondientes"
     Y no hay turnos correspondientes al paciente
     Y el paciente no esta dado de alta
   @wip
