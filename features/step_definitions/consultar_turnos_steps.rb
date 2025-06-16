@@ -8,7 +8,7 @@ Dado('hay {int} paciente registrado') do |_cantidad_pacientes|
 end
 
 Dado('la especialidad {string} dada de alta') do |especialidad|
-  request_body = { nombre: especialidad, duracion_de_turnos: 10, limite_turnos_por_usuario: 5 }.to_json
+  request_body = { nombre: especialidad, duracion_de_turnos: 10, limite_turnos_por_usuario: 100 }.to_json
   @response = Faraday.post('/especialidades', request_body, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(200)
 end
