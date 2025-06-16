@@ -78,4 +78,14 @@ describe GestorUsuarios do
 
     gestor_usuarios.actualizar(usuario)
   end
+
+  it 'elimina el usuario y sus turnos asociados por email' do
+    usuario = Usuario.new(email, id: 1)
+
+    allow(repositorio_usuarios).to receive(:buscar_por_email).with(email).and_return(usuario)
+    expect(repositorio_turnos).to receive(:eliminar_por_usuario).with(usuario)
+    expect(repositorio_usuarios).to receive(:delete).with(usuario)
+
+    gestor_usuarios.eliminar_usuario_por_email(email)
+  end
 end
