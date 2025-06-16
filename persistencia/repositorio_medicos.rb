@@ -18,6 +18,10 @@ class RepositorioMedicos < AbstractRepository
     load_collection dataset.where(especialidad_id: especialidad.id)
   end
 
+  def eliminar_por_matricula(matricula)
+    dataset.where(matricula:).delete
+  end
+
   protected
 
   def load_object(a_hash)

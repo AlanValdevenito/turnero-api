@@ -72,4 +72,12 @@ describe RepositorioTurnos do
     repositorios[:repo_turnos].eliminar_por_usuario(usuario)
     expect(repositorios[:repo_turnos].buscar_por_usuario(usuario)).to be_empty
   end
+
+  it 'elimina todos los turnos de un usuario' do
+    repositorios[:repo_turnos].save(crear_turno_para(medico, usuario, DateTime.parse('2025-06-10T11:30:00')))
+    repositorios[:repo_turnos].save(crear_turno_para(medico, usuario, DateTime.parse('2025-06-11T11:30:00')))
+    expect(repositorios[:repo_turnos].buscar_por_usuario(usuario).size).to eq(2)
+    repositorios[:repo_turnos].eliminar_por_medico(medico)
+    expect(repositorios[:repo_turnos].buscar_por_medico(medico)).to be_empty
+  end
 end

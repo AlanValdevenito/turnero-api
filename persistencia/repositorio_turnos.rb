@@ -30,6 +30,10 @@ class RepositorioTurnos < AbstractRepository
     dataset.where(usuario_id: usuario.id).delete
   end
 
+  def eliminar_por_medico(medico)
+    dataset.where(medico_id: medico.id).delete
+  end
+
   protected
 
   def load_object(a_hash)
