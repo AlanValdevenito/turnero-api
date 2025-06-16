@@ -14,7 +14,6 @@ Antecedentes:
   Y el médico "Laura Gomez" con matrícula "TRA789" de la especialidad "Traumatologia" dado de alta
   Y el médico "Mario Santos" con matrícula "ONC012" de la especialidad "Oncologia" dado de alta
 
-@wip
 Escenario: US16.1 Solicitar un turno dentro del limite permitido
     Dado que el paciente con email "usuario@prueba.com" tiene 1 turnos pendientes en la especialidad "Dermatologia"
     Y el limite de turnos en "Dermatologia" es de 2
