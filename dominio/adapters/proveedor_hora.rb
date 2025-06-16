@@ -1,14 +1,17 @@
 class ProveedorHora
   def initialize(huso_horario = '-03:00')
     @huso_horario = huso_horario
+    @hora_mock = nil
   end
 
-  # @return [Time] La hora actual en UTC
+  # Devuelve la hora actual en UTC, o la hora mockeada si fue seteada.
+  #
+  # @return [Time] La hora actual en UTC, o la hora mockeada si está definida.
   #
   # Ejemplo:
-  #   ahora => 2025-06-13 18:30:00 UTC
+  #   ahora # => 2025-06-13 18:30:00 UTC
   def ahora
-    Time.now.utc
+    @hora_mock || Time.now.utc
   end
 
   # @param [Time, DateTime] time_utc - un instante en UTC
@@ -48,4 +51,12 @@ class ProveedorHora
 
   # @return [String] el huso horario actual como string ("-03:00")
   attr_reader :huso_horario
+
+  def setear_hora_mock(hora_mock)
+    @hora_mock = hora_mock
+  end
+
+  def cancelar_hora_mock
+    @hora_mock = nil
+  end
 end
