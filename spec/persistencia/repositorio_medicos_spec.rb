@@ -41,4 +41,12 @@ describe RepositorioMedicos do
     recuperado = described_class.new.buscar_por_especialidad(especialidad)
     expect(recuperado.first.especialidad.nombre).to eq('Traumatologia')
   end
+
+  it 'deberia eliminar un medico por matricula' do
+    repositorio = described_class.new
+    especialidad = RepositorioEspecialidades.new.save(Especialidad.new('Traumatologia', 10, 5))
+    repositorio.save(Medico.new('Juan', 'Perez', 'ABC123', especialidad))
+    repositorio.eliminar_por_matricula('ABC123')
+    expect(repositorio.buscar_por_matricula('ABC123')).to be_nil
+  end
 end

@@ -13,3 +13,10 @@ get '/medicos' do
   status 200
   json(respuesta)
 end
+
+delete '/medicos/:matricula' do
+  logger.debug("DELETE /medicos/:matricula : #{@params}")
+  turnero.eliminar_medico_por_matricula(@params[:matricula])
+  status 200
+  { message: 'El médico eliminado', id: medico.id }.to_json
+end
