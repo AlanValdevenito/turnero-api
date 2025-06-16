@@ -11,21 +11,10 @@ class Turnero
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
-<<<<<<< HEAD
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
-    @gestor_turnos = GestorTurnos.new(
-      repositorio_turnos,
-      proveedor_dia,
-      proveedor_feriados,
-      proveedor_hora,
-      Penalizador.new(proveedor_hora, @gestor_usuarios)
-    )
-=======
-    @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios)
     @proveedor_hora = proveedor_hora
     @proveedor_dia = proveedor_dia
     @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, Penalizador.new(proveedor_hora, @gestor_usuarios))
->>>>>>> 5aa19304042ee2590a5de60803e065873b9dc5c2
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_hora)
   end
   # rubocop:enable Metrics/ParameterLists
