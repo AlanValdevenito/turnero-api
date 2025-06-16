@@ -62,3 +62,9 @@ Entonces('el turno es creado exitosamente') do
   expect(response_body['fecha']).to eq(@fecha)
   expect(response_body['hora']).to eq(@hora)
 end
+
+Entonces('el sistema rechaza la solicitud con el mensaje {string}') do |mensaje|
+  expect(@response.status).to eq(422)
+  response_body = JSON.parse(@response.body)
+  expect(response_body['mensaje']).to eq(mensaje)
+end
