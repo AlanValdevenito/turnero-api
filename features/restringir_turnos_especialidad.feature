@@ -25,7 +25,7 @@ Escenario: US16.2 Reservar un turno superando el limite
     Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en la especialidad "Dermatologia"
     Y el limite de turnos en "Dermatologia" es de 2
     Cuando solicita un nuevo turno en "Dermatologia"
-    Entonces el sistema rechaza la solicitud con el mensaje "Ya alcanzaste el limite de turnos para esta especialidad"
+    Entonces el sistema rechaza la solicitud con el mensaje "El usuario ha alcanzado el límite de turnos para esta especialidad"
 
 @wip
 Escenario: US16.3 Paciente tiene turnos en estados no pendientes y puede reservar uno nuevo
