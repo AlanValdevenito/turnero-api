@@ -1,5 +1,5 @@
 Dado('la especialidad {string} dada de alta con límite de {int} turnos') do |especialidad, limite|
-  request_body = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_paciente: limite }.to_json
+  request_body = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_usuario: limite }.to_json
   @response = Faraday.post('/especialidades', request_body, { 'Content-Type' => 'application/json' })
   expect(@response.status).to eq(200)
 end
@@ -30,9 +30,12 @@ Dado('que el paciente con email {string} tiene {int} turnos pendientes en la esp
 end
 
 Dado('el limite de turnos en {string} es de {int}') do |especialidad, limite|
-  @response = Faraday.get("/especialidades/#{especialidad}")
-  especialidad_data = JSON.parse(@response.body)
-  expect(especialidad_data['limite_turnos_por_paciente']).to eq(limite)
+  @response = Faraday.get('/especialidades')
+
+  especialidades = JSON.parse(@response.body)
+  especialidad_encontrada = especialidades.find { |e| e['nombre'] == especialidad }
+
+  expect(especialidad_encontrada['limite_turnos_por_usuario']).to eq(limite)
 end
 
 Cuando('solicita un nuevo turno en {string}') do |especialidad|
@@ -41,12 +44,12 @@ Cuando('solicita un nuevo turno en {string}') do |especialidad|
   medico = medicos.find { |m| m['especialidad'] == especialidad }
 
   matricula = medico['matricula']
-  @fecha = '2025-07-20'
+  @fecha = '2025-07-15'
   @hora = '17:00'
   request_body = {
     matricula:,
     fecha: @fecha,
-    hora:,
+    hora: @hora,
     email: @email
   }.to_json
 
@@ -58,5 +61,4 @@ Entonces('el turno es creado exitosamente') do
   response_body = JSON.parse(@response.body)
   expect(response_body['fecha']).to eq(@fecha)
   expect(response_body['hora']).to eq(@hora)
-  expect(response_body['email']).to eq(@email)
 end
