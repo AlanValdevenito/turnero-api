@@ -55,4 +55,12 @@ class GestorUsuarios
     @repositorio_turnos.eliminar_por_usuario(usuario)
     @repositorio_usuarios.delete(usuario)
   end
+
+  def limpiar_penalizaciones
+    @repositorio_usuarios.all.each do |usuario|
+      usuario.penalizable = true
+      usuario.ultima_penalizacion = nil
+      @repositorio_usuarios.save(usuario)
+    end
+  end
 end

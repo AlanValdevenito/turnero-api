@@ -131,6 +131,7 @@ class Turnero
 
   def cancelar_hora_mock
     @proveedor_hora.cancelar_hora_mock
+    @gestor_usuarios.limpiar_penalizaciones
   end
 
   def eliminar_usuario_por_email(email)

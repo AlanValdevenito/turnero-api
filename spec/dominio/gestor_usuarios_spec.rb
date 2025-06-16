@@ -88,4 +88,22 @@ describe GestorUsuarios do
 
     gestor_usuarios.eliminar_usuario_por_email(email)
   end
+
+  def expect_penalizacion_limpiada_para(usuario)
+    expect(usuario).to receive(:penalizable=).with(true)
+    expect(usuario).to receive(:ultima_penalizacion=).with(nil)
+    expect(repositorio_usuarios).to receive(:save).with(usuario)
+  end
+
+  def instance_usuarios
+    [instance_double('Usuario'), instance_double('Usuario')]
+  end
+
+  it 'limpia las penalizaciones de todos los usuarios' do
+    usuarios = instance_usuarios
+    allow(repositorio_usuarios).to receive(:all).and_return(usuarios)
+    usuarios.each { |usuario| expect_penalizacion_limpiada_para(usuario) }
+
+    gestor_usuarios.limpiar_penalizaciones
+  end
 end
