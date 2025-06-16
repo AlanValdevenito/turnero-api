@@ -30,7 +30,16 @@ class GestorTurnos
       raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
     end
 
+    raise LimiteTurnosExcedidoException unless cumple_limite_turnos?(usuario, medico.especialidad)
+
     @repositorio_turnos.save(Turno.crear(medico, usuario, fecha, hora))
+  end
+
+  def cumple_limite_turnos?(usuario, especialidad)
+    turnos_usuario = @repositorio_turnos.buscar_por_usuario(usuario)
+    return true if turnos_usuario.nil? || turnos_usuario.empty?
+
+    especialidad.tiene_limite_disponible?(turnos_usuario)
   end
 
   def disponibilidad_de_medico(medico)
@@ -52,9 +61,7 @@ class GestorTurnos
   def es_fecha_valida?(fecha)
     fecha = DateTime.parse(fecha)
     feriados = @proveedor_feriados.feriados(fecha.year)
-    raise FechaNoValidaException if @calculador_disponibilidad.dia_laboral?(fecha, feriados) == false
-
-    true
+    @calculador_disponibilidad.dia_laboral?(fecha, feriados) || raise(FechaNoValidaException)
   end
 
   def proximos_turnos_paciente(usuario)
@@ -83,19 +90,11 @@ class GestorTurnos
 
   def modificar_estado_turno(turno_id, nuevo_estado)
     validar_turno_id(turno_id)
-
     turno = buscar_turno_por_id(turno_id)
-
     validar_estado_actual(turno)
-
-    ahora = fecha_y_hora_actual
-
-    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, ahora)
-
+    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, fecha_y_hora_actual)
     @repositorio_turnos.save(turno)
-
     @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
-
     turno
   end
 
