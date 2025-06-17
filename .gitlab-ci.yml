@@ -11,6 +11,7 @@ variables:
   TEST_DB_URL: postgres://webapi:Passw0rd!@postgres/db_test
   DB_HOST: postgres
   TEAM: negro
+  API_KEY: key
 
 stages:
   - build
