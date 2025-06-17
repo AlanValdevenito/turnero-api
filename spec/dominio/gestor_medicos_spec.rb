@@ -5,6 +5,7 @@ require_relative '../../dominio/gestores/gestor_medicos'
 
 describe GestorMedicos do
   let(:repositorio_medicos) { instance_double('RepositorioMedicos') }
+  let(:repositorio_turnos)  { instance_double('RepositorioTurnos') }
   let(:gestor) { described_class.new(repositorio_medicos) }
   let(:medico) { instance_double('Medico', matricula: 'ABC123') }
 
