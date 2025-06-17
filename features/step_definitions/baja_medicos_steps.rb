@@ -21,3 +21,8 @@ Entonces('el medico ya no esta dado de alta') do
   response = Faraday.get("/turnos/medicos/#{@matricula}")
   expect(JSON.parse(response.body)['error']).to eq("Medico con matricula #{@matricula} inexistente")
 end
+
+Cuando('quiero dar de baja un medico inexistente') do
+  matricula_medico_inexistente = 'matriculaInexistente'
+  @response = Faraday.delete("/medicos/#{matricula_medico_inexistente}")
+end

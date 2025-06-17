@@ -23,4 +23,4 @@ Escenario: US-20.2 Dar de baja un medico con turnos
 @wip
 Escenario: US-20.3 Dar de baja un medico que no existe
   Cuando quiero dar de baja un medico inexistente
-  Entonces se muestra devuelve el error "404"
+  Entonces se devuelve el error 404
