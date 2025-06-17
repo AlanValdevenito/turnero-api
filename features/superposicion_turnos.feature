@@ -21,7 +21,7 @@ Característica: Superposición de turnos
     Cuando quiero reservar otro turno para la fecha '2025-06-13' y hora '08:59' con el médico con matrícula "DEF789"
     Entonces se muestra un error 409
     Y se muestra el mensaje de error "Ya existe un turno reservado en esa fecha y horario"
-  @wip
+
   Escenario: US-15.3 Reserva de turno borde exitosa
     Dado que para la fecha '2025-06-13' y hora '08:30' reserve un turno con el médico con matrícula "XYZ123"
     Cuando quiero reservar otro turno para la fecha '2025-06-13' y hora '09:00' con el médico con matrícula "DEF789"

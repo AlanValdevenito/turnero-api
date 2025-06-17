@@ -14,3 +14,7 @@ Cuando('quiero reservar otro turno para la fecha {string} y hora {string} con el
   request_body = { matricula:, fecha:, hora:, email: @email }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
 end
+
+Entonces('se muestra un exito {int}') do |codigo|
+  expect(@response.status).to eq(codigo)
+end
