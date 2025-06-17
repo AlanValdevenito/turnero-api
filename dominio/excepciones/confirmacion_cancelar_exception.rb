@@ -1,0 +1,2 @@
+class ConfirmacionCancelarException < StandardError
+end

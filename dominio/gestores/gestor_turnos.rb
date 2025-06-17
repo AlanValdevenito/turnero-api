@@ -90,27 +90,19 @@ class GestorTurnos
   def modificar_estado_turno(turno_id, nuevo_estado)
     validar_turno_id(turno_id)
     turno = buscar_turno_por_id(turno_id)
-    validar_estado_actual(turno)
-    turno = GestorEstadoTurno.modificar_estado_turno(turno, nuevo_estado, @proveedor_fecha.ahora)
+    turno = GestorEstadoTurno.modificar_estado_turno(turno, @proveedor_fecha.ahora, nuevo_estado)
     @repositorio_turnos.save(turno)
     @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
     turno
   end
 
-  def cancelar_turno(turno_id, proximas_24hs, email)
+  def cancelar_turno(turno_id, email, confirmacion)
     validar_turno_id(turno_id)
     turno = buscar_turno_por_id(turno_id)
-    raise TurnoNoPerteneceAUsuarioException unless turno.usuario.email == email
-
-    validar_estado_actual(turno)
-    turno = GestorEstadoTurno.cancelar_turno(turno, proximas_24hs)
+    turno = GestorEstadoTurno.cancelar_turno(turno, @proveedor_fecha.ahora, email, confirmacion)
     @repositorio_turnos.save(turno)
     @penalizador.actualizar_flag_penalizable(turno.usuario, turno.estado)
     turno
-  end
-
-  def ocurre_proximas_24hs?(turno)
-    turno.proximas_24hs?(@proveedor_fecha.ahora)
   end
 
   private
@@ -124,9 +116,5 @@ class GestorTurnos
 
   def turnos_recientes(turnos)
     turnos.sort_by(&:fecha_hora).reverse.first(MAXIMA_CANTIDAD_TURNOS_VISIBLES)
-  end
-
-  def validar_estado_actual(turno)
-    raise EstadoNoPermitidoException unless turno.estado == ESTADO_PENDIENTE
   end
 end

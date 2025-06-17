@@ -5,7 +5,6 @@ require_relative 'adaptador_zona_horaria'
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
-# rubocop:disable Metrics/ClassLength
 class Turnero
   # rubocop:disable Metrics/ParameterLists
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_fecha, proveedor_feriados)
@@ -114,12 +113,8 @@ class Turnero
     @gestor_turnos.modificar_estado_turno(turno_id, nuevo_estado)
   end
 
-  def cancelar_turno(id, proximas_24hs, email)
-    @gestor_turnos.cancelar_turno(id, proximas_24hs, email)
-  end
-
-  def ocurre_proximas_24hs?(turno)
-    @gestor_turnos.ocurre_proximas_24hs?(turno)
+  def cancelar_turno(turno_id, email, confirmacion)
+    @gestor_turnos.cancelar_turno(turno_id, email, confirmacion)
   end
 
   def setear_fecha_mock(fecha, hora)
@@ -136,5 +131,3 @@ class Turnero
     @gestor_usuarios.eliminar_usuario_por_email(email)
   end
 end
-
-# rubocop:enable Metrics/ClassLength

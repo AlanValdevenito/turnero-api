@@ -451,7 +451,7 @@ describe GestorTurnos do
         allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(ahora)
         allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(false)
 
-        expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(false)
+        expect(GestorEstadoTurno.ocurre_proximas_24hs?(turno, ahora)).to eq(false)
       end
 
       it 'devuelve true si el turno ocurre en las próximas 24hs' do
@@ -461,7 +461,7 @@ describe GestorTurnos do
         allow(contexto[:proveedor_fecha]).to receive(:ahora).and_return(ahora)
         allow(turno).to receive(:proximas_24hs?).with(ahora).and_return(true)
 
-        expect(contexto[:gestor_turnos].ocurre_proximas_24hs?(turno)).to eq(true)
+        expect(GestorEstadoTurno.ocurre_proximas_24hs?(turno, ahora)).to eq(true)
       end
     end
 
@@ -470,7 +470,7 @@ describe GestorTurnos do
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
-      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, usuario.email, true).estado).to eq('Cancelado')
     end
 
     it 'lo deja con estado Ausente si se hace con menos de 24hs de anticipacion' do
@@ -478,13 +478,13 @@ describe GestorTurnos do
       usuario = Usuario.new('usuario@mail.com')
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', usuario, fecha_turno))
       allow(contexto[:repositorio_turnos]).to receive(:save).with(instance_of(Turno))
-      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, usuario.email).estado).to eq('Ausente')
+      expect(contexto[:gestor_turnos].cancelar_turno(TURNO_ID, usuario.email, true).estado).to eq('Ausente')
     end
 
     it 'lanza excepcion si el email no coincide con el del turno' do
       fecha_turno = contexto[:proveedor_fecha].ahora + 12 * 60 * 60
       allow(contexto[:repositorio_turnos]).to receive(:buscar_por_id).with(TURNO_ID).and_return(Turno.new('medicoDummy', Usuario.new('usuario@mail.com'), fecha_turno))
-      expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, PROXIMAS_24HS_TRUE, 'otroUsuario@mail.com') }.to raise_error(TurnoNoPerteneceAUsuarioException)
+      expect { contexto[:gestor_turnos].cancelar_turno(TURNO_ID, 'otroUsuario@mail.com', true) }.to raise_error(TurnoNoPerteneceAUsuarioException)
     end
   end
 

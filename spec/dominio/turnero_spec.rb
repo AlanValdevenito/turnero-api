@@ -128,7 +128,7 @@ describe Turnero do
       usuario = Usuario.new('usuario@mail.com')
       allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
-      expect(turnero.cancelar_turno(1, PROXIMAS_24HS_FALSE, usuario.email).estado).to eq('Cancelado')
+      expect(turnero.cancelar_turno(1, usuario.email, true).estado).to eq('Cancelado')
     end
 
     it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
@@ -136,7 +136,7 @@ describe Turnero do
       usuario = Usuario.new('usuario@mail.com')
       allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
-      expect(turnero.cancelar_turno(1, 'proximas', usuario.email).estado).to eq('Ausente')
+      expect(turnero.cancelar_turno(1, usuario.email, true).estado).to eq('Ausente')
     end
   end
 
