@@ -46,7 +46,24 @@ class Turno
     (@fecha_hora.to_time - ahora).abs < 24 * 60 * 60
   end
 
-  def se_superpone_con?(_otro_turno)
-    false
+  def se_superpone_con?(otro_turno)
+    inicio_otra_fecha = construir_inicio_turno(otro_turno)
+    fin_otra_fecha = inicio_otra_fecha + duracion_en_segundos(otro_turno)
+
+    inicio_actual = @fecha_hora.to_time
+    fin_actual = inicio_actual + duracion_en_segundos(self)
+
+    inicio_actual < fin_otra_fecha && inicio_otra_fecha < fin_actual
+  end
+
+  private
+
+  def construir_inicio_turno(turno)
+    hora = Time.parse(turno.hora)
+    Time.new(@fecha_hora.year, @fecha_hora.month, @fecha_hora.day, hora.hour, hora.min)
+  end
+
+  def duracion_en_segundos(turno)
+    turno.medico.especialidad.duracion_de_turnos * 60
   end
 end

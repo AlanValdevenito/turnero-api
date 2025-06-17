@@ -67,5 +67,13 @@ describe Turno do
       superposicion = turno.se_superpone_con?(otro_turno)
       expect(superposicion).to eq(false)
     end
+
+    it 'deberia devolver true si existe superposicion de turnos' do
+      turno = described_class.new(Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5)), Usuario.new('usuario@prueba.com'), DateTime.parse('2025-06-05T10:00:00'))
+      otro_turno = described_class.new(Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5)), Usuario.new('usuario@prueba.com'), DateTime.parse('2025-06-05T10:05:00'))
+
+      superposicion = turno.se_superpone_con?(otro_turno)
+      expect(superposicion).to eq(true)
+    end
   end
 end
