@@ -41,7 +41,7 @@ Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
     Entonces el turno es creado exitosamente
 
 Escenario: US16.5 Paciente reserva turnos en diferentes especialidades
-    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en "Traumatologia"
+    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en la especialidad "Traumatologia"
     Y el limite de turnos en "Traumatologia" es de 2
     Cuando solicita un nuevo turno en "Oncologia"
     Entonces el turno es creado exitosamente
