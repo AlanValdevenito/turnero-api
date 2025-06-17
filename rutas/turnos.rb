@@ -81,8 +81,7 @@ get '/turnos/pacientes/proximos/:email' do
         id: e.id,
         'fecha y hora': e.fecha_hora.strftime('%Y-%m-%d %H:%M').to_s,
         especialidad: e.medico.especialidad.nombre,
-        medico: "#{e.medico.nombre} #{e.medico.apellido}",
-        proximas_24hs: turnero.ocurre_proximas_24hs?(e)
+        medico: "#{e.medico.nombre} #{e.medico.apellido}"
       }
     end
     status 200
@@ -177,19 +176,17 @@ end
 
 put '/turnos/:id/cancelacion' do
   logger.debug("PUT /turnos/:id/cancelacion: #{@params}")
-  id = params['id']
-  proximas_24hs = @params[:proximas_24hs]
+  id = @params['id']
   email = @params[:email]
+  confirmacion = @params[:confirmacion]
   begin
-    turno = turnero.cancelar_turno(id, proximas_24hs, email)
+    turno = turnero.cancelar_turno(id, email, confirmacion)
     status 200
     json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
   rescue TurnoNoEncontradoException
-    puts 'turno no encontrado'
     status 404
-    json({ mensaje: 'No puedes cancelar este turno' })
+    json({ mensaje: 'Turno no encontrado' })
   rescue TurnoNoPerteneceAUsuarioException
-    puts 'turno no te pertenece'
     status 403
     json({ mensaje: 'No puedes cancelar este turno' })
   end
