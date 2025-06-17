@@ -1,22 +1,21 @@
-require 'faraday'
 require 'json'
 
 def crear_medico(nombre:, apellido:, matricula:, especialidad:)
   especialidad_hash = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_usuario: 5 }
-  Faraday.post('/especialidades', especialidad_hash.to_json, { 'Content-Type' => 'application/json' })
+  api_post('/especialidades', especialidad_hash.to_json)
   medico_hash = {
     nombre:,
     apellido:,
     matricula:,
     especialidad:
   }
-  Faraday.post('/medicos', medico_hash.to_json, { 'Content-Type' => 'application/json' })
+  api_post('/medicos', medico_hash.to_json)
 end
 
 def crear_paciente(email)
   telegram_id = rand(100_000..999_999)
   usuario_hash = { email:, telegram_id: }
-  Faraday.post('/usuarios', usuario_hash.to_json, { 'Content-Type' => 'application/json' })
+  api_post('/usuarios', usuario_hash.to_json)
   [email, telegram_id]
 end
 
@@ -44,23 +43,21 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico {string} 
       hora: '10:00',
       email: @paciente_email
     }
-    response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+    response = api_post('/turnos', turno_hash.to_json)
     turno_id = JSON.parse(response.body)['id']
 
     # Solo cambiar el estado si no es 'Pendiente'
     next unless estado != 'Pendiente'
 
-    Faraday.put(
+    api_put(
       "/turnos/#{turno_id}",
-      { estado: }.to_json,
-      { 'Content-Type' => 'application/json' }
+      { estado: }.to_json
     )
   end
 end
 
 Cuando('solicito los proximos turnos del paciente') do
-  get "/turnos/pacientes/proximos/#{@paciente_email}"
-  @response = last_response
+  @response = api_get("/turnos/pacientes/proximos/#{@paciente_email}")
 end
 
 Entonces('recibo un listado de sus próximos turnos con {int} turno') do |cantidad|
@@ -89,7 +86,7 @@ Dado('el paciente tiene {int} turno con estado {string} con el médico matricula
       hora: '10:00',
       email: @paciente_email
     }
-    @response = Faraday.post('/turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+    @response = api_post('/turnos', turno_hash.to_json)
   end
 end
 

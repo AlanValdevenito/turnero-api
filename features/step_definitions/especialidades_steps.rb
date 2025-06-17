@@ -1,5 +1,5 @@
 Dado('el sistema no tiene registrado a la especialidad {string}') do |especialidad|
-  @response = Faraday.get('/especialidades')
+  @response = api_get('/especialidades')
   especialidades = JSON.parse(@response.body)
   encontrado = especialidades.any? do |e|
     e['nombre'] == especialidad
@@ -9,12 +9,12 @@ end
 
 Cuando('doy de alta a la especialidad {string}') do |especialidad|
   request_body = { nombre: especialidad, duracion_de_turnos: 10, limite_turnos_por_usuario: 5 }.to_json
-  @response = Faraday.post('/especialidades', request_body, { 'Content-Type' => 'application/json' })
+  @response = api_post('/especialidades', request_body)
   expect(@response.status).to eq(200)
 end
 
 Entonces('la especialidad {string} está registrada en el sistema') do |especialidad|
-  @response = Faraday.get('/especialidades')
+  @response = api_get('/especialidades')
   especialidades = JSON.parse(@response.body)
   encontrado = especialidades.any? do |m|
     m['nombre'] == especialidad

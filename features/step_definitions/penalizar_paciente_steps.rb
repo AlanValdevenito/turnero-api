@@ -1,4 +1,3 @@
-require 'faraday'
 require 'json'
 
 ESTADOS_VALIDOS = {
@@ -13,7 +12,7 @@ MENSAJE_DE_PENALIZACION = 'Penalización por porcentaje de asistencia abajo del 
 Dado('un paciente con email {string} registrado') do |email|
   telegram_id = rand(100_000..999_999)
   usuario_hash = { email:, telegram_id: }
-  Faraday.post('usuarios', usuario_hash.to_json, { 'Content-Type' => 'application/json' })
+  api_post('/usuarios', usuario_hash.to_json)
   @paciente_email = email
   @paciente_telegram_id = telegram_id
 end
@@ -68,7 +67,7 @@ Cuando('intenta reservar un nuevo turno') do
     hora: '10:00',
     email: @paciente_email
   }
-  @response = Faraday.post('turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', turno_hash.to_json)
 
   # Si la respuesta es penalización, guardamos y mockeamos la hora de penalización
   if @response.status == 400
@@ -105,7 +104,7 @@ Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos
     hora: '12:00',
     email: @paciente_email
   }
-  response = Faraday.post('turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+  response = api_post('/turnos', turno_hash.to_json)
 
   expect(response.status).to eq(400)
   body = JSON.parse(response.body)
@@ -142,7 +141,7 @@ Dado('saco un turno exitosamente') do
     hora: '10:00',
     email: @paciente_email
   }
-  @response = Faraday.post('turnos', turno_hash.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', turno_hash.to_json)
   expect(@response.status).to eq(201)
 end
 
@@ -157,7 +156,7 @@ Cuando('el estado del turno Pendiente se cambia a Ausente') do
   allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(nueva_hora.to_date)
 
   body = { estado: 'Ausente' }.to_json
-  response = Faraday.put("turnos/#{turno.id}", body, { 'Content-Type' => 'application/json' })
+  response = api_put("/turnos/#{turno.id}", body)
   expect(response.status).to eq(200)
 end
 
@@ -166,11 +165,11 @@ Dado('mockeo la fecha actual a {string} con hora {string}') do |fecha_str, hora_
   allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_call_original
   allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_call_original
   body = { fecha: fecha_str, hora: hora_str }.to_json
-  response = Faraday.post('test/fecha_mock', body, { 'Content-Type' => 'application/json' })
+  response = api_post('/test/fecha_mock', body)
   expect(response.status).to eq(200)
 end
 
 Entonces('cancelo el mock de hora') do
-  response = Faraday.delete('test/fecha_mock')
+  response = api_delete('/test/fecha_mock')
   expect(response.status).to eq(200)
 end

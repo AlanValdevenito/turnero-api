@@ -1,8 +1,8 @@
 def crear_medicos_disponibles
-  response = Faraday.get('/turnos/medicos-disponibles')
+  response = api_get('/turnos/medicos-disponibles')
   if JSON.parse(response.body).size < 7
     especialidad = { nombre: 'Cardiologia', duracion_de_turnos: 20, limite_turnos_por_usuario: 5 }
-    Faraday.post('/especialidades', especialidad.to_json, { 'Content-Type' => 'application/json' })
+    api_post('/especialidades', especialidad.to_json)
 
     (1..7).each do |i|
       medico = {
@@ -11,7 +11,7 @@ def crear_medicos_disponibles
         matricula: i,
         especialidad: 'Cardiologia'
       }
-      Faraday.post('/medicos', medico.to_json, { 'Content-Type' => 'application/json' })
+      api_post('/medicos', medico.to_json)
     end
   end
 end
@@ -25,7 +25,7 @@ end
 Dado('el usuario pide un turno') do
   crear_usuario
   crear_medicos_disponibles
-  @response = Faraday.get('/turnos/medicos-disponibles')
+  @response = api_get('/turnos/medicos-disponibles')
   expect(@response.status).to eq(200)
 end
 
@@ -47,7 +47,7 @@ Cuando('el usuario selecciona un médico de la lista') do
   medico = Medico.new('Michael', 'Jackson', '1', especialidad)
   RepositorioMedicos.new.save(medico)
 
-  @response = Faraday.get('/turnos/1/disponibilidad')
+  @response = api_get('/turnos/1/disponibilidad')
   expect(@response.status).to eq(200)
 end
 
@@ -68,7 +68,7 @@ Cuando('el usuario selecciona un turno') do
     hora: @turno_seleccionado['hora'],
     email: 'juan@mail.com'
   }
-  @response = Faraday.post('/turnos', @params.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', @params.to_json)
   expect(@response.status).to eq(201)
 end
 
@@ -109,6 +109,6 @@ Cuando('el médico no tiene turnos disponibles en los próximos 2 meses') do
     end
   end
 
-  @response = Faraday.get("/turnos/#{medico.matricula}/disponibilidad")
+  @response = api_get("/turnos/#{medico.matricula}/disponibilidad")
   expect(@response.status).to eq(400)
 end

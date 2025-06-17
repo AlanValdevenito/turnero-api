@@ -4,6 +4,10 @@ get '/version' do
   json({ version: Version.current })
 end
 
+get '/test-api-key' do
+  logger.info('GET /test-api-key')
+end
+
 post '/reset' do
   halt 403 unless settings.environment == :test
 

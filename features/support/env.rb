@@ -21,6 +21,22 @@ def app
   Sinatra::Application
 end
 
+def api_get(path, headers = {})
+  Faraday.get(path, nil, { 'HTTP_X_API_KEY' => ENV['API_KEY'] }.merge(headers))
+end
+
+def api_post(path, body, headers = {})
+  Faraday.post(path, body, { 'Content-Type' => 'application/json', 'HTTP_X_API_KEY' => ENV['API_KEY'] }.merge(headers))
+end
+
+def api_put(path, body, headers = {})
+  Faraday.put(path, body, { 'Content-Type' => 'application/json', 'HTTP_X_API_KEY' => ENV['API_KEY'] }.merge(headers))
+end
+
+def api_delete(path, headers = {})
+  Faraday.delete(path, nil, { 'HTTP_X_API_KEY' => ENV['API_KEY'] }.merge(headers))
+end
+
 Before do
   RSpec::Mocks.setup
 

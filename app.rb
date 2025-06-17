@@ -24,6 +24,15 @@ configure do
 end
 
 before do
+  rutas_sin_auth = [
+    '/version', '/reset'
+  ]
+
+  pass if rutas_sin_auth.include?(request.path_info)
+
+  api_key = request.env['HTTP_X_API_KEY']
+  halt 401, json(error: 'Error de autenticación: falta la API Key') unless api_key
+
   if !request.body.nil? && request.body.size.positive?
     request.body.rewind
     @params = JSON.parse(request.body.read, symbolize_names: true)

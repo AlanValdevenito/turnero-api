@@ -9,7 +9,7 @@ Dado('que el paciente tiene {int} turnos') do |cantidad_turnos|
 end
 
 Cuando('quiero dar de baja al paciente') do
-  @response = Faraday.delete("/pacientes/#{@email}")
+  @response = api_delete("/pacientes/#{@email}")
   expect(@response.status).to eq(200)
 end
 
@@ -22,13 +22,13 @@ Entonces('no hay turnos correspondientes al paciente') do
 end
 
 Entonces('el paciente no esta dado de alta') do
-  response = Faraday.get("/turnos/pacientes/#{@email}")
+  response = api_get("/turnos/pacientes/#{@email}")
   expect(response.status).to eq(404)
 end
 
 Cuando('quiero dar de baja un paciente inexistente') do
   email_inexistente = 'email@inexistente.com'
-  @response = Faraday.delete("/pacientes/#{email_inexistente}")
+  @response = api_delete("/pacientes/#{email_inexistente}")
 end
 
 Entonces('se devuelve el error {int}') do |error_code|

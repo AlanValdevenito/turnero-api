@@ -3,7 +3,7 @@ Dado('que nunca reserve un turno') do
 end
 
 Cuando('quiero ver mi historial de turnos') do
-  @response = Faraday.get("/turnos/pacientes/historial/#{@email}")
+  @response = api_get("/turnos/pacientes/historial/#{@email}")
   @turnos = JSON.parse(@response.body)
 end
 
@@ -15,31 +15,31 @@ Dado('que para la fecha {string} reserve 1 turno con el médico con matrícula {
   allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(DateTime.parse(fecha_actual))
 
   request_body = { matricula:, fecha: fecha_turno, hora: '09:00', email: @email }.to_json
-  @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', request_body)
   @turno_id = JSON.parse(@response.body)['id']
   expect(@response.status).to eq(201)
 end
 
 Dado('no asisti al turno') do
   params = { estado: 'Ausente' }
-  @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
   expect(@response.status).to eq(200)
 end
 
 Dado('asisti al turno') do
   params = { estado: 'Asistido' }
-  @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
   expect(@response.status).to eq(200)
 end
 
 Dado('cancele el turno') do
   params = { estado: 'Cancelado' }
-  @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
   expect(@response.status).to eq(200)
 end
 
 Entonces('puedo ver mi turno con el médico {string} de la especialidad {string} con estado {string}') do |medico, especialidad, estado|
-  @response = Faraday.get("/turnos/pacientes/historial/#{@email}")
+  @response = api_get("/turnos/pacientes/historial/#{@email}")
   @turnos = JSON.parse(@response.body)
 
   encontrado = @turnos.any? do |turno|
@@ -55,11 +55,11 @@ Dado('que reserve {int} turnos a los cuales asisti') do |cantidad_turnos|
     hora = hora_turno.strftime('%H:%M')
 
     request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, email: @email }.to_json
-    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    @response = api_post('/turnos', request_body)
     @turno_id = JSON.parse(@response.body)['id']
 
     params = { estado: 'Asistido' }
-    @response = Faraday.put("/turnos/#{@turno_id}", params.to_json, { 'Content-Type' => 'application/json' })
+    @response = api_put("/turnos/#{@turno_id}", params.to_json)
   end
 end
 

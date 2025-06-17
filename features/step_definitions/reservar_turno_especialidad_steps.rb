@@ -1,5 +1,5 @@
 Dado('que el usuario pide un turno por especialidad') do
-  @response = Faraday.get('/especialidades')
+  @response = api_get('/especialidades')
   expect(@response.status).to eq(200)
 end
 
@@ -11,7 +11,7 @@ Entonces('se muestra un listado de todas las especialidades con su con nombre') 
 end
 
 Cuando('el usuario selecciona la especialidad {string}') do |especialidad|
-  @response = Faraday.get("/turnos/medicos-disponibles/#{especialidad}")
+  @response = api_get("/turnos/medicos-disponibles/#{especialidad}")
 end
 
 Entonces('se muestra un listado de {int} médico de la especialidad {string} con su nombre y apellido') do |cantidad_medicos, especialidad|
@@ -26,7 +26,7 @@ Entonces('se muestra un listado de {int} médico de la especialidad {string} con
 end
 
 Cuando('el usuario selecciona un medico') do
-  @response = Faraday.get("/turnos/#{@matricula}/disponibilidad")
+  @response = api_get("/turnos/#{@matricula}/disponibilidad")
   expect(@response.status).to eq(200)
 end
 
@@ -35,7 +35,7 @@ Cuando('el usuario selecciona el turno con el medico de matricula {string}') do 
 
   body = { matricula:, fecha: turno_seleccionado['fecha'], hora: turno_seleccionado['hora'], email: @email }
 
-  @response = Faraday.post('/turnos', body.to_json, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', body.to_json)
   expect(@response.status).to eq(201)
 end
 

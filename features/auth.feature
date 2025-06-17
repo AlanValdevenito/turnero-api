@@ -1,7 +1,6 @@
 # language: es
 Característica: Autenticación por API KEY en la API
 
-@wip
 Escenario: US-12.1 Acceso denegado sin API KEY
    Cuando envío una request a la API sin incluir una API KEY en el header
    Entonces la API responde con un mensaje de error de autenticación

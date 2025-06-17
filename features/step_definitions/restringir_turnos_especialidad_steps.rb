@@ -1,11 +1,11 @@
 Dado('la especialidad {string} dada de alta con límite de {int} turnos') do |especialidad, limite|
   request_body = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_usuario: limite }.to_json
-  @response = Faraday.post('/especialidades', request_body, { 'Content-Type' => 'application/json' })
+  @response = api_post('/especialidades', request_body)
   expect(@response.status).to eq(200)
 end
 
 Dado('que el paciente con email {string} tiene {int} turnos pendientes en la especialidad {string}') do |email, cantidad, especialidad|
-  @response = Faraday.get('/medicos')
+  @response = api_get('/medicos')
   medicos = JSON.parse(@response.body)
   medico = medicos.find { |m| m['especialidad'] == especialidad }
 
@@ -21,7 +21,7 @@ Dado('que el paciente con email {string} tiene {int} turnos pendientes en la esp
       email:
     }.to_json
 
-    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    @response = api_post('/turnos', request_body)
     expect(@response.status).to eq(201)
   end
 
@@ -30,7 +30,7 @@ Dado('que el paciente con email {string} tiene {int} turnos pendientes en la esp
 end
 
 Dado('el limite de turnos en {string} es de {int}') do |especialidad, limite|
-  @response = Faraday.get('/especialidades')
+  @response = api_get('/especialidades')
 
   especialidades = JSON.parse(@response.body)
   especialidad_encontrada = especialidades.find { |e| e['nombre'] == especialidad }
@@ -39,7 +39,7 @@ Dado('el limite de turnos en {string} es de {int}') do |especialidad, limite|
 end
 
 Cuando('solicita un nuevo turno en {string}') do |especialidad|
-  @response = Faraday.get('/medicos')
+  @response = api_get('/medicos')
   medicos = JSON.parse(@response.body)
   medico = medicos.find { |m| m['especialidad'] == especialidad }
 
@@ -53,7 +53,7 @@ Cuando('solicita un nuevo turno en {string}') do |especialidad|
     email: @email
   }.to_json
 
-  @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+  @response = api_post('/turnos', request_body)
 end
 
 Entonces('el turno es creado exitosamente') do
@@ -70,7 +70,7 @@ Entonces('el sistema rechaza la solicitud con el mensaje {string}') do |mensaje|
 end
 
 Dado('que el paciente con email {string} tiene {int} turnos en {string}') do |email, turnos, especialidad|
-  @response = Faraday.get('/medicos')
+  @response = api_get('/medicos')
   medicos = JSON.parse(@response.body)
   medico = medicos.find { |m| m['especialidad'] == especialidad }
 
@@ -88,7 +88,7 @@ Dado('que el paciente con email {string} tiene {int} turnos en {string}') do |em
       email:
     }.to_json
 
-    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    @response = api_post('/turnos', request_body)
     expect(@response.status).to eq(201)
   end
 
@@ -97,30 +97,30 @@ Dado('que el paciente con email {string} tiene {int} turnos en {string}') do |em
 end
 
 Dado('los turnos tienen estado {string}') do |estado|
-  @response = Faraday.get("/turnos/pacientes/#{@email}")
+  @response = api_get("/turnos/pacientes/#{@email}")
   expect(@response.status).to eq(200)
 
   turnos = JSON.parse(@response.body)
 
   turno1_id = turnos[0]['id']
   request_body1 = { estado: }.to_json
-  response1 = Faraday.put("/turnos/#{turno1_id}", request_body1, { 'Content-Type' => 'application/json' })
+  response1 = api_put("/turnos/#{turno1_id}", request_body1)
   expect(response1.status).to eq(200)
 
   turno2_id = turnos[1]['id']
   request_body2 = { estado: }.to_json
-  response2 = Faraday.put("/turnos/#{turno2_id}", request_body2, { 'Content-Type' => 'application/json' })
+  response2 = api_put("/turnos/#{turno2_id}", request_body2)
   expect(response2.status).to eq(200)
 end
 
 Dado('cancela un turno en {string}') do |_especialidad|
-  @response = Faraday.get("/turnos/pacientes/#{@email}")
+  @response = api_get("/turnos/pacientes/#{@email}")
   expect(@response.status).to eq(200)
 
   turnos = JSON.parse(@response.body)
 
   turno1_id = turnos[0]['id']
   request_body1 = { estado: 'Cancelado' }.to_json
-  response1 = Faraday.put("/turnos/#{turno1_id}", request_body1, { 'Content-Type' => 'application/json' })
+  response1 = api_put("/turnos/#{turno1_id}", request_body1)
   expect(response1.status).to eq(200)
 end
