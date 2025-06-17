@@ -154,7 +154,7 @@ describe Turnero do
       medico = instance_double('Medico', 'ABC123')
       allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
       allow(repositorios[:turnos]).to receive(:eliminar_por_medico).with(medico)
-   
+
       expect(repositorios[:medico]).to receive(:delete).with(medico)
       turnero.eliminar_medico_por_matricula('ABC123')
     end
