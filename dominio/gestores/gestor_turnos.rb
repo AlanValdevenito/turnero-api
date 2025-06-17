@@ -24,14 +24,29 @@ class GestorTurnos
 
     @penalizador.penalizar_si_corresponde(usuario, @calculador_reputacion.calcular_reputacion(usuario))
 
-    turnos_existentes = @repositorio_turnos.buscar_por_medico(medico)
-    turnos_existentes.each do |turno|
-      raise TurnoYaExisteException if turno.fecha == fecha && turno.hora == hora
-    end
+    turno = Turno.crear(medico, usuario, fecha, hora)
+
+    validar_turnos_del_medico(turno)
+    validar_turnos_del_usuario(turno)
 
     raise LimiteTurnosExcedidoException unless cumple_limite_turnos?(usuario, medico.especialidad)
 
-    @repositorio_turnos.save(Turno.crear(medico, usuario, fecha, hora))
+    @repositorio_turnos.save(turno)
+  end
+
+  def validar_turnos_del_medico(otro_turno)
+    turnos_existentes = @repositorio_turnos.buscar_por_medico(otro_turno.medico)
+    turnos_existentes.each do |turno|
+      raise TurnoYaExisteException if turno.fecha == otro_turno.fecha && turno.hora == otro_turno.hora
+    end
+  end
+
+  def validar_turnos_del_usuario(otro_turno)
+    turnos_existentes = @repositorio_turnos.buscar_por_usuario(otro_turno.usuario)
+    turnos_existentes.each do |turno|
+      next unless turno.fecha == otro_turno.fecha
+      raise SuperposicionDeTurnosException if turno.se_superpone_con?(otro_turno)
+    end
   end
 
   def cumple_limite_turnos?(usuario, especialidad)

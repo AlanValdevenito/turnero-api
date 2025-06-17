@@ -196,7 +196,7 @@ describe GestorTurnos do
     it 'deberia crear un turno correctamente' do
       stub_creacion_turno_correcta(contexto)
 
-      turno = contexto[:gestor_turnos].crear_turno(contexto[:medico], contexto[:usuario], '2025-06-05', '10:00')
+      turno = contexto[:gestor_turnos].crear_turno(contexto[:medico], contexto[:usuario], '2025-06-05', '11:00')
       expect(turno.fecha).to eq('2025-06-05')
     end
 
@@ -238,8 +238,24 @@ describe GestorTurnos do
 
       it 'tira error si se supera el limite de turnos de una especialidad' do
         expect do
-          contexto[:gestor_turnos].crear_turno(medico, usuario, '2025-07-11', '10:00')
+          contexto[:gestor_turnos].crear_turno(medico, usuario, '2025-07-11', '11:00')
         end.to raise_error(LimiteTurnosExcedidoException)
+      end
+    end
+
+    context 'when hay superposicion de turnos' do
+      let(:especialidad) { Especialidad.new('Cardiologia', 10, 5) }
+      let(:medico) { Medico.new('Lucia', 'Martinez', 'CAR123', especialidad) }
+      let(:usuario) { Usuario.new('paciente@correo.com') }
+
+      it 'deberia devolver error al crear turno si hay superposicion con otros turnos' do
+        turno_existente = Turno.new(medico, usuario, hora_utc(2025, 6, 10, 10, 0))
+        turno_superpuesto_hora = '10:05'
+
+        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_medico).with(medico).and_return([turno_existente])
+        allow(contexto[:repositorio_turnos]).to receive(:buscar_por_usuario).with(usuario).and_return([turno_existente])
+
+        expect { contexto[:gestor_turnos].crear_turno(medico, usuario, '2025-06-10', turno_superpuesto_hora) }.to raise_error(SuperposicionDeTurnosException)
       end
     end
   end

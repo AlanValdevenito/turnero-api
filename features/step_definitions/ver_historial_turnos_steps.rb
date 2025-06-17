@@ -52,8 +52,8 @@ end
 
 Dado('que reserve {int} turnos a los cuales asisti') do |cantidad_turnos|
   cantidad_turnos.times do |i|
-    minuto = (i + 1).to_s.rjust(2, '0')
-    hora = "09:#{minuto}"
+    hora_turno = Time.new(2025, 6, 5, 9, 0) + (i * 10 * 60) # incrementa de a 10 minutos
+    hora = hora_turno.strftime('%H:%M')
 
     request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, email: @email }.to_json
     @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
