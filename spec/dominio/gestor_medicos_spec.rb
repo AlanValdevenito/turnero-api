@@ -25,4 +25,10 @@ describe GestorMedicos do
 
     gestor.eliminar_medico_por_matricula('ABC123')
   end
+
+  it 'lanza MedicoNoEncontradoException si el medico no existe' do
+    allow(repositorio_medicos).to receive(:buscar_por_matricula).with('ABC123').and_return(nil)
+
+    expect { gestor.eliminar_medico_por_matricula('ABC123') }.to raise_error(MedicoNoEncontradoException)
+  end
 end

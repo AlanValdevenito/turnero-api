@@ -1,3 +1,5 @@
+Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
+
 post '/medicos' do
   logger.debug("POST /medicos: #{@params}")
   medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:matricula], @params[:especialidad])
@@ -16,7 +18,12 @@ end
 
 delete '/medicos/:matricula' do
   logger.debug("DELETE /medicos/:matricula : #{@params}")
-  turnero.eliminar_medico_por_matricula(@params[:matricula])
-  status 200
-  { message: 'Medico eliminado con sus turnos correspondientes' }.to_json
+  begin
+    turnero.eliminar_medico_por_matricula(@params[:matricula])
+    status 200
+    { message: 'Medico eliminado con sus turnos correspondientes' }.to_json
+  rescue MedicoNoEncontradoException
+    status 404
+    { message: "Medico con matricula #{@params[:matricula]} inexistente" }.to_json
+  end
 end
