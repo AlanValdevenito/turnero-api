@@ -35,7 +35,7 @@ Escenario: US16.3 Paciente tiene turnos en estados no pendientes y puede reserva
 
 @wip
 Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
-    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en "Cardiologia"
+    Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en la especialidad "Cardiologia"
     Y el limite de turnos en "Cardiologia" es de 2
     Y cancela un turno en "Cardiologia"
     Cuando solicita un nuevo turno en "Cardiologia"

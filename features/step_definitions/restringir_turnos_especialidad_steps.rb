@@ -112,3 +112,15 @@ Dado('los turnos tienen estado {string}') do |estado|
   response2 = Faraday.put("/turnos/#{turno2_id}", request_body2, { 'Content-Type' => 'application/json' })
   expect(response2.status).to eq(200)
 end
+
+Dado('cancela un turno en {string}') do |_especialidad|
+  @response = Faraday.get("/turnos/pacientes/#{@email}")
+  expect(@response.status).to eq(200)
+
+  turnos = JSON.parse(@response.body)
+
+  turno1_id = turnos[0]['id']
+  request_body1 = { estado: 'Cancelado' }.to_json
+  response1 = Faraday.put("/turnos/#{turno1_id}", request_body1, { 'Content-Type' => 'application/json' })
+  expect(response1.status).to eq(200)
+end
