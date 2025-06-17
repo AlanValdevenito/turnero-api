@@ -8,17 +8,13 @@ describe Especialidad do
       instance_double('Medico',
                       especialidad: instance_double('Especialidad', nombre: 'Cardiologia'))
     end
-    let(:turno_pendiente) do
-      instance_double('Turno', medico:, estado: 'Pendiente')
+
+    def crear_turno(estado)
+      instance_double('Turno', medico:, estado:)
     end
-    let(:turno_cancelado) do
-      instance_double('Turno', medico:, estado: 'Cancelado')
-    end
-    let(:turno_asistido) do
-      instance_double('Turno', medico:, estado: 'Asistido')
-    end
-    let(:turno_ausente) do
-      instance_double('Turno', medico:, estado: 'Ausente')
+
+    def crear_turnos(*estados)
+      estados.map { |estado| crear_turno(estado) }
     end
 
     it 'devuelve true cuando no hay turnos' do
@@ -26,38 +22,32 @@ describe Especialidad do
     end
 
     it 'devuelve true cuando hay turnos pero menos que el límite' do
-      turnos = [turno_pendiente]
-
+      turnos = crear_turnos('Pendiente')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(true)
     end
 
     it 'devuelve false cuando hay turnos que superan el límite' do
-      turnos = [turno_pendiente, turno_pendiente, turno_pendiente]
-
+      turnos = crear_turnos('Pendiente', 'Pendiente', 'Pendiente')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(false)
     end
 
     it 'devuelve true cuando hay turnos cancelados que no cuentan para el límite' do
-      turnos = [turno_cancelado, turno_cancelado, turno_cancelado, turno_pendiente]
-
+      turnos = crear_turnos('Cancelado', 'Cancelado', 'Cancelado', 'Pendiente')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(true)
     end
 
     it 'devuelve true cuando hay turnos asistidos que no cuentan para el límite' do
-      turnos = [turno_asistido, turno_asistido, turno_asistido, turno_pendiente]
-
+      turnos = crear_turnos('Asistido', 'Asistido', 'Asistido', 'Pendiente')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(true)
     end
 
     it 'devuelve true cuando hay turnos ausentes que no cuentan para el límite' do
-      turnos = [turno_ausente, turno_ausente, turno_ausente, turno_pendiente]
-
+      turnos = crear_turnos('Ausente', 'Ausente', 'Ausente', 'Pendiente')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(true)
     end
 
     it 'devuelve false cuando hay suficientes turnos pendientes para superar el límite' do
-      turnos = [turno_pendiente, turno_cancelado, turno_pendiente, turno_asistido]
-
+      turnos = crear_turnos('Pendiente', 'Cancelado', 'Pendiente', 'Asistido')
       expect(especialidad.tiene_limite_disponible?(turnos)).to be(false)
     end
   end
