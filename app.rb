@@ -32,6 +32,7 @@ before do
 
   api_key = request.env['HTTP_X_API_KEY']
   halt 401, json(error: 'Error de autenticación: falta la API Key') unless api_key
+  halt 401, json(error: 'Error de autenticación: API key inválida') unless api_key == ENV['API_KEY']
 
   if !request.body.nil? && request.body.size.positive?
     request.body.rewind

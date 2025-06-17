@@ -7,7 +7,7 @@ Entonces('la API responde con un mensaje de error de autenticación de key falta
 end
 
 Cuando('envío una request a la API incluyendo una API KEY inválida en el header') do
-  @response = Faraday.get('/test-api-key', nil, { 'X-API-KEY' => 'INVALIDA' })
+  @response = Faraday.get('/test-api-key', nil, { 'HTTP_X_API_KEY' => 'INVALIDA' })
 end
 
 Entonces('la API responde con un mensaje de error de autenticación de key invalida') do
