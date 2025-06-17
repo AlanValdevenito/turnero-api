@@ -40,7 +40,6 @@ Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
     Cuando solicita un nuevo turno en "Cardiologia"
     Entonces el turno es creado exitosamente
 
-@wip
 Escenario: US16.5 Paciente reserva turnos en diferentes especialidades
     Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en "Traumatologia"
     Y el limite de turnos en "Traumatologia" es de 2
