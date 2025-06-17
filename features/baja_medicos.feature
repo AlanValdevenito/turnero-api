@@ -13,7 +13,7 @@ Escenario: US-20.1 Dar de baja un medico sin turnos
   Entonces se muestra el mensaje de exitoo "Medico eliminado con sus turnos correspondientes"
   Y no hay turnos correspondientes al medico
   Y el medico ya no esta dado de alta
-@wip
+
 Escenario: US-20.2 Dar de baja un medico con turnos
   Dado que el medico tiene 2 turnos
   Cuando quiero dar de baja al medico
