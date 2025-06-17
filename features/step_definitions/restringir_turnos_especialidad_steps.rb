@@ -68,3 +68,47 @@ Entonces('el sistema rechaza la solicitud con el mensaje {string}') do |mensaje|
   response_body = JSON.parse(@response.body)
   expect(response_body['error']).to eq(mensaje)
 end
+
+Dado('que el paciente con email {string} tiene {int} turnos en {string}') do |email, turnos, especialidad|
+  @response = Faraday.get('/medicos')
+  medicos = JSON.parse(@response.body)
+  medico = medicos.find { |m| m['especialidad'] == especialidad }
+
+  matricula = medico['matricula']
+
+  dias_laborables = [14, 15, 16, 17, 18]
+
+  turnos.times do |i|
+    dia = dias_laborables[i].to_s.rjust(2, '0')
+
+    request_body = {
+      matricula:,
+      fecha: "2025-04-#{dia}",
+      hora: '15:00',
+      email:
+    }.to_json
+
+    @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })
+    expect(@response.status).to eq(201)
+  end
+
+  @email = email
+  @especialidad = especialidad
+end
+
+Dado('un turno tiene estado {string} y el otro {string}') do |estado1, estado2|
+  @response = Faraday.get("/turnos/pacientes/#{@email}")
+  expect(@response.status).to eq(200)
+
+  turnos = JSON.parse(@response.body)
+
+  turno1_id = turnos[0]['id']
+  request_body1 = { estado: estado1 }.to_json
+  response1 = Faraday.put("/turnos/#{turno1_id}", request_body1, { 'Content-Type' => 'application/json' })
+  expect(response1.status).to eq(200)
+
+  turno2_id = turnos[1]['id']
+  request_body2 = { estado: estado2 }.to_json
+  response2 = Faraday.put("/turnos/#{turno2_id}", request_body2, { 'Content-Type' => 'application/json' })
+  expect(response2.status).to eq(200)
+end
