@@ -47,4 +47,12 @@ class GestorUsuarios
 
     @repositorio_usuarios.save(usuario)
   end
+
+  def eliminar_usuario_por_email(email)
+    usuario = @repositorio_usuarios.buscar_por_email(email)
+    raise UsuarioNoEncontradoException unless usuario
+
+    @repositorio_turnos.eliminar_por_usuario(usuario)
+    @repositorio_usuarios.delete(usuario)
+  end
 end
