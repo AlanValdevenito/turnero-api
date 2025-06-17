@@ -18,7 +18,7 @@ configure do
   set :logger, customer_logger
   set :default_content_type, :json
   set :environment, ENV['APP_MODE'].to_sym
-  set :turnero, Turnero.new(RepositorioUsuarios.new, RepositorioMedicos.new, RepositorioEspecialidades.new, RepositorioTurnos.new, ProveedorDia.new, ProveedorFeriados.new, ProveedorHora.new)
+  set :turnero, Turnero.new(RepositorioUsuarios.new, RepositorioMedicos.new, RepositorioEspecialidades.new, RepositorioTurnos.new, ProveedorFecha.new, ProveedorFeriados.new)
   use LogMiddleware
   customer_logger.info('Iniciando turnero...')
 end

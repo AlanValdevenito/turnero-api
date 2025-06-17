@@ -30,7 +30,7 @@ Dado('el médico {string} de la especialidad {string} con matricula {string} dad
 end
 
 Dado('la fecha actual es {string}') do |fecha|
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha))
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(fecha))
   @fecha_actual = Date.parse(fecha)
 end
 

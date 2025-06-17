@@ -2,23 +2,23 @@ require 'spec_helper'
 
 describe Penalizador do
   let(:usuario) { instance_double('Usuario', penalizable: true) }
-  let(:proveedor_hora) { instance_double('ProveedorHora') }
+  let(:proveedor_fecha) { instance_double('ProveedorFecha') }
   let(:gestor_usuarios) { instance_double('GestorUsuarios') }
-  let(:penalizador) { described_class.new(proveedor_hora, gestor_usuarios) }
+  let(:penalizador) { described_class.new(proveedor_fecha, gestor_usuarios) }
 
   describe '#chequeo_penalizacion_vigente' do
     let(:hora_base) { Time.now }
 
     it 'no lanza excepción si el usuario no tiene penalización' do
       allow(usuario).to receive(:ultima_penalizacion).and_return(nil)
-      allow(proveedor_hora).to receive(:ahora).and_return(hora_base)
+      allow(proveedor_fecha).to receive(:ahora).and_return(hora_base)
       expect { penalizador.chequeo_penalizacion_vigente(usuario) }.not_to raise_error
     end
 
     it 'lanza excepción si la penalización está vigente' do
       penalizacion_time = hora_base - 60 # penalización hace 1 minuto
       allow(usuario).to receive(:ultima_penalizacion).and_return(penalizacion_time)
-      allow(proveedor_hora).to receive(:ahora).and_return(hora_base)
+      allow(proveedor_fecha).to receive(:ahora).and_return(hora_base)
       stub_const('DURACION_PENALIDAD', 3) # 3 minutos
 
       expect { penalizador.chequeo_penalizacion_vigente(usuario) }.to raise_error(PenalizacionPorReputacionException)
@@ -27,7 +27,7 @@ describe Penalizador do
     it 'no lanza excepción si la penalización ya expiró' do
       penalizacion_time = hora_base - 5 * 60 # penalización hace 5 minutos
       allow(usuario).to receive(:ultima_penalizacion).and_return(penalizacion_time)
-      allow(proveedor_hora).to receive(:ahora).and_return(hora_base)
+      allow(proveedor_fecha).to receive(:ahora).and_return(hora_base)
       stub_const('DURACION_PENALIDAD', 3) # 3 minutos
 
       expect { penalizador.chequeo_penalizacion_vigente(usuario) }.not_to raise_error
@@ -38,7 +38,7 @@ describe Penalizador do
     let(:hora_base) { Time.now }
 
     before(:each) do
-      allow(proveedor_hora).to receive(:ahora).and_return(hora_base)
+      allow(proveedor_fecha).to receive(:ahora).and_return(hora_base)
       allow(gestor_usuarios).to receive(:actualizar)
       allow(usuario).to receive(:ultima_penalizacion).and_return(nil)
       allow(usuario).to receive(:ultima_penalizacion=)

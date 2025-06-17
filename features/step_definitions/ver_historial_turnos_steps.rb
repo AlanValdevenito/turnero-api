@@ -13,7 +13,7 @@ Entonces('se muestra el mensaje {string}') do |mensaje|
 end
 
 Dado('que para la fecha {string} reserve 1 turno con el médico con matrícula {string} siendo hoy {string}') do |fecha_turno, matricula, fecha_actual|
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha_actual))
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(DateTime.parse(fecha_actual))
 
   request_body = { matricula:, fecha: fecha_turno, hora: '09:00', email: @email }.to_json
   @response = Faraday.post('/turnos', request_body, { 'Content-Type' => 'application/json' })

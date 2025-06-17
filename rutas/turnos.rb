@@ -150,6 +150,9 @@ post '/turnos' do
   rescue FechaNoValidaException
     status 400
     json({ error: 'Fecha inválida para agendar un turno' })
+  rescue LimiteTurnosExcedidoException
+    status 422
+    json({ error: 'El usuario ha alcanzado el límite de turnos para esta especialidad' })
   rescue TurnoYaExisteException
     status 400
     json({ error: 'Ya existe un turno para ese médico y fecha/hora' })

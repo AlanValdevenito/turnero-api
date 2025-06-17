@@ -2,8 +2,8 @@ DURACION_PENALIDAD = 3
 REPUTACION_MINIMA = 80
 
 class Penalizador
-  def initialize(proveedor_hora, gestor_usuarios)
-    @proveedor_hora = proveedor_hora
+  def initialize(proveedor_fecha, gestor_usuarios)
+    @proveedor_fecha = proveedor_fecha
     @gestor_usuarios = gestor_usuarios
   end
 
@@ -18,7 +18,7 @@ class Penalizador
     if reputacion < REPUTACION_MINIMA
       # actualizo la ultima penalizacion del usuario a ahora
       # y lo marco como no penalizable
-      usuario.ultima_penalizacion = @proveedor_hora.ahora.to_datetime
+      usuario.ultima_penalizacion = @proveedor_fecha.ahora.to_datetime
       usuario.penalizable = false
       @gestor_usuarios.actualizar(usuario)
       raise PenalizacionPorReputacionException
@@ -28,7 +28,7 @@ class Penalizador
   def chequeo_penalizacion_vigente(usuario)
     # si intenta sacar turno y tiene una penalización vigente, lanzo excepción
     if usuario.ultima_penalizacion &&
-       (@proveedor_hora.ahora - usuario.ultima_penalizacion.to_time < DURACION_PENALIDAD * 60)
+       (@proveedor_fecha.ahora - usuario.ultima_penalizacion.to_time < DURACION_PENALIDAD * 60)
       raise PenalizacionPorReputacionException
     end
   end

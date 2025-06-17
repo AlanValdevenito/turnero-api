@@ -4,7 +4,7 @@ Dir[File.join(__dir__, '../../dominio/excepciones', '*.rb')].each { |file| requi
 
 describe Turnero do
   subject(:turnero) do
-    described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:dia], proveedores[:feriados], proveedores[:hora])
+    described_class.new(repositorios[:usuario], repositorios[:medico], repositorios[:especialidad], repositorios[:turnos], proveedores[:fecha], proveedores[:feriados])
   end
 
   before(:each) do
@@ -29,9 +29,8 @@ describe Turnero do
 
   let(:proveedores) do
     {
-      dia: instance_double('ProveedorDia', hoy: Date.parse('2025-06-16')),
       feriados: instance_double('ProveedorFeriadosDummy', feriados: [{ "dia": 16, "mes": 6 }]),
-      hora: instance_double('ProveedorHora', ahora: Time.new(2025, 6, 16, 10, 0, 0))
+      fecha: instance_double('ProveedorFecha', ahora: Time.new(2025, 6, 16, 10, 0, 0))
     }
   end
 
@@ -125,7 +124,7 @@ describe Turnero do
 
   describe 'Cancelar turnos' do
     it 'cancelar turno devuelve un turno cancelado si se hace con mas de 24hs de anticipacion' do
-      fecha_turno = proveedores[:hora].ahora + 36 * 60 * 60
+      fecha_turno = proveedores[:fecha].ahora + 36 * 60 * 60
       usuario = Usuario.new('usuario@mail.com')
       allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))
@@ -133,7 +132,7 @@ describe Turnero do
     end
 
     it 'cancelar turno devuelve un turno ausente si se hace con menos de 24hs de anticipacion' do
-      fecha_turno = proveedores[:hora].ahora + 12 * 60 * 60
+      fecha_turno = proveedores[:fecha].ahora + 12 * 60 * 60
       usuario = Usuario.new('usuario@mail.com')
       allow(repositorios[:turnos]).to receive(:buscar_por_id).with(1).and_return(Turno.new('medico', usuario, fecha_turno))
       allow(repositorios[:turnos]).to receive(:save).with(instance_of(Turno))

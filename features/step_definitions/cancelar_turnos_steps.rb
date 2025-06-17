@@ -2,9 +2,9 @@ Dado('que para la fecha {string} reserve {int} turno con el medico con matricula
   @matricula = matricula
   @fecha_turno = fecha_turno
   @fecha_hoy = fecha_hoy
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(fecha_hoy))
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(fecha_hoy))
   anio, mes, dia = fecha_hoy.split('-')
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
   medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
   usuario = RepositorioUsuarios.new.buscar_por_email(@email)
   turno = Turno.new(medico, usuario, Date.parse(fecha_turno), 'Pendiente')
@@ -34,9 +34,9 @@ Cuando('pido cancelar un turno con un id inexistente') do
 end
 
 Cuando('pido cancelar el turno de otro paciente') do
-  allow_any_instance_of(ProveedorDia).to receive(:hoy).and_return(Date.parse(@fecha_hoy))
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(@fecha_hoy))
   anio, mes, dia = @fecha_hoy.split('-')
-  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
   usuario = Usuario.new('otroUsuario@mail.com')
   RepositorioUsuarios.new.save(usuario)
   medico = RepositorioMedicos.new.buscar_por_matricula(@matricula)
