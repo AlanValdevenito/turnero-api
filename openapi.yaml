@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Negro API
-  version: 0.9.3
+  version: 0.9.4
 servers:
   - url: http://localhost:3000
     description: Local
@@ -40,6 +40,57 @@ paths:
                   message:
                     type: string
                     example: Datos reiniciados
+        '403':
+          description: Prohibido fuera del entorno de test
+  /test/hora_mock:
+    post:
+      summary: Setear hora mock (solo test)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hora:
+                  type: string
+                  example: "10:04"
+      responses:
+        '200':
+          description: Hora mock seteada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hora mock seteada a 10:04
+        '400':
+          description: Error en los datos enviados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '403':
+          description: Prohibido fuera del entorno de test
+
+    delete:
+      summary: Cancelar hora mock (solo test)
+      responses:
+        '200':
+          description: Hora mock cancelada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Hora mock cancelada
         '403':
           description: Prohibido fuera del entorno de test
 
