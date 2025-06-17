@@ -167,7 +167,6 @@ Dado('mockeo la fecha actual a {string} con hora {string}') do |fecha_str, hora_
   allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_call_original
   body = { fecha: fecha_str, hora: hora_str }.to_json
   response = Faraday.post('test/fecha_mock', body, { 'Content-Type' => 'application/json' })
-  puts response.body
   expect(response.status).to eq(200)
 end
 

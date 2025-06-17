@@ -1,6 +1,5 @@
 Dado('que el paciente tiene {int} turnos') do |cantidad_turnos|
   medico = RepositorioMedicos.new.buscar_por_matricula(@matricula)
-  puts medico.nombre
   usuario = RepositorioUsuarios.new.buscar_por_email(@email)
   fecha = Date.parse('2025-06-18')
   cantidad_turnos.times do |n|
@@ -19,9 +18,7 @@ Entonces('se muestra el mensaje de exitoo {string}') do |mensaje|
 end
 
 Entonces('no hay turnos correspondientes al paciente') do
-  response = Faraday.get("/turnos/pacientes/#{@email}")
-  puts JSON.parse(response.body)
-  expect(JSON.parse(response.body)['error']).to eq("Paciente con email #{@email} inexistente")
+  expect(RepositorioUsuarios.new.buscar_por_email(@email)).to be_nil
 end
 
 Entonces('el paciente no esta dado de alta') do

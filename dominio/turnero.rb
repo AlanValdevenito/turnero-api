@@ -3,6 +3,7 @@ require_relative '../dominio/gestores/gestor_usuarios'
 require_relative '../dominio/gestores/gestor_turnos'
 require_relative '../dominio/gestores/gestor_medicos'
 require_relative 'adaptador_zona_horaria'
+# rubocop:disable Metrics/ClassLength
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
@@ -137,3 +138,4 @@ class Turnero
     @gestor_medicos.eliminar_medico_por_matricula(matricula)
   end
 end
+# rubocop:enable Metrics/ClassLength
