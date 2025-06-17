@@ -162,10 +162,15 @@ Cuando('el estado del turno Pendiente se cambia a Ausente') do
 end
 
 Dado('mockeo la hora actual a {string}') do |hora_str|
-  raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
-
+  puts "Mockeando la hora actual a: #{hora_str}"
   allow_any_instance_of(ProveedorHora).to receive(:ahora).and_call_original
   body = { hora: hora_str }.to_json
-  response = Faraday.post('hora_mock', body, { 'Content-Type' => 'application/json' })
+  response = Faraday.post('test/hora_mock', body, { 'Content-Type' => 'application/json' })
+  puts response.body
+  expect(response.status).to eq(200)
+end
+
+Entonces('cancelo el mock de hora') do
+  response = Faraday.delete('test/hora_mock')
   expect(response.status).to eq(200)
 end

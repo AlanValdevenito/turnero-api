@@ -16,28 +16,26 @@ post '/reset' do
   json({ message: 'Datos reiniciados' })
 end
 
-post '/hora_mock' do
+# PARA TESTEAR LA US-11 (USO EXCLUSIVO)
+post '/test/hora_mock' do
   # halt 403 unless settings.environment == :test
+  hora = params[:hora]
+  raise ArgumentError, 'Debe enviar el campo "hora"' unless hora
 
-  body = JSON.parse(request.body.read)
-  hora_str = body['hora'] # ejemplo: "22:00" o "1:00"
-  raise ArgumentError, 'Debe enviar el campo "hora"' unless hora_str
-
-  hora, min = hora_str.split(':').map(&:to_i)
-  turnero.setear_hora_mock(hora, min)
+  turnero.setear_hora_mock(hora)
 
   status 200
-  json({ message: "Hora mock seteada a #{hora_str}" })
+  json({ message: "Hora mock seteada a #{hora}" })
 rescue ArgumentError => e
   status 400
   json({ error: e.message })
-rescue StandardError
+rescue StandardError => e
   status 400
-  json({ error: 'Error al setear la hora mock' })
+  json({ error: 'Error al setear la hora mock', details: e.message })
 end
 
 # Eliminar la hora mock (DELETE porque elimina un recurso)
-delete '/hora_mock' do
+delete '/test/hora_mock' do
   # halt 403 unless settings.environment == :test
 
   turnero.cancelar_hora_mock

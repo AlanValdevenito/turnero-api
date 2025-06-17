@@ -12,13 +12,9 @@ class Turnero
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios)
-    @gestor_turnos = GestorTurnos.new(
-      repositorio_turnos,
-      proveedor_dia,
-      proveedor_feriados,
-      proveedor_hora,
-      Penalizador.new(proveedor_hora, @gestor_usuarios)
-    )
+    @proveedor_hora = proveedor_hora
+    @proveedor_dia = proveedor_dia
+    @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, Penalizador.new(proveedor_hora, @gestor_usuarios))
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_hora)
   end
   # rubocop:enable Metrics/ParameterLists
@@ -125,5 +121,15 @@ class Turnero
 
   def ocurre_proximas_24hs?(turno)
     @gestor_turnos.ocurre_proximas_24hs?(turno)
+  end
+
+  def setear_hora_mock(hora)
+    fecha = @proveedor_dia.hoy.strftime('%Y-%m-%d')
+    fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
+    @proveedor_hora.setear_hora_mock(Time.parse("#{fecha_utc} #{hora_utc}"))
+  end
+
+  def cancelar_hora_mock
+    @proveedor_hora.cancelar_hora_mock
   end
 end
