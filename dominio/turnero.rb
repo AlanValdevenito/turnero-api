@@ -11,7 +11,7 @@ class Turnero
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora)
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
-    @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios)
+    @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
     @proveedor_hora = proveedor_hora
     @proveedor_dia = proveedor_dia
     @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_dia, proveedor_feriados, proveedor_hora, Penalizador.new(proveedor_hora, @gestor_usuarios))
