@@ -33,7 +33,6 @@ Escenario: US16.3 Paciente tiene turnos en estados no pendientes y puede reserva
     Cuando solicita un nuevo turno en "Dermatologia"
     Entonces el turno es creado exitosamente
 
-@wip
 Escenario: US16.4 Paciente cancela un turno y puede reservar uno nuevo
     Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos pendientes en la especialidad "Cardiologia"
     Y el limite de turnos en "Cardiologia" es de 2
