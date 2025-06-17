@@ -55,4 +55,8 @@ class ProveedorHora
   def setear_hora_mock(hora_mock)
     @hora_mock = hora_mock
   end
+
+  def cancelar_hora_mock
+    @hora_mock = nil
+  end
 end
