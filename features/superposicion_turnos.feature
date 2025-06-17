@@ -9,7 +9,7 @@ Característica: Superposición de turnos
     Y el médico "Jose Sanchez" con matrícula "XYZ123" de la especialidad "Cardiologia" dado de alta
     Y la especialidad "Oncologia" dada de alta cuya duracion de turnos es 1 minutos
     Y el médico "Martin Vista" con matrícula "DEF789" de la especialidad "Oncologia" dado de alta
-  @wip
+
   Escenario: US-15.1 Reserva de turno fallida por superposicion
     Dado que para la fecha '2025-06-13' y hora '08:30' reserve un turno con el médico con matrícula "ABC123"
     Cuando quiero reservar otro turno para la fecha '2025-06-13' y hora '08:30' con el médico con matrícula "XYZ123"
