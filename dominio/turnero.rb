@@ -1,6 +1,7 @@
 Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 require_relative '../dominio/gestores/gestor_usuarios'
 require_relative '../dominio/gestores/gestor_turnos'
+require_relative '../dominio/gestores/gestor_medicos'
 require_relative 'adaptador_zona_horaria'
 
 MEDICOS_DISPONIBLES = 7
@@ -12,6 +13,7 @@ class Turnero
     @repositorio_medicos = repositorio_medicos
     @repositorio_especialidades = repositorio_especialidades
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
+    @gestor_medicos = GestorMedicos.new(repositorio_medicos)
     @proveedor_fecha = proveedor_fecha
     @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_fecha, proveedor_feriados, Penalizador.new(proveedor_fecha, @gestor_usuarios))
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_fecha)
@@ -134,6 +136,10 @@ class Turnero
 
   def eliminar_usuario_por_email(email)
     @gestor_usuarios.eliminar_usuario_por_email(email)
+  end
+
+  def eliminar_medico_por_matricula(matricula)
+    @gestor_medicos.eliminar_medico_por_matricula(matricula)
   end
 end
 

@@ -148,4 +148,13 @@ describe Turnero do
       turnero.eliminar_usuario_por_email(email)
     end
   end
+
+  describe 'Eliminar médico' do
+    it 'deberia eliminar medico y sus turnos asociados dado su matricula' do
+      medico = instance_double('Medico', 'ABC123')
+      allow(repositorios[:medico]).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
+      expect(repositorios[:medico]).to receive(:delete).with(medico)
+      turnero.eliminar_medico_por_matricula('ABC123')
+    end
+  end
 end
