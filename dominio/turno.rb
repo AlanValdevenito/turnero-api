@@ -45,4 +45,8 @@ class Turno
   def proximas_24hs?(ahora)
     (@fecha_hora.to_time - ahora).abs < 24 * 60 * 60
   end
+
+  def se_superpone_con?(_otro_turno)
+    false
+  end
 end

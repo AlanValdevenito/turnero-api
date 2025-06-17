@@ -140,24 +140,8 @@ post '/turnos' do
     turno = turnero.crear_turno(params[:matricula], params[:fecha], params[:hora], params[:email])
     status 201
     json(turno_a_json(turno))
-  rescue UsuarioNoEncontradoException
-    status 404
-    json({ error: 'Usuario no encontrado' })
-  rescue MedicoNoEncontradoException
-    status 404
-    json({ error: 'Médico no encontrado' })
-  rescue FechaNoValidaException
-    status 400
-    json({ error: 'Fecha inválida para agendar un turno' })
-  rescue LimiteTurnosExcedidoException
-    status 422
-    json({ error: 'El usuario ha alcanzado el límite de turnos para esta especialidad' })
-  rescue TurnoYaExisteException
-    status 400
-    json({ error: 'Ya existe un turno para ese médico y fecha/hora' })
-  rescue PenalizacionPorReputacionException
-    status 400
-    json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' })
+  rescue StandardError => e
+    manejar_error_crear_turno(e)
   end
 end
 
@@ -189,6 +173,46 @@ put '/turnos/:id/cancelacion' do
   rescue TurnoNoPerteneceAUsuarioException
     status 403
     json({ mensaje: 'No puedes cancelar este turno' })
+  end
+end
+
+helpers do
+  def errores_not_found
+    {
+      UsuarioNoEncontradoException => -> { halt 404, json({ error: 'Usuario no encontrado' }) },
+      MedicoNoEncontradoException => -> { halt 404, json({ error: 'Médico no encontrado' }) }
+    }
+  end
+
+  def errores_bad_request
+    {
+      FechaNoValidaException => -> { halt 400, json({ error: 'Fecha inválida para agendar un turno' }) },
+      TurnoYaExisteException => -> { halt 400, json({ error: 'Ya existe un turno para ese médico y fecha/hora' }) },
+      PenalizacionPorReputacionException => -> { halt 400, json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' }) }
+    }
+  end
+
+  def errores_unprocessable_entity
+    {
+      LimiteTurnosExcedidoException => -> { halt 422, json({ error: 'El usuario ha alcanzado el límite de turnos para esta especialidad' }) }
+    }
+  end
+
+  def errores_conflict
+    {
+      SuperposicionDeTurnosException => -> { halt 409, json({ error: 'Ya existe un turno reservado en esa fecha y horario' }) }
+    }
+  end
+end
+
+helpers do
+  def errores_crear_turno
+    errores_not_found.merge(errores_bad_request).merge(errores_unprocessable_entity).merge(errores_conflict)
+  end
+
+  def manejar_error_crear_turno(error)
+    handler = errores_crear_turno[error.class]
+    handler ? handler.call : raise(error)
   end
 end
 

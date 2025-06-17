@@ -58,4 +58,14 @@ describe Turno do
     turno.cambiar_fecha_hora(DateTime.parse('2025-08-10T18:45:00'))
     expect_fecha_y_hora(turno, '2025-08-10', '18:45')
   end
+
+  describe 'Superposicion de turnos' do
+    it 'deberia devolver false si no existe superposicion de turnos' do
+      turno = described_class.new(Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5)), Usuario.new('usuario@prueba.com'), DateTime.parse('2025-06-05T10:00:00'))
+      otro_turno = described_class.new(Medico.new('Juan', 'Perez', 'ABC123', Especialidad.new('Traumatologia', 10, 5)), Usuario.new('usuario@prueba.com'), DateTime.parse('2025-06-05T10:15:00'))
+
+      superposicion = turno.se_superpone_con?(otro_turno)
+      expect(superposicion).to eq(false)
+    end
+  end
 end
