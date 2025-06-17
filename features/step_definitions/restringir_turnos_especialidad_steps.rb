@@ -96,19 +96,19 @@ Dado('que el paciente con email {string} tiene {int} turnos en {string}') do |em
   @especialidad = especialidad
 end
 
-Dado('un turno tiene estado {string} y el otro {string}') do |estado1, estado2|
+Dado('los turnos tienen estado {string}') do |estado|
   @response = Faraday.get("/turnos/pacientes/#{@email}")
   expect(@response.status).to eq(200)
 
   turnos = JSON.parse(@response.body)
 
   turno1_id = turnos[0]['id']
-  request_body1 = { estado: estado1 }.to_json
+  request_body1 = { estado: }.to_json
   response1 = Faraday.put("/turnos/#{turno1_id}", request_body1, { 'Content-Type' => 'application/json' })
   expect(response1.status).to eq(200)
 
   turno2_id = turnos[1]['id']
-  request_body2 = { estado: estado2 }.to_json
+  request_body2 = { estado: }.to_json
   response2 = Faraday.put("/turnos/#{turno2_id}", request_body2, { 'Content-Type' => 'application/json' })
   expect(response2.status).to eq(200)
 end

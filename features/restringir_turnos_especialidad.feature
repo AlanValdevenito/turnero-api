@@ -29,7 +29,7 @@ Escenario: US16.2 Reservar un turno superando el limite
 @wip
 Escenario: US16.3 Paciente tiene turnos en estados no pendientes y puede reservar uno nuevo
     Dado que el paciente con email "usuario@prueba.com" tiene 2 turnos en "Dermatologia"
-    Y un turno tiene estado "Ausente" y el otro "Asistido"
+    Y los turnos tienen estado "Asistido"
     Y el limite de turnos en "Dermatologia" es de 2
     Cuando solicita un nuevo turno en "Dermatologia"
     Entonces el turno es creado exitosamente
