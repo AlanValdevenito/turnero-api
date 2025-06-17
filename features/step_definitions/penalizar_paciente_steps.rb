@@ -160,3 +160,12 @@ Cuando('el estado del turno Pendiente se cambia a Ausente') do
   response = Faraday.put("turnos/#{turno.id}", body, { 'Content-Type' => 'application/json' })
   expect(response.status).to eq(200)
 end
+
+Dado('mockeo la hora actual a {string}') do |hora_str|
+  raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+
+  allow_any_instance_of(ProveedorHora).to receive(:ahora).and_call_original
+  body = { hora: hora_str }.to_json
+  response = Faraday.post('hora_mock', body, { 'Content-Type' => 'application/json' })
+  expect(response.status).to eq(200)
+end

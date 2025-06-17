@@ -51,6 +51,12 @@ Característica: Penalización temporal por bajo porcentaje de asistencia
     Entonces debe mostrarse un mensaje de penalización
     Y no puede reservar turnos por los próximos 3 minutos
 
+  @wip
+  Escenario: [TEST]: mock de horario funciona
+    Dado que el paciente fue penalizado por bajo porcentaje
+    Y mockeo la hora actual a "10:04"
+    Cuando intenta reservar un nuevo turno
+    Entonces puede hacerlo exitosamente
 
 
 
