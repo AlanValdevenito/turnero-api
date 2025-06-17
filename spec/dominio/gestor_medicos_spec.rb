@@ -6,12 +6,23 @@ require_relative '../../dominio/gestores/gestor_medicos'
 describe GestorMedicos do
   let(:repositorio_medicos) { instance_double('RepositorioMedicos') }
   let(:repositorio_turnos)  { instance_double('RepositorioTurnos') }
-  let(:gestor) { described_class.new(repositorio_medicos) }
-  let(:medico) { instance_double('Medico', matricula: 'ABC123') }
+  let(:gestor) { described_class.new(repositorio_medicos, repositorio_turnos) }
+  let(:medico) { instance_double('Medico', matricula: 'ABC123', id: 1) }
 
   it 'elimina el medico cuando existe' do
     allow(repositorio_medicos).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
+    allow(repositorio_turnos).to receive(:eliminar_por_medico).with(medico)
+
     expect(repositorio_medicos).to receive(:delete).with(medico)
+    gestor.eliminar_medico_por_matricula('ABC123')
+  end
+
+  it 'elimina los turnos del medico antes de eliminarlo' do
+    allow(repositorio_medicos).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
+
+    expect(repositorio_turnos).to receive(:eliminar_por_medico).with(medico).ordered
+    expect(repositorio_medicos).to receive(:delete).with(medico).ordered
+
     gestor.eliminar_medico_por_matricula('ABC123')
   end
 end
