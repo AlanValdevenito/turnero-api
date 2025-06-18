@@ -19,5 +19,9 @@ describe GestorEspecialidades do
       allow(repositorio_especialidades).to receive(:buscar_por_nombre).and_return(nil)
       expect { gestor_especialidades.modificar_especialidad_por_nombre('Pediatria', 'Pediatria General', 10) }.to raise_error(EspecialidadNoEncontradaException)
     end
+
+    it 'deberia devolver error si se intenta modificar una especialidad con un limite de turnos por usuario negativo' do
+      expect { gestor_especialidades.modificar_especialidad_por_nombre('Pediatria', 'Pediatria General', -5) }.to raise_error(LimiteDeTurnosNoPositivoException)
+    end
   end
 end
