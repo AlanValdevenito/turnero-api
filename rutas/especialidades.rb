@@ -13,3 +13,13 @@ get '/especialidades' do
   status 200
   json(respuesta)
 end
+
+put '/especialidades/:nombre' do
+  logger.debug("PUT /especialidades/:nombre: #{@params}")
+  nombre = params['nombre']
+  nuevo_nombre = @params[:nombre]
+  nuevo_limite = @params[:limite_turnos_por_usuario]
+  especialidad = turnero.modificar_especialidad(nombre, nuevo_nombre, nuevo_limite)
+  status 200
+  json({ id: especialidad.id, nombre: especialidad.nombre, duracion_de_turnos: especialidad.duracion_de_turnos, limite_turnos_por_usuario: especialidad.limite_turnos_por_usuario })
+end
