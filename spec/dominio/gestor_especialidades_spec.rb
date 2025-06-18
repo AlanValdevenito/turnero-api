@@ -59,5 +59,10 @@ describe GestorEspecialidades do
       allow(repositorios[:turnos]).to receive(:eliminar_por_medico)
       gestor_especialidades.eliminar_especialidad_por_nombre('Traumatologia')
     end
+
+    it 'deberia lanzar excepcion si no se encuentra especialidad' do
+      allow(repositorios[:especialidades]).to receive(:buscar_por_nombre).with('Inexistente').and_return(nil)
+      expect { gestor_especialidades.eliminar_especialidad_por_nombre('Inexistente') }.to raise_error(EspecialidadNoEncontradaException)
+    end
   end
 end

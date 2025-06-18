@@ -21,7 +21,7 @@ Característica: Baja de especialidades
     Y no hay turnos correspondientes a la especialidad
     Y la especialidad ya no esta dada de alta
     Y los medicos de la especialidad ya no estan dados de alta
-    @wip
+
     Escenario: US-21.3 Dar de baja una especialidad que no existe
     Cuando quiero dar de baja una especialidad inexistente
     Entonces se devuelve el error 404

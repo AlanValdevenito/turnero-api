@@ -24,6 +24,8 @@ class GestorEspecialidades
   def eliminar_especialidad_por_nombre(nombre)
     nombre_normalizado = normalizar_texto(nombre).capitalize
     especialidad = @repositorio_especialidades.buscar_por_nombre(nombre_normalizado)
+    raise EspecialidadNoEncontradaException if especialidad.nil?
+
     medicos = @repositorio_medicos.buscar_por_especialidad(especialidad)
     medicos.each do |medico|
       @repositorio_turnos.eliminar_por_medico(medico)
