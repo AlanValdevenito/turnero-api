@@ -145,6 +145,16 @@ describe Turnero do
 
       verificar_nombres_duplicados(%w[oftalmologia OFTALMOLOGIA Oftalmología])
     end
+
+    it 'el nombre se guarda normalizado capitalizado' do
+      especialidad = turnero.crear_especialidad('cardiologia', 30, 2)
+      expect(especialidad.nombre).to eq('Cardiologia')
+    end
+
+    it 'el nombre se guarda sin acentos y capitalizado' do
+      especialidad = turnero.crear_especialidad('cardiología', 30, 2)
+      expect(especialidad.nombre).to eq('Cardiologia')
+    end
   end
 
   it 'deberia devolver todas las especialidades' do
