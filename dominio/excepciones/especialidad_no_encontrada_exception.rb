@@ -1,0 +1,2 @@
+class EspecialidadNoEncontradaException < StandardError
+end

@@ -19,7 +19,12 @@ put '/especialidades/:nombre' do
   nombre = params['nombre']
   nuevo_nombre = @params[:nombre]
   nuevo_limite = @params[:limite_turnos_por_usuario]
-  especialidad = turnero.modificar_especialidad(nombre, nuevo_nombre, nuevo_limite)
-  status 200
-  json({ id: especialidad.id, nombre: especialidad.nombre, duracion_de_turnos: especialidad.duracion_de_turnos, limite_turnos_por_usuario: especialidad.limite_turnos_por_usuario })
+  begin
+    especialidad = turnero.modificar_especialidad(nombre, nuevo_nombre, nuevo_limite)
+    status 200
+    json({ id: especialidad.id, nombre: especialidad.nombre, duracion_de_turnos: especialidad.duracion_de_turnos, limite_turnos_por_usuario: especialidad.limite_turnos_por_usuario })
+  rescue EspecialidadNoEncontradaException
+    status 404
+    json({ error: 'Especialidad no encontrada' })
+  end
 end

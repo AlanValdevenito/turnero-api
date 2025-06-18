@@ -14,7 +14,7 @@ Característica: Modificación de una especialidad
     Y la duracion por cada turno es 30 minutos
   @wip
   Escenario: US-24.2 Modificacion invalida por nombre inexistente
-    Dado que actualizo la especialidad "Pediatría" con un nuevo nombre "Pediatría General" y con un nuevo limite de 5 turnos por usuarios
+    Dado que actualizo la especialidad "Pediatria" con un nuevo nombre "Pediatria General" y con un nuevo limite de 5 turnos por usuarios
     Entonces la respuesta es 404
     Y se muestra el mensaje de error "Especialidad no encontrada"
   @wip
