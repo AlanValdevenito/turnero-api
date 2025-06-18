@@ -70,7 +70,10 @@ class Turnero
   end
 
   def crear_medico(nombre, apellido, matricula, especialidad_nombre)
-    medico_existente = @repositorio_medicos.buscar_por_matricula(matricula)
+    medico_existente = @repositorio_medicos.all.find do |med|
+      normalizar_texto(med.matricula) == normalizar_texto(matricula)
+    end
+
     raise MatriculaDuplicadaException if medico_existente
 
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)

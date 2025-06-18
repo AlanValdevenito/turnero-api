@@ -19,12 +19,12 @@ describe Turnero do
     {
       usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
       medico: instance_double('repositorios_medicos',
-                              save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5)),
-                              all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
-                              buscar_por_matricula: nil,  # Cambiar aquí: por defecto no encuentra médico
-                              buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10, 5))]),
+                              save: ->(medico) { medico },
+                              all: [],
+                              buscar_por_matricula: nil,
+                              buscar_por_especialidad: []),
       especialidad: instance_double('RepositorioEspecialidades',
-                                    save: Especialidad.new('Traumatologia', 10, 5),
+                                    save: ->(especialidad) { especialidad },
                                     all: [Especialidad.new('Traumatologia', 10, 5)],
                                     buscar_por_nombre: Especialidad.new('Traumatologia', 10, 5)),
       turnos: instance_double('RepositorioTurnos')
@@ -51,21 +51,45 @@ describe Turnero do
         .with(medico.matricula).and_return(medico)
     end
 
+    def verificar_matriculas_duplicadas(matriculas)
+      matriculas.each do |matricula_variacion|
+        expect do
+          turnero.crear_medico('Carlos', 'Perez', matricula_variacion, 'Traumatologia')
+        end.to raise_error(MatriculaDuplicadaException)
+      end
+    end
+
     it 'deberia crear un medico' do
       medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
       expect(medico.nombre).to eq('Michael')
     end
 
+    it 'deberia crear un medico con especialidad' do
+      medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
+      expect(medico.especialidad.nombre).to eq('Traumatologia')
+    end
+
     it 'la matricula debe ser unica' do
       medico1 = turnero.crear_medico('Michael', 'Jordan', 'ABC123', 'Traumatologia')
-      configurar_medico_existente(medico1)
+
+      allow(repositorios[:medico]).to receive(:all).and_return([medico1])
 
       expect { turnero.crear_medico('Carlos', 'Perez', 'ABC123', 'Traumatologia') }
         .to raise_error(MatriculaDuplicadaException)
     end
+
+    it 'la matricula debe ser unica sin importar mayusculas o acentos' do
+      medico1 = turnero.crear_medico('Michael', 'Jordan', 'abc123', 'Traumatologia')
+      allow(repositorios[:medico]).to receive(:all).and_return([medico1])
+
+      verificar_matriculas_duplicadas(%w[ABC123 ábc123 ÁBC123])
+    end
   end
 
   it 'deberia devolver todos los medicos' do
+    allow(repositorios[:medico]).to receive(:all)
+      .and_return([Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10, 5))])
+
     medicos = turnero.medicos
     expect(medicos.first.nombre).to eq('Michael')
   end
@@ -118,16 +142,18 @@ describe Turnero do
     expect(especialidades.first.nombre).to eq('Traumatologia')
   end
 
-  it 'deberia crear un medico con especialidad' do
-    medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
-    expect(medico.especialidad.nombre).to eq('Traumatologia')
+  def configurar_medicos_mock
+    allow(repositorios[:medico]).to receive(:all)
+      .and_return([Medico.new('Michael', 'Jordan', '1', Especialidad.new('Traumatologia', 10, 5))])
   end
 
   it 'deberia devolver los medicos disponibles' do
+    configurar_medicos_mock
     medicos_disponibles = turnero.medicos_disponibles
+
     expect(medicos_disponibles.size).to be <= 7
     expect(medicos_disponibles.first.apellido).to eq('Jordan')
-    expect(medicos_disponibles.first.matricula).to eq(1)
+    expect(medicos_disponibles.first.matricula).to eq('1')
   end
 
   it 'deberia devolver error si el usuario no existe' do
@@ -143,6 +169,11 @@ describe Turnero do
   end
 
   describe 'Reserva de turno por especialidad ' do
+    before(:each) do
+      allow(repositorios[:medico]).to receive(:buscar_por_especialidad)
+        .and_return([Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10, 5))])
+    end
+
     it 'deberia devolver los medicos disponibles de una especialidad' do
       traumatologos_disponibles = turnero.medicos_disponibles_especialidad('Traumatologia')
       expect(traumatologos_disponibles.first.matricula).to eq('XYZ123')
