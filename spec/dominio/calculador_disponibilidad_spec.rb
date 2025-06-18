@@ -7,6 +7,11 @@ describe 'CalculadorDeDisponibilidad' do
   before(:each) do
     stub_const('CANTIDAD_TURNOS', 3)
     allow(calculador.proveedor_fecha).to receive(:hoy).and_return(Date.parse('2025-06-11'))
+    allow(calculador.proveedor_fecha).to receive(:ahora).and_return(Time.utc(2025, 6, 11, 10, 0))
+  end
+
+  def turnos_esperados_sin_adaptar_a_la_zona_horaria
+    [Time.utc(2025, 6, 11, 20, 50).to_datetime, Time.utc(2025, 6, 12, 11, 0).to_datetime, Time.utc(2025, 6, 12, 11, 10).to_datetime]
   end
 
   describe '.turnos_para_dia' do
@@ -73,6 +78,27 @@ describe 'CalculadorDeDisponibilidad' do
       cantidad = 3
       turnos = calculador.turnos_disponibles(duracion, [], cantidad, feriado, feriado + 1)
       expect(turnos).to be_empty
+    end
+
+    it 'deberia devolver turnos disponibles con una ventana de 4 horas a partir de la hora actual' do
+      stub_feriados_api
+
+      hoy = Date.parse('2025-06-11')
+      ventana_minima = Time.utc(2025, 6, 11, 14, 0)
+
+      turnos = calculador.turnos_para_dia(hoy, 30, Set.new)
+
+      expect(turnos).to all(be >= ventana_minima.to_datetime)
+    end
+
+    it 'deberia devolver el turno de 17:50 y del día siguiente 08:00 y 08:10' do
+      allow(calculador.proveedor_fecha).to receive(:ahora).and_return(Time.utc(2025, 6, 11, 16, 42))
+      allow(calculador.proveedor_fecha).to receive(:hoy).and_return(Time.utc(2025, 6, 11, 16, 42).to_date)
+      stub_feriados_api
+
+      turnos_disponibles_sin_adaptar_a_la_zona_horaria = calculador.turnos_disponibles(10, [], 3, Date.parse('2025-06-11'), Date.parse('2025-06-15'))
+
+      expect(turnos_disponibles_sin_adaptar_a_la_zona_horaria).to eq(turnos_esperados_sin_adaptar_a_la_zona_horaria)
     end
   end
 end

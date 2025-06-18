@@ -1,6 +1,8 @@
 class CalculadorDeDisponibilidad
   attr_reader :proveedor_fecha
 
+  CUATRO_HORAS = (4 * 60 * 60)
+
   def initialize(proveedor_fecha, proveedor_feriados)
     @proveedor_fecha = proveedor_fecha
     @proveedor_feriados = proveedor_feriados
@@ -39,18 +41,32 @@ class CalculadorDeDisponibilidad
     inicio_jornada, fin_jornada = jornada_laboral(fecha)
     hora_actual = hora_inicio(fecha, inicio_jornada, duracion)
     ultimo_turno = fin_jornada - duracion * 60
+    ventana = calcular_ventana_minima
 
+    generar_turnos(hora_actual, ultimo_turno, duracion, tiempos_ocupados, ventana)
+  end
+
+  def calcular_ventana_minima
+    @proveedor_fecha.ahora + CUATRO_HORAS
+  end
+
+  def generar_turnos(hora_actual, ultimo_turno, duracion, tiempos_ocupados, ventana)
     turnos = []
+
     while hora_actual <= ultimo_turno
       turno_time = hora_actual # ya está en UTC
       turno_unix = turno_time.to_i
 
-      turnos << turno_time.to_datetime unless tiempos_ocupados.include?(turno_unix)
+      turnos << turno_time.to_datetime if turno_valido?(turno_time, turno_unix, ventana, tiempos_ocupados)
 
       hora_actual += duracion * 60
     end
 
     turnos
+  end
+
+  def turno_valido?(turno_time, turno_unix, ventana, tiempos_ocupados)
+    turno_time >= ventana && !tiempos_ocupados.include?(turno_unix)
   end
 
   def es_feriado?(fecha, feriados)
