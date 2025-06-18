@@ -1,7 +1,5 @@
 Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
-require_relative '../dominio/gestores/gestor_usuarios'
-require_relative '../dominio/gestores/gestor_turnos'
-require_relative '../dominio/gestores/gestor_medicos'
+Dir[File.join(__dir__, '../dominio/gestores', '*.rb')].each { |file| require file }
 require_relative 'adaptador_zona_horaria'
 # rubocop:disable Metrics/ClassLength
 
@@ -14,6 +12,7 @@ class Turnero
     @repositorio_especialidades = repositorio_especialidades
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
     @gestor_medicos = GestorMedicos.new(repositorio_medicos, repositorio_turnos)
+    @gestor_especialidades = GestorEspecialidades.new(repositorio_especialidades)
     @proveedor_fecha = proveedor_fecha
     @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_fecha, proveedor_feriados, Penalizador.new(proveedor_fecha, @gestor_usuarios))
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_fecha)
@@ -136,6 +135,10 @@ class Turnero
 
   def eliminar_medico_por_matricula(matricula)
     @gestor_medicos.eliminar_medico_por_matricula(matricula)
+  end
+
+  def modificar_especialidad(nombre, nuevo_nombre, nuevo_limite)
+    @gestor_especialidades.modificar_especialidad_por_nombre(nombre, nuevo_nombre, nuevo_limite)
   end
 end
 # rubocop:enable Metrics/ClassLength

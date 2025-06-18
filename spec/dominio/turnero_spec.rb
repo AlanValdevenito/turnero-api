@@ -159,4 +159,16 @@ describe Turnero do
       turnero.eliminar_medico_por_matricula('ABC123')
     end
   end
+
+  describe 'Modificar especialidad' do
+    it 'deberia modificar el nombre y el limite de turnos por usuario de una especialidad' do
+      allow(repositorios[:especialidad]).to receive(:save).and_return(Especialidad.new('Traumatologia General', 30, 5))
+      allow(repositorios[:especialidad]).to receive(:buscar_por_nombre).and_return(Especialidad.new('Traumatologia', 30, 3))
+
+      especialidad_modificada = turnero.modificar_especialidad('Traumatologia', 'Traumatologia General', 5)
+
+      expect(especialidad_modificada.nombre).to eq('Traumatologia General')
+      expect(especialidad_modificada.limite_turnos_por_usuario).to eq(5)
+    end
+  end
 end
