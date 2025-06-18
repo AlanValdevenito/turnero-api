@@ -11,7 +11,7 @@ get '/usuarios/:email' do
   logger.debug("GET /usuarios/:email: #{params}")
   email = params[:email]
   begin
-    usuario = turnero.buscar_usuario_por_email(email)
+    usuario = turnero.gestor_usuarios.buscar_usuario_por_email(email)
     status 200
     json({ id: usuario.id, email: usuario.email })
   rescue UsuarioNoEncontradoException

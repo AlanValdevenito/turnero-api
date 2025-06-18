@@ -1,11 +1,12 @@
 Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, '../dominio/gestores', '*.rb')].each { |file| require file }
 require_relative 'adaptador_zona_horaria'
-# rubocop:disable Metrics/ClassLength
 
 MEDICOS_DISPONIBLES = 7
 TURNOS_DISPONIBLES = 3
 class Turnero
+  attr_reader :gestor_usuarios, :gestor_medicos, :gestor_especialidades, :gestor_turnos
+
   # rubocop:disable Metrics/ParameterLists
   def initialize(repositorio_usuarios, repositorio_medicos, repositorio_especialidades, repositorio_turnos, proveedor_fecha, proveedor_feriados)
     @repositorio_medicos = repositorio_medicos
@@ -31,10 +32,6 @@ class Turnero
     @gestor_usuarios.usuarios
   end
 
-  def buscar_usuario_por_email(email)
-    @gestor_usuarios.buscar_usuario_por_email(email)
-  end
-
   def medicos
     @repositorio_medicos.all
   end
@@ -44,7 +41,7 @@ class Turnero
   end
 
   def turnos_paciente(email)
-    usuario = buscar_usuario_por_email(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     turnos = @gestor_turnos.turnos_paciente(usuario)
     @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
@@ -57,7 +54,7 @@ class Turnero
 
   def crear_turno(matricula, fecha, hora, email)
     medico = @gestor_medicos.buscar_medico_por_matricula(matricula)
-    usuario = buscar_usuario_por_email(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
     turno = @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
     @adaptador_zona_horaria.adaptar_zona_horaria(turno)
@@ -93,13 +90,13 @@ class Turnero
   end
 
   def proximos_turnos_paciente(email)
-    usuario = buscar_usuario_por_email(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     turnos = @gestor_turnos.proximos_turnos_paciente(usuario)
     @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def historial_turnos_paciente(email)
-    usuario = buscar_usuario_por_email(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     turnos = @gestor_turnos.historial_turnos_paciente(usuario)
     @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
@@ -134,4 +131,3 @@ class Turnero
     @gestor_especialidades.modificar_especialidad_por_nombre(nombre, nuevo_nombre, nuevo_limite)
   end
 end
-# rubocop:enable Metrics/ClassLength
