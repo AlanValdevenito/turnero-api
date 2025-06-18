@@ -22,7 +22,7 @@ Característica: Modificación de una especialidad
     Dado que actualizo la especialidad "Traumatologia" con un nuevo nombre "Traumatologia General" y con un nuevo limite de -3 turnos por usuarios
     Entonces la respuesta es 400
     Y se muestra el mensaje de error "El limite de turnos por usuario debe ser un entero positivo"
-  @wip
+
   Escenario: US-24.4 Modificacion invalida por limite no entero
     Dado que actualizo la especialidad "Traumatologia" con un nuevo nombre "Traumatologia General" y con un nuevo limite de "ABC" turnos por usuarios
     Entonces la respuesta es 400
