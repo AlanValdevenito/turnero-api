@@ -17,7 +17,7 @@ Característica: Modificación de una especialidad
     Dado que actualizo la especialidad "Pediatria" con un nuevo nombre "Pediatria General" y con un nuevo limite de 5 turnos por usuarios
     Entonces la respuesta es 404
     Y se muestra el mensaje de error "Especialidad no encontrada"
-  @wip
+
   Escenario: US-24.3 Modificacion invalida por limite negativo
     Dado que actualizo la especialidad "Traumatologia" con un nuevo nombre "Traumatologia General" y con un nuevo limite de -3 turnos por usuarios
     Entonces la respuesta es 400
