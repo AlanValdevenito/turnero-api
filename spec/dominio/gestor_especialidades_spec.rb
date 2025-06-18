@@ -23,5 +23,9 @@ describe GestorEspecialidades do
     it 'deberia devolver error si se intenta modificar una especialidad con un limite de turnos por usuario negativo' do
       expect { gestor_especialidades.modificar_especialidad_por_nombre('Pediatria', 'Pediatria General', -5) }.to raise_error(LimiteDeTurnosNoPositivoException)
     end
+
+    it 'deberia devolver error si se intenta modificar una especialidad con un limite de turnos por usuario no entero' do
+      expect { gestor_especialidades.modificar_especialidad_por_nombre('Pediatria', 'Pediatria General', '5') }.to raise_error(LimiteDeTurnosNoEnteroException)
+    end
   end
 end

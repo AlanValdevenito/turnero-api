@@ -27,3 +27,8 @@ Entonces('la duracion por cada turno es {int} minutos') do |duracion_actualizada
   especialidad = JSON.parse(@response.body)
   expect(especialidad['duracion_de_turnos']).to eq(duracion_actualizada)
 end
+
+Dado('que actualizo la especialidad {string} con un nuevo nombre {string} y con un nuevo limite de {string} turnos por usuarios') do |especialidad, nueva_especialidad, nuevo_limite|
+  request_body = { nombre: nueva_especialidad, limite_turnos_por_usuario: nuevo_limite }
+  @response = api_put("/especialidades/#{especialidad}", request_body.to_json)
+end
