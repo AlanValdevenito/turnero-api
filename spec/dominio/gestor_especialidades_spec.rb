@@ -8,7 +8,6 @@ describe GestorEspecialidades do
 
   let(:especialidad) { instance_double('Especialidad', nombre: 'Traumatologia', id: 1) }
 
-
   describe 'Modificar especialidad' do
     it 'deberia modificar el nombre y el limite de turnos por usuario de una especialidad' do
       allow(repositorio_especialidades).to receive(:buscar_por_nombre).and_return(Especialidad.new('Traumatologia', 30, 3))
