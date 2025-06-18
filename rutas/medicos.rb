@@ -5,6 +5,9 @@ post '/medicos' do
   medico = turnero.crear_medico(@params[:nombre], @params[:apellido], @params[:matricula], @params[:especialidad])
   status 200
   { message: 'El médico fue dado de alta correctamente.', id: medico.id }.to_json
+rescue MatriculaDuplicadaException
+  status 409
+  { error: 'La matricula corresponde a un medico existente' }.to_json
 end
 
 get '/medicos' do
