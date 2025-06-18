@@ -5,7 +5,7 @@ Característica: Modificación de una especialidad
     Dado existe el paciente con email "usuario@prueba.com"
     Y existe la especialidad con nombre "Traumatologia", con límite de 3 turnos por usuario y con duracion por cada turno de 30 minutos
     Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Traumatologia" dado de alta
-  @wip
+
   Escenario: US-24.1 Modificación exitosa una especialidad
     Dado que actualizo la especialidad "Traumatologia" con un nuevo nombre "Traumatologia General" y con un nuevo limite de 5 turnos por usuarios
     Entonces la respuesta es 200
