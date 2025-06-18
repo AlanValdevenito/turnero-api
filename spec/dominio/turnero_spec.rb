@@ -84,6 +84,16 @@ describe Turnero do
 
       verificar_matriculas_duplicadas(%w[ABC123 ábc123 ÁBC123])
     end
+
+    it 'la matricula se guarda normalizada en mayusculas' do
+      medico = turnero.crear_medico('Michael', 'Jordan', 'abc123', 'Traumatologia')
+      expect(medico.matricula).to eq('ABC123')
+    end
+
+    it 'la matricula se guarda sin acentos y en mayusculas' do
+      medico = turnero.crear_medico('Carlos', 'Pérez', 'ábc123', 'Traumatologia')
+      expect(medico.matricula).to eq('ABC123')
+    end
   end
 
   it 'deberia devolver todos los medicos' do
