@@ -4,6 +4,8 @@ class GestorEspecialidades
   end
 
   def modificar_especialidad_por_nombre(nombre, nuevo_nombre, nuevo_limite)
+    raise LimiteDeTurnosNoPositivoException unless nuevo_limite > 0
+
     especialidad = @repositorio_especialidades.buscar_por_nombre(nombre)
     raise EspecialidadNoEncontradaException if especialidad.nil?
 

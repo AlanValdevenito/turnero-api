@@ -26,5 +26,8 @@ put '/especialidades/:nombre' do
   rescue EspecialidadNoEncontradaException
     status 404
     json({ error: 'Especialidad no encontrada' })
+  rescue LimiteDeTurnosNoPositivoException
+    status 400
+    json({ error: 'El limite de turnos por usuario debe ser un entero positivo' })
   end
 end
