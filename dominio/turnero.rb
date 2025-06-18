@@ -13,7 +13,7 @@ class Turnero
     @repositorio_especialidades = repositorio_especialidades
     @gestor_usuarios = GestorUsuarios.new(repositorio_usuarios, repositorio_turnos)
     @gestor_medicos = GestorMedicos.new(repositorio_medicos, repositorio_turnos)
-    @gestor_especialidades = GestorEspecialidades.new(repositorio_especialidades)
+    @gestor_especialidades = GestorEspecialidades.new(repositorio_especialidades, repositorio_medicos, repositorio_turnos)
     @proveedor_fecha = proveedor_fecha
     @gestor_turnos = GestorTurnos.new(repositorio_turnos, proveedor_fecha, proveedor_feriados, Penalizador.new(proveedor_fecha, @gestor_usuarios))
     @adaptador_zona_horaria = AdaptadorZonaHoraria.new(proveedor_fecha)
