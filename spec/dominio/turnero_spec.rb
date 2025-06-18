@@ -18,11 +18,15 @@ describe Turnero do
   let(:repositorios) do
     {
       usuario: instance_double('RepositorioUsuarios', buscar_por_email: Usuario.new('Juan@mail.com')),
-      medico: instance_double('repositorios_medicos', save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5)), all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
-                                                      buscar_por_matricula: [Medico.new('Medico1', 'Apellido1', 'ABC123', Especialidad.new('Traumatologia', 10, 5))],
-                                                      buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10, 5))]),
-      especialidad: instance_double('RepositorioEspecialidades', save: Especialidad.new('Traumatologia', 10, 5), all: [Especialidad.new('Traumatologia', 10, 5)],
-                                                                 buscar_por_nombre: Especialidad.new('Traumatologia', 10, 5)),
+      medico: instance_double('repositorios_medicos',
+                              save: Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5)),
+                              all: [Medico.new('Michael', 'Jordan', 1, 'Traumatologia')],
+                              buscar_por_matricula: nil,  # Cambiar aquí: por defecto no encuentra médico
+                              buscar_por_especialidad: [Medico.new('Medico2', 'Apellido2', 'XYZ123', Especialidad.new('Traumatologia', 10, 5))]),
+      especialidad: instance_double('RepositorioEspecialidades',
+                                    save: Especialidad.new('Traumatologia', 10, 5),
+                                    all: [Especialidad.new('Traumatologia', 10, 5)],
+                                    buscar_por_nombre: Especialidad.new('Traumatologia', 10, 5)),
       turnos: instance_double('RepositorioTurnos')
     }
   end
@@ -34,9 +38,31 @@ describe Turnero do
     }
   end
 
-  it 'deberia crear un medico' do
-    medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
-    expect(medico.nombre).to eq('Michael')
+  describe 'crear un medico' do
+    before(:each) do
+      allow(repositorios[:medico]).to receive(:buscar_por_matricula).and_return(nil)
+      allow(repositorios[:medico]).to receive(:save) do |medico|
+        medico
+      end
+    end
+
+    def configurar_medico_existente(medico)
+      allow(repositorios[:medico]).to receive(:buscar_por_matricula)
+        .with(medico.matricula).and_return(medico)
+    end
+
+    it 'deberia crear un medico' do
+      medico = turnero.crear_medico('Michael', 'Jordan', 1, 'Traumatologia')
+      expect(medico.nombre).to eq('Michael')
+    end
+
+    it 'la matricula debe ser unica' do
+      medico1 = turnero.crear_medico('Michael', 'Jordan', 'ABC123', 'Traumatologia')
+      configurar_medico_existente(medico1)
+
+      expect { turnero.crear_medico('Carlos', 'Perez', 'ABC123', 'Traumatologia') }
+        .to raise_error(MatriculaDuplicadaException)
+    end
   end
 
   it 'deberia devolver todos los medicos' do
