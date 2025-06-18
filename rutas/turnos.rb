@@ -187,8 +187,7 @@ helpers do
   def errores_bad_request
     {
       FechaNoValidaException => -> { halt 400, json({ error: 'Fecha inválida para agendar un turno' }) },
-      TurnoYaExisteException => -> { halt 400, json({ error: 'Ya existe un turno para ese médico y fecha/hora' }) },
-      PenalizacionPorReputacionException => -> { halt 400, json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' }) }
+      TurnoYaExisteException => -> { halt 400, json({ error: 'Ya existe un turno para ese médico y fecha/hora' }) }
     }
   end
 

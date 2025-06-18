@@ -43,6 +43,11 @@ class Turnero
     @repositorio_especialidades.all
   end
 
+  def penalizar_si_corresponde(email)
+    usuario = @gestor_usuarios.buscar_usuario_por_email(email)
+    @gestor_turnos.penalizar_si_corresponde(usuario)
+  end
+
   def turnos_paciente(email)
     usuario = @gestor_usuarios.buscar_usuario_por_email(email)
     turnos = @gestor_turnos.turnos_paciente(usuario)

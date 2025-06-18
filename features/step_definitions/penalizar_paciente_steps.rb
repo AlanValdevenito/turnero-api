@@ -57,17 +57,7 @@ Dado(/^que el paciente tuvo (\d+) turnos: (.+)$/) do |_total, lista|
 end
 
 Cuando('intenta reservar un nuevo turno') do
-  @dias_para_nuevo_turno ||= 100
-  fecha_turno = @fecha_actual + @dias_para_nuevo_turno
-  @dias_para_nuevo_turno += 1
-
-  turno_hash = {
-    matricula: 'ABC123',
-    fecha: fecha_turno.strftime('%Y-%m-%d'),
-    hora: '10:00',
-    email: @paciente_email
-  }
-  @response = api_post('/turnos', turno_hash.to_json)
+  @response = api_get("/usuarios/#{@paciente_email}/penalizacion")
 
   # Si la respuesta es penalización, guardamos y mockeamos la hora de penalización
   if @response.status == 400
@@ -77,9 +67,9 @@ Cuando('intenta reservar un nuevo turno') do
 end
 
 Entonces('puede hacerlo exitosamente') do
-  expect(@response.status).to eq(201)
+  expect(@response.status).to eq(200)
   body = JSON.parse(@response.body)
-  expect(body['message']).to eq('El turno se reservó exitosamente')
+  expect(body['message']).to eq('El usuario no es penalizado')
 end
 
 Entonces('debe mostrarse un mensaje de penalización') do
@@ -94,17 +84,7 @@ Entonces('no puede reservar turnos por los próximos {int} minutos') do |minutos
   hora_mock = @hora_de_penalizacion + (minutos * 60) - 1 # justo antes de que termine la penalización
   allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(hora_mock)
 
-  @dias_para_nuevo_turno ||= 100
-  fecha_turno = @fecha_actual + @dias_para_nuevo_turno
-  @dias_para_nuevo_turno += 1
-
-  turno_hash = {
-    matricula: 'ABC123',
-    fecha: fecha_turno.strftime('%Y-%m-%d'),
-    hora: '12:00',
-    email: @paciente_email
-  }
-  response = api_post('/turnos', turno_hash.to_json)
+  response = api_get("/usuarios/#{@paciente_email}/penalizacion")
 
   expect(response.status).to eq(400)
   body = JSON.parse(response.body)

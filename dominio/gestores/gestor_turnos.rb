@@ -19,10 +19,12 @@ class GestorTurnos
 
   def turnos_medico(medico) = turnos_recientes(@repositorio_turnos.buscar_por_medico(medico))
 
+  def penalizar_si_corresponde(usuario)
+    @penalizador.penalizar_si_corresponde(usuario, @calculador_reputacion.calcular_reputacion(usuario))
+  end
+
   def crear_turno(medico, usuario, fecha, hora)
     raise FechaNoValidaException unless es_fecha_valida?(fecha)
-
-    @penalizador.penalizar_si_corresponde(usuario, @calculador_reputacion.calcular_reputacion(usuario))
 
     turno = Turno.crear(medico, usuario, fecha, hora)
 

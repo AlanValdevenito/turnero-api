@@ -33,6 +33,22 @@ get '/usuarios/telegram/:telegram_id' do
   end
 end
 
+get '/usuarios/:email/penalizacion' do
+  logger.debug("GET /usuarios/:email/penalizacion: #{params}")
+  email = params[:email]
+  begin
+    turnero.penalizar_si_corresponde(email)
+    status 200
+    json({ message: 'El usuario no es penalizado' })
+  rescue PenalizacionPorReputacionException
+    status 400
+    json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' })
+  rescue UsuarioNoEncontradoException
+    status 404
+    json({ error: 'Usuario no encontrado' })
+  end
+end
+
 post '/usuarios' do
   logger.debug("POST /usuarios: #{@params}")
   begin
