@@ -66,19 +66,6 @@ describe Turnero do
     expect(medicos_disponibles.first.matricula).to eq(1)
   end
 
-  it 'deberia buscar un medico por matricula' do
-    medico = Medico.new('Michael', 'Jordan', 1, Especialidad.new('Traumatologia', 10, 5))
-    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(1).and_return(medico)
-    encontrado = turnero.buscar_medico_por_matricula(1)
-    expect(encontrado).to eq(medico)
-  end
-
-  it 'deberia devolver error si el médico no existe' do
-    allow(repositorios[:medico]).to receive(:buscar_por_matricula).with(999).and_return(nil)
-
-    expect { turnero.disponibilidad_de_medico(999) }.to raise_error(MedicoNoEncontradoException)
-  end
-
   it 'deberia devolver error si el usuario no existe' do
     allow(repositorios[:usuario]).to receive(:buscar_por_email).with(email).and_return(nil)
 

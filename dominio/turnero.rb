@@ -50,13 +50,13 @@ class Turnero
   end
 
   def turnos_medico(matricula)
-    medico = buscar_medico_por_matricula(matricula)
+    medico = @gestor_medicos.buscar_medico_por_matricula(matricula)
     turnos = @gestor_turnos.turnos_medico(medico)
     @adaptador_zona_horaria.adaptar_zona_horaria_turnos(turnos)
   end
 
   def crear_turno(matricula, fecha, hora, email)
-    medico = buscar_medico_por_matricula(matricula)
+    medico = @gestor_medicos.buscar_medico_por_matricula(matricula)
     usuario = buscar_usuario_por_email(email)
     fecha_utc, hora_utc = @adaptador_zona_horaria.parsear_a_utc(fecha, hora)
     turno = @gestor_turnos.crear_turno(medico, usuario, fecha_utc, hora_utc)
@@ -86,15 +86,8 @@ class Turnero
     medicos
   end
 
-  def buscar_medico_por_matricula(matricula)
-    medico = @repositorio_medicos.buscar_por_matricula(matricula)
-    raise MedicoNoEncontradoException unless medico
-
-    medico
-  end
-
   def disponibilidad_de_medico(matricula)
-    medico = buscar_medico_por_matricula(matricula)
+    medico = @gestor_medicos.buscar_medico_por_matricula(matricula)
     horarios = @gestor_turnos.disponibilidad_de_medico(medico)
     @adaptador_zona_horaria.adaptar_zona_horarios(horarios)
   end
