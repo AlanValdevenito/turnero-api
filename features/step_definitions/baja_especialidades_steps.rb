@@ -1,7 +1,6 @@
 Dado('que la especialidad tiene {int} medicos') do |_cantidad_medicos|
 end
 
-
 Dado('el otro médico {string} con matrícula {string} de la especialidad {string} dado de alta') do |medico, matricula, especialidad|
   nombre, apellido = medico.split
   @matricula2 = matricula
