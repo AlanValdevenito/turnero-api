@@ -18,6 +18,7 @@ Entonces('se muestra el mensaje de exitoo {string}') do |mensaje|
 end
 
 Entonces('no hay turnos correspondientes al paciente') do
+  expect(RepositorioTurnos.new.all).to be_empty
   expect(RepositorioUsuarios.new.buscar_por_email(@email)).to be_nil
 end
 

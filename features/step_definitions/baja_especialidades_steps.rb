@@ -24,6 +24,7 @@ Cuando('quiero dar de baja la especialidad') do
 end
 
 Entonces('no hay turnos correspondientes a la especialidad') do
+  expect(RepositorioTurnos.new.all).to be_empty
   expect(RepositorioEspecialidades.new.buscar_por_nombre(@matricula)).to be_nil
 end
 

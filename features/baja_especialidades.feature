@@ -13,7 +13,7 @@ Característica: Baja de especialidades
     Entonces se muestra el mensaje de exitoo "Especialidad eliminada con sus medicos y turnos correspondientes"
     Y no hay turnos correspondientes a la especialidad
     Y la especialidad ya no esta dada de alta
-    @wip
+
     Escenario: US-21.2 Dar de baja una especialidad con medicos
     Dado que la especialidad tiene dos medicos
     Cuando quiero dar de baja la especialidad

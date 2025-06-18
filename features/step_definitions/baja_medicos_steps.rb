@@ -14,6 +14,7 @@ Cuando('quiero dar de baja al medico') do
 end
 
 Entonces('no hay turnos correspondientes al medico') do
+  expect(RepositorioTurnos.new.all).to be_empty
   expect(RepositorioMedicos.new.buscar_por_matricula(@matricula)).to be_nil
 end
 
