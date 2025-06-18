@@ -93,7 +93,9 @@ class Turnero
 
     raise EspecialidadDuplicadaException if especialidad_existente
 
-    especialidad = Especialidad.new(nombre, duracion_de_turnos, limite_turnos_por_usuario)
+    nombre_normalizado = normalizar_texto(nombre).capitalize
+
+    especialidad = Especialidad.new(nombre_normalizado, duracion_de_turnos, limite_turnos_por_usuario)
     @repositorio_especialidades.save(especialidad)
   end
 
