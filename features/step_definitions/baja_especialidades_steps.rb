@@ -39,3 +39,7 @@ Entonces('los medicos de la especialidad ya no estan dados de alta') do
   medico2 = RepositorioMedicos.new.buscar_por_matricula(@Matricula2)
   expect(medico2).to be_nil
 end
+
+Cuando('quiero dar de baja una especialidad inexistente') do
+  @response = api_delete('/especialidades/especialidadInexistente')
+end

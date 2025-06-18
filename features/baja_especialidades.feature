@@ -24,4 +24,4 @@ Característica: Baja de especialidades
     @wip
     Escenario: US-21.3 Dar de baja una especialidad que no existe
     Cuando quiero dar de baja una especialidad inexistente
-    Entonces se muestra devuelve el error 404
+    Entonces se devuelve el error 404
