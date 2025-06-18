@@ -79,6 +79,8 @@ class Turnero
     matricula_normalizada = normalizar_texto(matricula).upcase
 
     especialidad = @repositorio_especialidades.buscar_por_nombre(especialidad_nombre)
+    raise EspecialidadNoEncontradaException unless especialidad
+
     medico = Medico.new(nombre, apellido, matricula_normalizada, especialidad)
     @repositorio_medicos.save(medico)
   end
@@ -91,7 +93,9 @@ class Turnero
 
     raise EspecialidadDuplicadaException if especialidad_existente
 
-    especialidad = Especialidad.new(nombre, duracion_de_turnos, limite_turnos_por_usuario)
+    nombre_normalizado = normalizar_texto(nombre).capitalize
+
+    especialidad = Especialidad.new(nombre_normalizado, duracion_de_turnos, limite_turnos_por_usuario)
     @repositorio_especialidades.save(especialidad)
   end
 

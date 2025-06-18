@@ -8,6 +8,9 @@ post '/medicos' do
 rescue MatriculaDuplicadaException
   status 409
   { error: 'La matricula corresponde a un medico existente' }.to_json
+rescue EspecialidadNoEncontradaException
+  status 422
+  { error: 'La especialidad no existe' }.to_json
 end
 
 get '/medicos' do
