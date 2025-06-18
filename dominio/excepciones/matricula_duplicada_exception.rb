@@ -1,0 +1,2 @@
+class MatriculaDuplicadaException < StandardError
+end

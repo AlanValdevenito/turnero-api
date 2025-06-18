@@ -8,7 +8,7 @@ def crear_medicos_disponibles
       medico = {
         nombre: "Nombre#{i}",
         apellido: "Apellido#{i}",
-        matricula: i,
+        matricula: i.to_s,
         especialidad: 'Cardiologia'
       }
       api_post('/medicos', medico.to_json)
