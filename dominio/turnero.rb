@@ -75,6 +75,13 @@ class Turnero
   end
 
   def crear_especialidad(nombre, duracion_de_turnos, limite_turnos_por_usuario)
+    todas_especialidades = @repositorio_especialidades.all
+    especialidad_existente = todas_especialidades.find do |esp|
+      esp.nombre == nombre
+    end
+
+    raise EspecialidadDuplicadaException if especialidad_existente
+
     especialidad = Especialidad.new(nombre, duracion_de_turnos, limite_turnos_por_usuario)
     @repositorio_especialidades.save(especialidad)
   end

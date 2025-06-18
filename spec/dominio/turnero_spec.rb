@@ -44,9 +44,32 @@ describe Turnero do
     expect(medicos.first.nombre).to eq('Michael')
   end
 
-  it 'deberia crear una especialidad' do
-    especialidad = turnero.crear_especialidad('Traumatologia', 10, 5)
-    expect(especialidad.nombre).to eq('Traumatologia')
+  describe 'crear una especialidad' do
+    before(:each) do
+      allow(repositorios[:especialidad]).to receive(:buscar_por_nombre).and_return(nil)
+      allow(repositorios[:especialidad]).to receive(:save) do |especialidad|
+        especialidad
+      end
+    end
+
+    def configurar_especialidad_existente(especialidad)
+      allow(repositorios[:especialidad]).to receive(:all).and_return([especialidad])
+      allow(repositorios[:especialidad]).to receive(:buscar_por_nombre)
+        .with(especialidad.nombre).and_return(especialidad)
+    end
+
+    it 'deberia crear una especialidad' do
+      especialidad = turnero.crear_especialidad('Dermatologia', 10, 5)
+      expect(especialidad.nombre).to eq('Dermatologia')
+    end
+
+    it 'el nombre de la especialidad debe ser unico' do
+      especialidad1 = turnero.crear_especialidad('Cardiologia', 10, 5)
+      configurar_especialidad_existente(especialidad1)
+
+      expect { turnero.crear_especialidad('Cardiologia', 15, 2) }
+        .to raise_error(EspecialidadDuplicadaException)
+    end
   end
 
   it 'deberia devolver todas las especialidades' do

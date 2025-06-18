@@ -1,0 +1,2 @@
+class EspecialidadDuplicadaException < StandardError
+end
