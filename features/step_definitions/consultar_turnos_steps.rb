@@ -8,6 +8,7 @@ Dado('hay {int} paciente registrado') do |_cantidad_pacientes|
 end
 
 Dado('la especialidad {string} dada de alta') do |especialidad|
+  @especialidad = especialidad
   request_body = { nombre: especialidad, duracion_de_turnos: 10, limite_turnos_por_usuario: 100 }.to_json
   @response = api_post('/especialidades', request_body)
   expect(@response.status).to eq(200)
