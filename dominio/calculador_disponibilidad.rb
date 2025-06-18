@@ -135,9 +135,16 @@ class CalculadorDeDisponibilidad
   def calcular_proximo_turno(fecha, duracion)
     ahora = @proveedor_fecha.ahora
     minutos = proximo_minuto_turno(ahora.min, duracion)
-    hora = proxima_hora_turno(ahora.hour, ahora.min, duracion)
+    horas_adicionales = ((ahora.min / duracion.to_f).ceil * duracion) / 60
+    hora_total = ahora.hour + horas_adicionales
 
-    @proveedor_fecha.construir_hora_utc(fecha.year, fecha.month, fecha.day, hora, minutos)
+    # Si se desborda al día siguiente (>= 24), retornar tiempo fuera de jornada
+    if hora_total >= 24
+      # Retornar un tiempo que exceda el fin de jornada para que no genere turnos
+      return ahora + 86_400  # +1 día
+    end
+
+    @proveedor_fecha.construir_hora_utc(fecha.year, fecha.month, fecha.day, hora_total, minutos)
   end
 
   def proximo_minuto_turno(min_actual, duracion)
