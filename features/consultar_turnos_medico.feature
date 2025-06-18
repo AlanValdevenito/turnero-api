@@ -3,8 +3,8 @@ Característica: Consultar los turnos asignados a un médico por su matrícula
 
   Antecedentes:
     Dado existe el paciente con email "juan@mail.com"
-    Y la especialidad "Cardiología" dada de alta
-    Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiología" dado de alta
+    Y la especialidad "Cardiologia" dada de alta
+    Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiologia" dado de alta
 
   Escenario: US-30.1 Quiero ver los turnos de un medico que no tiene turnos
     Dado el médico con matrícula "ABC123" tiene 0 turnos
@@ -19,7 +19,7 @@ Característica: Consultar los turnos asignados a un médico por su matrícula
     Y deberia ver el estado "Pendiente", email del paciente "juan@mail.com", fecha "2025-06-10" y hora "10:00"
 
   Escenario: US-30.3 Ver los turnos de un medico no dado de alta es invalido
-   Dado el medico con matricula "XYZ999" no esta dado de alta 
+   Dado el medico con matricula "XYZ999" no esta dado de alta
    Cuando consulto los turnos del médico con matrícula "XYZ999"
    Entonces deberia ver un error 404
    Y el mensaje de error debe ser "Medico con matricula XYZ999 inexistente"
