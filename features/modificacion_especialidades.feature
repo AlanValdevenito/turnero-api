@@ -12,7 +12,7 @@ Característica: Modificación de una especialidad
     Y se muestra la informacion actualizada donde el nombre es "Traumatologia General"
     Y el limite de turnos por usuarios es 5
     Y la duracion por cada turno es 30 minutos
-  @wip
+
   Escenario: US-24.2 Modificacion invalida por nombre inexistente
     Dado que actualizo la especialidad "Pediatria" con un nuevo nombre "Pediatria General" y con un nuevo limite de 5 turnos por usuarios
     Entonces la respuesta es 404
