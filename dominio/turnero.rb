@@ -149,5 +149,9 @@ class Turnero
   def modificar_especialidad(nombre, nuevo_nombre, nuevo_limite)
     @gestor_especialidades.modificar_especialidad_por_nombre(nombre, nuevo_nombre, nuevo_limite)
   end
+
+  def eliminar_especialidad_por_nombre(nombre)
+    @gestor_especialidades.eliminar_especialidad_por_nombre(nombre)
+  end
 end
 # rubocop:enable Metrics/ClassLength

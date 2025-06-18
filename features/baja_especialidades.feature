@@ -1,6 +1,4 @@
 # language: es
-
-
 Característica: Baja de especialidades
 
     Antecedentes:
@@ -8,17 +6,17 @@ Característica: Baja de especialidades
         Y la especialidad "Cardiologia" dada de alta
         Y el médico "Juan Perez" con matrícula "ABC123" de la especialidad "Cardiologia" dado de alta
         Y el médico "Juan Smith" con matrícula "TRA123" de la especialidad "Cardiologia" dado de alta
-    @wip
+
     Escenario: US-21.1 Dar de baja una especialidad sin medicos
     Dado que la especialidad tiene 0 medicos
     Cuando quiero dar de baja la especialidad
-    Entonces se muestra el mensaje de exitoo "especialidad eliminada con sus medicos y turnos correspondientes"
+    Entonces se muestra el mensaje de exitoo "Especialidad eliminada con sus medicos y turnos correspondientes"
     Y no hay turnos correspondientes a la especialidad
     Y la especialidad ya no esta dada de alta
     @wip
     Escenario: US-21.2 Dar de baja una especialidad con medicos
     Cuando quiero dar de baja la especialidad
-    Entonces se muestra el mensaje de exitoo "especialidad eliminada con sus medicos y turnos correspondientes"
+    Entonces se muestra el mensaje de exitoo "Especialidad eliminada con sus medicos y turnos correspondientes"
     Y no hay turnos correspondientes a la especialidad
     Y la especialidad ya no esta dada de alta
     Y los medicos de la especialidad ya no estan dados de alta

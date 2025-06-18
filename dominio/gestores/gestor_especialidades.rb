@@ -15,4 +15,9 @@ class GestorEspecialidades
 
     @repositorio_especialidades.save(especialidad)
   end
+
+  def eliminar_especialidad_por_nombre(nombre)
+    especialidad = @repositorio_especialidades.buscar_por_nombre(nombre)
+    @repositorio_especialidades.delete(especialidad)
+  end
 end

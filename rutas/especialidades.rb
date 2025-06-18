@@ -37,3 +37,10 @@ put '/especialidades/:nombre' do
     json({ error: 'El limite de turnos por usuario debe ser un numero entero' })
   end
 end
+
+delete '/especialidades/:nombre' do
+  logger.debug("DELETE /especialidades/:nombre : #{@params}")
+  turnero.eliminar_especialidad_por_nombre(@params[:nombre])
+  status 200
+  { message: 'Especialidad eliminada con sus medicos y turnos correspondientes' }.to_json
+end
