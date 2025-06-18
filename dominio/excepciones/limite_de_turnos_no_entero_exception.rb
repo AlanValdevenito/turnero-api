@@ -1,0 +1,2 @@
+class LimiteDeTurnosNoEnteroException < StandardError
+end

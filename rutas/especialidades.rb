@@ -29,5 +29,8 @@ put '/especialidades/:nombre' do
   rescue LimiteDeTurnosNoPositivoException
     status 400
     json({ error: 'El limite de turnos por usuario debe ser un entero positivo' })
+  rescue LimiteDeTurnosNoEnteroException
+    status 400
+    json({ error: 'El limite de turnos por usuario debe ser un numero entero' })
   end
 end
