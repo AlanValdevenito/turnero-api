@@ -22,7 +22,7 @@ Antecedentes:
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'
       Y consulto mis turnos
       Cuando pido cancelar un turno con un id inexistente
-      Entonces devuelve el mensaje "Turno no encontrado"
+      Entonces devuelve el mensaje "No puedes cancelar este turno"
 
     Escenario: US-4.4 Cancelar un turno con un id de un turno que no me pertenece
       Dado que para la fecha '2025-06-13' reserve 1 turno con el medico con matricula "ABC123" siendo hoy '2025-06-12'

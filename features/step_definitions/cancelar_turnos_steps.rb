@@ -29,7 +29,7 @@ Cuando('pido cancelar un turno con un id inexistente') do
   id_inexistente = 100
   request_body = { email: @email, confirmacion: true }.to_json
   @response = api_put("/turnos/#{id_inexistente}/cancelacion", request_body)
-  expect(@response.status).to eq(404)
+  expect(@response.status).to eq(403)
 end
 
 Cuando('pido cancelar el turno de otro paciente') do

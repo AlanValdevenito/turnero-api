@@ -165,14 +165,21 @@ put '/turnos/:id/cancelacion' do
   confirmacion = @params[:confirmacion]
   begin
     turno = turnero.cancelar_turno(id, email, confirmacion)
+    puts 'exito'
     status 200
     json({ mensaje: "Turno actualizado: estado #{turno.estado}" })
   rescue TurnoNoEncontradoException
-    status 404
-    json({ mensaje: 'Turno no encontrado' })
-  rescue TurnoNoPerteneceAUsuarioException
+    puts 'error 403 no encontrado'
     status 403
     json({ mensaje: 'No puedes cancelar este turno' })
+  rescue TurnoNoPerteneceAUsuarioException
+    puts 'error 403 no es tuyo'
+    status 403
+    json({ mensaje: 'No puedes cancelar este turno' })
+  rescue ConfirmacionCancelarException
+    puts 'error 409'
+    status 409
+    json({ mensaje: 'Necesitas confirmacion para cancelar este turno' })
   end
 end
 
@@ -187,7 +194,8 @@ helpers do
   def errores_bad_request
     {
       FechaNoValidaException => -> { halt 400, json({ error: 'Fecha inválida para agendar un turno' }) },
-      TurnoYaExisteException => -> { halt 400, json({ error: 'Ya existe un turno para ese médico y fecha/hora' }) }
+      TurnoYaExisteException => -> { halt 400, json({ error: 'Ya existe un turno para ese médico y fecha/hora' }) },
+      PenalizacionPorReputacionException => -> { halt 400, json({ error: 'Penalización por porcentaje de asistencia abajo del 80%' }) }
     }
   end
 
