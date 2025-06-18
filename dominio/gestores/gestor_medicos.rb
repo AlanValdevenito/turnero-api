@@ -1,6 +1,6 @@
 require_relative '../excepciones/medico_no_encontrado_exception'
 Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
-require_relative 'helpers'
+require_relative '../helpers'
 
 class GestorMedicos
   def initialize(repositorio_medico, repositorio_turnos)
