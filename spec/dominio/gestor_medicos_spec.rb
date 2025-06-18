@@ -9,6 +9,12 @@ describe GestorMedicos do
   let(:gestor) { described_class.new(repositorio_medicos, repositorio_turnos) }
   let(:medico) { instance_double('Medico', matricula: 'ABC123', id: 1) }
 
+  it 'busca un medico por matricula' do
+    medico = instance_double('Medico')
+    allow(repositorio_medicos).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
+    expect(gestor.buscar_medico_por_matricula('ABC123')).to eq(medico)
+  end
+
   it 'elimina el medico cuando existe' do
     allow(repositorio_medicos).to receive(:buscar_por_matricula).with('ABC123').and_return(medico)
     allow(repositorio_turnos).to receive(:eliminar_por_medico).with(medico)

@@ -7,6 +7,13 @@ class GestorMedicos
     @repositorio_turnos = repositorio_turnos
   end
 
+  def buscar_medico_por_matricula(matricula)
+    medico = @repositorio_medicos.buscar_por_matricula(matricula)
+    raise MedicoNoEncontradoException unless medico
+
+    medico
+  end
+
   def eliminar_medico_por_matricula(matricula)
     medico = @repositorio_medicos.buscar_por_matricula(matricula)
     raise MedicoNoEncontradoException unless medico
