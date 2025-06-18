@@ -1,6 +1,7 @@
 Dir[File.join(__dir__, '../dominio/excepciones', '*.rb')].each { |file| require file }
 Dir[File.join(__dir__, '../dominio/gestores', '*.rb')].each { |file| require file }
 require_relative 'adaptador_zona_horaria'
+require_relative 'helpers'
 # rubocop:disable Metrics/ClassLength
 
 MEDICOS_DISPONIBLES = 7
@@ -77,7 +78,7 @@ class Turnero
   def crear_especialidad(nombre, duracion_de_turnos, limite_turnos_por_usuario)
     todas_especialidades = @repositorio_especialidades.all
     especialidad_existente = todas_especialidades.find do |esp|
-      esp.nombre == nombre
+      normalizar_texto(esp.nombre) == normalizar_texto(nombre)
     end
 
     raise EspecialidadDuplicadaException if especialidad_existente

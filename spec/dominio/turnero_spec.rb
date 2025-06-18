@@ -47,6 +47,7 @@ describe Turnero do
   describe 'crear una especialidad' do
     before(:each) do
       allow(repositorios[:especialidad]).to receive(:buscar_por_nombre).and_return(nil)
+      allow(repositorios[:especialidad]).to receive(:all).and_return([])
       allow(repositorios[:especialidad]).to receive(:save) do |especialidad|
         especialidad
       end
@@ -58,17 +59,31 @@ describe Turnero do
         .with(especialidad.nombre).and_return(especialidad)
     end
 
+    def verificar_nombres_duplicados(nombres)
+      nombres.each do |nombre|
+        expect { turnero.crear_especialidad(nombre, 30, 2) }
+          .to raise_error(EspecialidadDuplicadaException)
+      end
+    end
+
     it 'deberia crear una especialidad' do
       especialidad = turnero.crear_especialidad('Dermatologia', 10, 5)
       expect(especialidad.nombre).to eq('Dermatologia')
     end
 
-    it 'el nombre de la especialidad debe ser unico' do
+    it 'el nombre de la especialidad debe ser unico - caso basico' do
       especialidad1 = turnero.crear_especialidad('Cardiologia', 10, 5)
       configurar_especialidad_existente(especialidad1)
 
       expect { turnero.crear_especialidad('Cardiologia', 15, 2) }
         .to raise_error(EspecialidadDuplicadaException)
+    end
+
+    it 'el nombre de la especialidad debe ser unico sin importar mayusculas o acentos' do
+      especialidad1 = turnero.crear_especialidad('Oftalmologia', 30, 2)
+      configurar_especialidad_existente(especialidad1)
+
+      verificar_nombres_duplicados(%w[oftalmologia OFTALMOLOGIA Oftalmología])
     end
   end
 
