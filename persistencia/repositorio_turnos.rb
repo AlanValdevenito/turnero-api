@@ -16,6 +16,7 @@ class RepositorioTurnos < AbstractRepository
   def obtener_turnos_existentes(medico_id, fecha_inicio, fecha_fin)
     dataset
       .where(medico_id:)
+      .where(estado: 'Pendiente')
       .where { fecha_hora >= fecha_inicio && fecha_hora < fecha_fin }
       .select(:fecha_hora)
       .to_a

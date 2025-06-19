@@ -39,6 +39,7 @@ class GestorTurnos
   def validar_turnos_del_medico(otro_turno)
     turnos_existentes = @repositorio_turnos.buscar_por_medico(otro_turno.medico)
     turnos_existentes.each do |turno|
+      next unless turno.estado == 'Pendiente'
       raise TurnoYaExisteException if turno.fecha == otro_turno.fecha && turno.hora == otro_turno.hora
     end
   end
@@ -46,7 +47,7 @@ class GestorTurnos
   def validar_turnos_del_usuario(otro_turno)
     turnos_existentes = @repositorio_turnos.buscar_por_usuario(otro_turno.usuario)
     turnos_existentes.each do |turno|
-      next unless turno.fecha == otro_turno.fecha
+      next unless turno.estado == 'Pendiente' && turno.fecha == otro_turno.fecha
       raise SuperposicionDeTurnosException if turno.se_superpone_con?(otro_turno)
     end
   end
