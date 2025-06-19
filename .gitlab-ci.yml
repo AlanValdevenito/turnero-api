@@ -92,9 +92,8 @@ acceptance_test_job:
   image: nicopaez/kubectl:1.32.5
   environment: test
   script:
-    - cp ${SECRETS} infra/${CI_ENVIRONMENT_NAME}.secrets.yaml
-    - chmod +x ./scripts/acceptance_test.sh
-    - ./scripts/acceptance_test.sh ${TEAM} ${CI_ENVIRONMENT_NAME}
+    - VERSION=$(cat VERSION.txt)
+    - ./scripts/smoke_test.sh ${TEAM} ${CI_ENVIRONMENT_NAME} $VERSION
   when: manual
 
 deploy_prod_job:
