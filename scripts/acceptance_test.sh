@@ -10,7 +10,7 @@ API_URL="https://api.9521.com.ar/${TEAM}-${ENVIRONMENT}"
 ESPECIALIDAD_NOMBRE="Testologia"
 DURACION=60
 LIMITE=3
-API_KEY=$(grep 'API_KEY:' infra/${ENVIRONMENT}.secrets.yaml | awk '{print $2}' | base64 --decode)
+API_KEY=$(grep 'API_KEY:' infra/${ENVIRONMENT}.secrets.yaml | awk '{print $2}' | base64 -d)
 
 if [ -z "$API_KEY" ]; then
   echo "❌ No se pudo obtener la API_KEY del archivo de secretos"
