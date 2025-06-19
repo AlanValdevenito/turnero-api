@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Negro API
-  version: 0.9.4
+  version: 0.18.1
 servers:
   - url: http://localhost:3000
     description: Local
@@ -25,7 +25,6 @@ paths:
                   version:
                     type: string
                     example: "1.0.0"
-
   /reset:
     post:
       summary: Reiniciar datos (solo test)
@@ -42,9 +41,10 @@ paths:
                     example: Datos reiniciados
         '403':
           description: Prohibido fuera del entorno de test
-  /test/hora_mock:
+
+  /test/fecha_mock:
     post:
-      summary: Setear hora mock (solo test)
+      summary: Setear fecha mock (solo test)
       requestBody:
         required: true
         content:
@@ -52,12 +52,15 @@ paths:
             schema:
               type: object
               properties:
+                fecha:
+                  type: string
+                  example: "2024-01-15"
                 hora:
                   type: string
                   example: "10:04"
       responses:
         '200':
-          description: Hora mock seteada
+          description: Fecha mock seteada
           content:
             application/json:
               schema:
@@ -65,24 +68,17 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Hora mock seteada a 10:04
+                    example: "Fecha mock seteada a 2024-01-15 10:04"
         '400':
           description: Error en los datos enviados
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
         '403':
           description: Prohibido fuera del entorno de test
 
     delete:
-      summary: Cancelar hora mock (solo test)
+      summary: Cancelar fecha mock (solo test)
       responses:
         '200':
-          description: Hora mock cancelada
+          description: Fecha mock cancelada
           content:
             application/json:
               schema:
@@ -90,7 +86,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Hora mock cancelada
+                    example: "Fecha mock cancelada"
         '403':
           description: Prohibido fuera del entorno de test
 
@@ -111,6 +107,9 @@ paths:
                       type: string
                     duracion_de_turnos:
                       type: integer
+                    limite_turnos_por_usuario:
+                      type: integer
+
     post:
       summary: Crear especialidad
       requestBody:
@@ -138,6 +137,69 @@ paths:
                   id:
                     type: integer
 
+  /especialidades/{nombre}:
+    put:
+      summary: Modificar especialidad
+      parameters:
+        - in: path
+          name: nombre
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                limite_turnos_por_usuario:
+                  type: integer
+      responses:
+        '200':
+          description: Especialidad modificada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  duracion_de_turnos:
+                    type: integer
+                  limite_turnos_por_usuario:
+                    type: integer
+        '400':
+          description: Error de validación
+        '404':
+          description: Especialidad no encontrada
+
+    delete:
+      summary: Eliminar especialidad
+      parameters:
+        - in: path
+          name: nombre
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Especialidad eliminada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Especialidad eliminada con sus medicos y turnos correspondientes"
+        '404':
+          description: Especialidad no encontrada
+
   /medicos:
     get:
       summary: Listar médicos
@@ -159,6 +221,7 @@ paths:
                       type: string
                     especialidad:
                       type: string
+
     post:
       summary: Crear médico
       requestBody:
@@ -190,6 +253,29 @@ paths:
                   id:
                     type: integer
 
+  /medicos/{matricula}:
+    delete:
+      summary: Eliminar médico
+      parameters:
+        - in: path
+          name: matricula
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Médico eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Medico eliminado con sus turnos correspondientes"
+        '404':
+          description: Médico no encontrado
+
   /usuarios:
     get:
       summary: Listar usuarios
@@ -208,6 +294,7 @@ paths:
                     email:
                       type: string
                       format: email
+
     post:
       summary: Crear usuario
       requestBody:
@@ -258,6 +345,40 @@ paths:
         '404':
           description: Usuario no encontrado
 
+  /usuarios/{email}/penalizacion:
+    get:
+      summary: Verificar penalización de usuario
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Usuario no penalizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "El usuario no es penalizado"
+        '400':
+          description: Usuario penalizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Penalización por porcentaje de asistencia abajo del 80%"
+        '404':
+          description: Usuario no encontrado
+
   /usuarios/telegram/{telegram_id}:
     get:
       summary: Buscar usuario por telegram_id
@@ -273,12 +394,68 @@ paths:
         '404':
           description: Usuario no encontrado
 
+  /pacientes/{email}:
+    delete:
+      summary: Eliminar paciente
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Paciente eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "paciente eliminado con sus turnos correspondientes"
+        '404':
+          description: Paciente no encontrado
+
   /turnos/medicos-disponibles:
     get:
       summary: Listar médicos con turnos disponibles
       responses:
         '200':
           description: Lista de médicos
+
+  /turnos/medicos-disponibles/{especialidad}:
+    get:
+      summary: Listar médicos disponibles por especialidad
+      parameters:
+        - in: path
+          name: especialidad
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de médicos de la especialidad
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    nombre:
+                      type: string
+                    apellido:
+                      type: string
+                    matricula:
+                      type: string
+                    especialidad:
+                      type: string
+        '404':
+          description: Especialidad sin médicos
 
   /turnos/{matricula}/disponibilidad:
     get:
@@ -410,3 +587,38 @@ paths:
           description: Turno no encontrado
         '409':
           description: Conflicto de estado
+
+  /turnos/{id}/cancelacion:
+    put:
+      summary: Cancelar turno
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                confirmacion:
+                  type: boolean
+      responses:
+        '200':
+          description: Turno cancelado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+        '403':
+          description: No puedes cancelar este turno
+        '409':
+          description: Necesitas confirmación para cancelar
