@@ -1,0 +1,624 @@
+openapi: 3.0.3
+info:
+  title: Negro API
+  version: 0.18.1
+servers:
+  - url: http://localhost:3000
+    description: Local
+  - url: https://api.9521.com.ar/negro-test
+    description: Test
+  - url: https://api.9521.com.ar/negro-prod
+    description: Producción
+
+paths:
+  /version:
+    get:
+      summary: Obtener versión de la API
+      responses:
+        '200':
+          description: Versión actual
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: "1.0.0"
+  /reset:
+    post:
+      summary: Reiniciar datos (solo test)
+      responses:
+        '200':
+          description: Datos reiniciados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Datos reiniciados
+        '403':
+          description: Prohibido fuera del entorno de test
+
+  /test/fecha_mock:
+    post:
+      summary: Setear fecha mock (solo test)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fecha:
+                  type: string
+                  example: "2024-01-15"
+                hora:
+                  type: string
+                  example: "10:04"
+      responses:
+        '200':
+          description: Fecha mock seteada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Fecha mock seteada a 2024-01-15 10:04"
+        '400':
+          description: Error en los datos enviados
+        '403':
+          description: Prohibido fuera del entorno de test
+
+    delete:
+      summary: Cancelar fecha mock (solo test)
+      responses:
+        '200':
+          description: Fecha mock cancelada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Fecha mock cancelada"
+        '403':
+          description: Prohibido fuera del entorno de test
+
+  /especialidades:
+    get:
+      summary: Listar especialidades
+      responses:
+        '200':
+          description: Lista de especialidades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
+                    duracion_de_turnos:
+                      type: integer
+                    limite_turnos_por_usuario:
+                      type: integer
+
+    post:
+      summary: Crear especialidad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                duracion_de_turnos:
+                  type: integer
+      responses:
+        '200':
+          description: Especialidad creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: La especialidad fue dada de alta correctamente.
+                  id:
+                    type: integer
+
+  /especialidades/{nombre}:
+    put:
+      summary: Modificar especialidad
+      parameters:
+        - in: path
+          name: nombre
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                limite_turnos_por_usuario:
+                  type: integer
+      responses:
+        '200':
+          description: Especialidad modificada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  nombre:
+                    type: string
+                  duracion_de_turnos:
+                    type: integer
+                  limite_turnos_por_usuario:
+                    type: integer
+        '400':
+          description: Error de validación
+        '404':
+          description: Especialidad no encontrada
+
+    delete:
+      summary: Eliminar especialidad
+      parameters:
+        - in: path
+          name: nombre
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Especialidad eliminada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Especialidad eliminada con sus medicos y turnos correspondientes"
+        '404':
+          description: Especialidad no encontrada
+
+  /medicos:
+    get:
+      summary: Listar médicos
+      responses:
+        '200':
+          description: Lista de médicos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
+                    apellido:
+                      type: string
+                    matricula:
+                      type: string
+                    especialidad:
+                      type: string
+
+    post:
+      summary: Crear médico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                matricula:
+                  type: string
+                especialidad:
+                  type: string
+      responses:
+        '200':
+          description: Médico creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: El médico fue dado de alta correctamente.
+                  id:
+                    type: integer
+
+  /medicos/{matricula}:
+    delete:
+      summary: Eliminar médico
+      parameters:
+        - in: path
+          name: matricula
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Médico eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Medico eliminado con sus turnos correspondientes"
+        '404':
+          description: Médico no encontrado
+
+  /usuarios:
+    get:
+      summary: Listar usuarios
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    email:
+                      type: string
+                      format: email
+
+    post:
+      summary: Crear usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                telegram_id:
+                  type: integer
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  telegram_id:
+                    type: integer
+                  message:
+                    type: string
+                    example: El paciente se registró existosamente
+        '400':
+          description: Error en los datos enviados
+
+  /usuarios/{email}:
+    get:
+      summary: Buscar usuario por email
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Usuario encontrado
+        '404':
+          description: Usuario no encontrado
+
+  /usuarios/{email}/penalizacion:
+    get:
+      summary: Verificar penalización de usuario
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Usuario no penalizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "El usuario no es penalizado"
+        '400':
+          description: Usuario penalizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Penalización por porcentaje de asistencia abajo del 80%"
+        '404':
+          description: Usuario no encontrado
+
+  /usuarios/telegram/{telegram_id}:
+    get:
+      summary: Buscar usuario por telegram_id
+      parameters:
+        - in: path
+          name: telegram_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuario encontrado
+        '404':
+          description: Usuario no encontrado
+
+  /pacientes/{email}:
+    delete:
+      summary: Eliminar paciente
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: Paciente eliminado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "paciente eliminado con sus turnos correspondientes"
+        '404':
+          description: Paciente no encontrado
+
+  /turnos/medicos-disponibles:
+    get:
+      summary: Listar médicos con turnos disponibles
+      responses:
+        '200':
+          description: Lista de médicos
+
+  /turnos/medicos-disponibles/{especialidad}:
+    get:
+      summary: Listar médicos disponibles por especialidad
+      parameters:
+        - in: path
+          name: especialidad
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de médicos de la especialidad
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    nombre:
+                      type: string
+                    apellido:
+                      type: string
+                    matricula:
+                      type: string
+                    especialidad:
+                      type: string
+        '404':
+          description: Especialidad sin médicos
+
+  /turnos/{matricula}/disponibilidad:
+    get:
+      summary: Disponibilidad de un médico
+      parameters:
+        - in: path
+          name: matricula
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Disponibilidad encontrada
+        '400':
+          description: Sin turnos disponibles
+        '404':
+          description: Médico no encontrado
+
+  /turnos/pacientes/{email}:
+    get:
+      summary: Turnos de un paciente por email
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de turnos
+        '404':
+          description: Paciente inexistente
+
+  /turnos/pacientes/proximos/{email}:
+    get:
+      summary: Próximos turnos de un paciente por email
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de próximos turnos
+        '400':
+          description: El paciente no tiene próximos turnos
+
+  /turnos/pacientes/historial/{email}:
+    get:
+      summary: Historial de turnos de un paciente por email
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de turnos en historial
+        '400':
+          description: El paciente no tiene turnos en su historial
+
+  /turnos/medicos/{matricula}:
+    get:
+      summary: Turnos de un médico
+      parameters:
+        - in: path
+          name: matricula
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de turnos
+        '404':
+          description: Médico inexistente
+
+  /turnos:
+    post:
+      summary: Crear turno
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                matricula:
+                  type: string
+                fecha:
+                  type: string
+                hora:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '201':
+          description: Turno creado
+        '400':
+          description: Error en los datos enviados
+        '404':
+          description: Usuario o médico no encontrado
+
+  /turnos/{id}:
+    put:
+      summary: Modificar estado de un turno
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+      responses:
+        '200':
+          description: Turno actualizado
+        '400':
+          description: Error de validación
+        '404':
+          description: Turno no encontrado
+        '409':
+          description: Conflicto de estado
+
+  /turnos/{id}/cancelacion:
+    put:
+      summary: Cancelar turno
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                confirmacion:
+                  type: boolean
+      responses:
+        '200':
+          description: Turno cancelado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+        '403':
+          description: No puedes cancelar este turno
+        '409':
+          description: Necesitas confirmación para cancelar

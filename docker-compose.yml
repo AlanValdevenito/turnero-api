@@ -16,6 +16,7 @@ services:
         PORT: 3000
         TEST_DB_URL: "postgres://postgres:example@test_db:5432/postgres"
         DEV_DB_URL: "postgres://postgres:example@dev_db:5432/postgres"
+        API_KEY: "${API_KEY}"
     depends_on:
       - test_db
       - dev_db        

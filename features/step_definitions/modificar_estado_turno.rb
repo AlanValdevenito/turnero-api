@@ -1,0 +1,47 @@
+Dado('hay un turno en el futuro') do
+  turno = {
+    matricula: 'ABC123',
+    fecha: '2025-11-03',
+    hora: '11:00',
+    email: @paciente_email
+  }
+  response = api_post('/turnos', turno.to_json)
+  json = JSON.parse(response.body)
+  expect(response.status).to eq(201)
+  @turno_id = json['id']
+end
+
+Dado('tiene estado {string}') do |estado|
+  params = { estado: }
+  _res = api_put("/turnos/#{@turno_id}", params.to_json)
+  response = api_get("/turnos/pacientes/#{@paciente_email}")
+  expect(response.body).to include(estado)
+end
+
+Dado('el hospital intenta pasar a {string} el turno') do |estado|
+  params = { estado: }
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
+end
+
+Dado('hay un turno ya pasado') do
+  turno = {
+    matricula: 'ABC123',
+    fecha: '2025-03-03',
+    hora: '12:00',
+    email: @paciente_email
+  }
+  response = api_post('/turnos', turno.to_json)
+  json = JSON.parse(response.body)
+  expect(response.status).to eq(201)
+  @turno_id = json['id']
+end
+
+Entonces('el turno queda con estado {string}') do |estado|
+  response = api_get("/turnos/pacientes/#{@paciente_email}")
+  expect(response.body).to include(estado)
+end
+
+Entonces('recibo un mensaje {string}') do |mensaje|
+  json_response = JSON.parse(@response.body)
+  expect(json_response['mensaje']).to eq(mensaje)
+end

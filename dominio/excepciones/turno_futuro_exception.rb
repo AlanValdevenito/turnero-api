@@ -1,0 +1,2 @@
+class TurnoFuturoException < StandardError
+end

@@ -1,0 +1,70 @@
+Dado('que nunca reserve un turno') do
+  # Nada
+end
+
+Cuando('quiero ver mi historial de turnos') do
+  @response = api_get("/turnos/pacientes/historial/#{@email}")
+  @turnos = JSON.parse(@response.body)
+end
+
+Entonces('se muestra el mensaje {string}') do |mensaje|
+  expect(@response.body).to include(mensaje)
+end
+
+Dado('que para la fecha {string} reserve 1 turno con el médico con matrícula {string} siendo hoy {string}') do |fecha_turno, matricula, fecha_actual|
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(DateTime.parse(fecha_actual))
+
+  request_body = { matricula:, fecha: fecha_turno, hora: '09:00', email: @email }.to_json
+  @response = api_post('/turnos', request_body)
+  @turno_id = JSON.parse(@response.body)['id']
+  expect(@response.status).to eq(201)
+end
+
+Dado('no asisti al turno') do
+  params = { estado: 'Ausente' }
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
+  expect(@response.status).to eq(200)
+end
+
+Dado('asisti al turno') do
+  params = { estado: 'Asistido' }
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
+  expect(@response.status).to eq(200)
+end
+
+Dado('cancele el turno') do
+  params = { estado: 'Cancelado' }
+  @response = api_put("/turnos/#{@turno_id}", params.to_json)
+  expect(@response.status).to eq(200)
+end
+
+Entonces('puedo ver mi turno con el médico {string} de la especialidad {string} con estado {string}') do |medico, especialidad, estado|
+  @response = api_get("/turnos/pacientes/historial/#{@email}")
+  @turnos = JSON.parse(@response.body)
+
+  encontrado = @turnos.any? do |turno|
+    turno['medico'] == medico && turno['especialidad'] == especialidad && turno['estado'] == estado
+  end
+
+  expect(encontrado).to be true
+end
+
+Dado('que reserve {int} turnos a los cuales asisti') do |cantidad_turnos|
+  cantidad_turnos.times do |i|
+    hora_turno = Time.new(2025, 6, 5, 9, 0) + (i * 10 * 60) # incrementa de a 10 minutos
+    hora = hora_turno.strftime('%H:%M')
+
+    request_body = { matricula: @matricula, fecha: '2025-06-05', hora:, email: @email }.to_json
+    @response = api_post('/turnos', request_body)
+    @turno_id = JSON.parse(@response.body)['id']
+
+    params = { estado: 'Asistido' }
+    @response = api_put("/turnos/#{@turno_id}", params.to_json)
+  end
+end
+
+Entonces('puedo ver los {int} turnos que ya pasaron más cercanos a la fecha actual ordenados por fecha desde el mas reciente al mas antiguo') do |cantidad_turnos_visibles|
+  fechas = @turnos.map { |t| DateTime.parse((t['fecha y hora']).to_s) }
+  expect(fechas.length).to eq(cantidad_turnos_visibles)
+  expect(fechas).to eq(fechas.sort.reverse)
+end

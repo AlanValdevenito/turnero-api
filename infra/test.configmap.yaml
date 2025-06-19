@@ -6,3 +6,4 @@ data:
   APP_MODE: production
   LOG_LEVEL: debug
   PORT: "3000"
+  FERIADOS_URL: https://nolaborables.com.ar/api/v2/feriados

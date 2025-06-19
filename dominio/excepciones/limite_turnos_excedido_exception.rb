@@ -1,0 +1,2 @@
+class LimiteTurnosExcedidoException < StandardError
+end

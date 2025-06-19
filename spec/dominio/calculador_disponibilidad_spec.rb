@@ -1,0 +1,104 @@
+require 'spec_helper'
+require 'date'
+require_relative '../../dominio/adapters/proveedor_fecha'
+require_relative '../../dominio/calculador_disponibilidad'
+
+describe 'CalculadorDeDisponibilidad' do
+  before(:each) do
+    stub_const('CANTIDAD_TURNOS', 3)
+    allow(calculador.proveedor_fecha).to receive(:hoy).and_return(Date.parse('2025-06-11'))
+    allow(calculador.proveedor_fecha).to receive(:ahora).and_return(Time.utc(2025, 6, 11, 10, 0))
+  end
+
+  def turnos_esperados_sin_adaptar_a_la_zona_horaria
+    [Time.utc(2025, 6, 11, 20, 50).to_datetime, Time.utc(2025, 6, 12, 11, 0).to_datetime, Time.utc(2025, 6, 12, 11, 10).to_datetime]
+  end
+
+  describe '.turnos_para_dia' do
+    let(:fecha) { Date.parse('2025-06-12') }
+    let(:duracion) { 30 }
+    let(:fecha_fin) { fecha + 3 }
+    let(:calculador) { CalculadorDeDisponibilidad.new(ProveedorFecha.new('-03:00'), ProveedorFeriados.new) }
+    let(:inicio_jornada) { calculador.proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 8, 0).to_datetime }
+
+    def stub_feriados_api
+      stub_request(:get, 'https://nolaborables.com.ar/api/v2/feriados/2025')
+        .to_return(status: 200, body: '[{ "dia": 16, "mes": 6 }]', headers: {})
+    end
+
+    it 'devuelve la cantidad exacta de turnos si hay suficientes' do
+      cantidad = 3
+      stub_feriados_api
+      turnos = calculador.turnos_disponibles(duracion, [], cantidad, fecha, fecha_fin)
+
+      expect(turnos.size).to eq(cantidad)
+      expect(turnos).to all(be_a(DateTime))
+    end
+
+    it 'no devuelve turnos en fines de semana' do
+      stub_feriados_api
+      sabado = Date.parse('2025-06-07')
+      domingo = Date.parse('2025-06-08')
+
+      turnos = calculador.turnos_disponibles(duracion, [], CANTIDAD_TURNOS, sabado, domingo)
+      expect(turnos).to be_empty
+    end
+
+    it 'genera turnos cada duracion si no hay tiempos ocupados' do
+      turnos = calculador.turnos_para_dia(fecha, duracion, Set.new)
+
+      expect(turnos).not_to be_empty
+      expect(turnos.first).to be_a(DateTime)
+      expect(turnos.size).to eq(20)
+    end
+
+    it 'no ofrece los turnos ocupados' do
+      ocupado = calculador.proveedor_fecha.construir_hora_desde_local(fecha.year, fecha.month, fecha.day, 9, 0)
+      tiempos_ocupados = Set.new([ocupado.to_i])
+
+      turnos = calculador.turnos_para_dia(fecha, duracion, tiempos_ocupados)
+
+      horas = turnos.map { |t| [t.hour, t.min] }
+      expect(horas).not_to include([9, 0])
+    end
+
+    it 'devuelve un turno si solo uno está disponible' do
+      turnos_ocupados = (1...20).map do |i|
+        (inicio_jornada + Rational(i * duracion, 1440))
+      end.to_set
+
+      turnos = calculador.turnos_para_dia(fecha, duracion, turnos_ocupados.map(&:to_time).map(&:to_i).to_set)
+
+      expect(turnos.first).to eq(inicio_jornada)
+    end
+
+    it 'no devuelve turnos en feriados o no laborables' do
+      stub_feriados_api
+      feriado = Date.parse('2025-06-16')
+      cantidad = 3
+      turnos = calculador.turnos_disponibles(duracion, [], cantidad, feriado, feriado + 1)
+      expect(turnos).to be_empty
+    end
+
+    it 'deberia devolver turnos disponibles con una ventana de 4 horas a partir de la hora actual' do
+      stub_feriados_api
+
+      hoy = Date.parse('2025-06-11')
+      ventana_minima = Time.utc(2025, 6, 11, 14, 0)
+
+      turnos = calculador.turnos_para_dia(hoy, 30, Set.new)
+
+      expect(turnos).to all(be >= ventana_minima.to_datetime)
+    end
+
+    it 'deberia devolver el turno de 17:50 y del día siguiente 08:00 y 08:10' do
+      allow(calculador.proveedor_fecha).to receive(:ahora).and_return(Time.utc(2025, 6, 11, 16, 42))
+      allow(calculador.proveedor_fecha).to receive(:hoy).and_return(Time.utc(2025, 6, 11, 16, 42).to_date)
+      stub_feriados_api
+
+      turnos_disponibles_sin_adaptar_a_la_zona_horaria = calculador.turnos_disponibles(10, [], 3, Date.parse('2025-06-11'), Date.parse('2025-06-15'))
+
+      expect(turnos_disponibles_sin_adaptar_a_la_zona_horaria).to eq(turnos_esperados_sin_adaptar_a_la_zona_horaria)
+    end
+  end
+end

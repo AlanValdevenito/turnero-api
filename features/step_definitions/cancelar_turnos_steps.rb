@@ -1,0 +1,47 @@
+Dado('que para la fecha {string} reserve {int} turno con el medico con matricula {string} siendo hoy {string}') do |fecha_turno, _cantidad_turnos, matricula, fecha_hoy|
+  @matricula = matricula
+  @fecha_turno = fecha_turno
+  @fecha_hoy = fecha_hoy
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(fecha_hoy))
+  anio, mes, dia = fecha_hoy.split('-')
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
+  medico = RepositorioMedicos.new.buscar_por_matricula(matricula)
+  usuario = RepositorioUsuarios.new.buscar_por_email(@email)
+  turno = Turno.new(medico, usuario, Date.parse(fecha_turno), 'Pendiente')
+  @id = RepositorioTurnos.new.save(turno).id
+end
+
+Dado('consulto mis turnos') do
+  response = api_get("/turnos/pacientes/proximos/#{@email}")
+  @turno = JSON.parse(response.body).first
+end
+
+Cuando('pido cancelar el turno') do
+  request_body = { email: @email, confirmacion: true }.to_json
+  @response = api_put("/turnos/#{@turno['id']}/cancelacion", request_body)
+end
+
+Entonces('devuelve el mensaje {string}') do |mensaje|
+  expect(JSON.parse(@response.body)['mensaje']).to include mensaje
+end
+
+Cuando('pido cancelar un turno con un id inexistente') do
+  id_inexistente = 100
+  request_body = { email: @email, confirmacion: true }.to_json
+  @response = api_put("/turnos/#{id_inexistente}/cancelacion", request_body)
+  expect(@response.status).to eq(403)
+end
+
+Cuando('pido cancelar el turno de otro paciente') do
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(@fecha_hoy))
+  anio, mes, dia = @fecha_hoy.split('-')
+  allow_any_instance_of(ProveedorFecha).to receive(:ahora).and_return(Time.local(anio, mes, dia, 8, 0, 0))
+  usuario = Usuario.new('otroUsuario@mail.com')
+  RepositorioUsuarios.new.save(usuario)
+  medico = RepositorioMedicos.new.buscar_por_matricula(@matricula)
+  turno = Turno.new(medico, usuario, Date.parse(@fecha_turno), 'Pendiente')
+  RepositorioTurnos.new.save(turno)
+  request_body = { email: usuario.email, confirmacion: true }.to_json
+  @response = api_put("/turnos/#{@turno['id']}/cancelacion", request_body)
+  expect(@response.status).to eq(403)
+end

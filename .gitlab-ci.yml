@@ -11,11 +11,13 @@ variables:
   TEST_DB_URL: postgres://webapi:Passw0rd!@postgres/db_test
   DB_HOST: postgres
   TEAM: negro
+  API_KEY: key
 
 stages:
   - build
   - package
   - deploy_test
+  - smoke_test
   - acceptance_test
   - deploy_prod
 
@@ -74,3 +76,40 @@ deploy_test_job:
     - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} set image deployment/restapi restapi=$CI_REGISTRY_IMAGE:$VERSION
   only:
     - tags
+
+smoke_test_job:
+  stage: smoke_test
+  image: nicopaez/kubectl:1.32.5
+  environment: test
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - ./scripts/smoke_test.sh ${TEAM} ${CI_ENVIRONMENT_NAME} $VERSION
+  only:
+    - tags
+
+acceptance_test_job:
+  stage: acceptance_test
+  image: nicopaez/kubectl:1.32.5
+  environment: test
+  script:
+    - cp ${SECRETS} infra/${CI_ENVIRONMENT_NAME}.secrets.yaml
+    - echo "📂 Listado de archivos en el root:"
+    - ls -la
+    - echo "📂 Listado de archivos en scripts/:"
+    - ls -la scripts/
+    - echo "🐚 Ejecutando acceptance_test.sh..."
+    - ./scripts/acceptance_test.sh ${TEAM} ${CI_ENVIRONMENT_NAME}
+  when: manual
+
+deploy_prod_job:
+  stage: deploy_prod
+  image: nicopaez/kubectl:1.32.5
+  environment: prod
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - cp ${KUBECONFIG} $HOME/.kube/config
+    - cp ${SECRETS} infra/${CI_ENVIRONMENT_NAME}.secrets.yaml
+    - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} apply -f infra/${CI_ENVIRONMENT_NAME}.secrets.yaml
+    - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
+    - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} set image deployment/restapi restapi=$CI_REGISTRY_IMAGE:$VERSION
+  when: manual

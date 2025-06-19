@@ -1,0 +1,109 @@
+require 'json'
+
+def crear_medico(nombre:, apellido:, matricula:, especialidad:)
+  especialidad_hash = { nombre: especialidad, duracion_de_turnos: 20, limite_turnos_por_usuario: 5 }
+  api_post('/especialidades', especialidad_hash.to_json)
+  medico_hash = {
+    nombre:,
+    apellido:,
+    matricula:,
+    especialidad:
+  }
+  api_post('/medicos', medico_hash.to_json)
+end
+
+def crear_paciente(email)
+  telegram_id = rand(100_000..999_999)
+  usuario_hash = { email:, telegram_id: }
+  api_post('/usuarios', usuario_hash.to_json)
+  [email, telegram_id]
+end
+
+Dado('el paciente {string} registrado') do |email|
+  @paciente_email, @paciente_telegram_id = crear_paciente(email)
+end
+
+Dado('el médico {string} de la especialidad {string} con matricula {string} dado de alta') do |nombre_completo, especialidad, matricula|
+  nombre, apellido = nombre_completo.split(' ', 2)
+  crear_medico(nombre:, apellido:, matricula:, especialidad:)
+end
+
+Dado('la fecha actual es {string}') do |fecha|
+  allow_any_instance_of(ProveedorFecha).to receive(:hoy).and_return(Date.parse(fecha))
+  @fecha_actual = Date.parse(fecha)
+end
+
+Dado('el paciente tiene {int} turno con estado {string} con el médico {string} matricula {string} de la especialidad {string}') do |cantidad, estado, _medico_nombre, matricula, _especialidad|
+  raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+
+  cantidad.times do
+    turno_hash = {
+      matricula:,
+      fecha: (@fecha_actual + 1).strftime('%Y-%m-%d'),
+      hora: '10:00',
+      email: @paciente_email
+    }
+    response = api_post('/turnos', turno_hash.to_json)
+    turno_id = JSON.parse(response.body)['id']
+
+    # Solo cambiar el estado si no es 'Pendiente'
+    next unless estado != 'Pendiente'
+
+    api_put(
+      "/turnos/#{turno_id}",
+      { estado: }.to_json
+    )
+  end
+end
+
+Cuando('solicito los proximos turnos del paciente') do
+  @response = api_get("/turnos/pacientes/proximos/#{@paciente_email}")
+end
+
+Entonces('recibo un listado de sus próximos turnos con {int} turno') do |cantidad|
+  body = JSON.parse(@response.body)
+  expect(body.size).to eq(cantidad)
+end
+
+Entonces('tiene al medico {string} de la especialidad {string}') do |nombre, especialidad|
+  body = JSON.parse(@response.body)
+  expect(body.any? { |t| t['medico'] == nombre && t['especialidad'] == especialidad }).to be true
+end
+
+Entonces('recibo un mensaje de error {string}') do |mensaje_error|
+  expect(@response.status).to eq(400)
+  body = JSON.parse(@response.body)
+  expect(body['error']).to eq(mensaje_error)
+end
+
+Dado('el paciente tiene {int} turno con estado {string} con el médico matricula {string} para la fecha {string}') do |cantidad, _estado, matricula, fecha|
+  raise 'Debes definir la fecha actual con el step correspondiente' unless @fecha_actual
+
+  cantidad.times do
+    turno_hash = {
+      matricula:,
+      fecha:,
+      hora: '10:00',
+      email: @paciente_email
+    }
+    @response = api_post('/turnos', turno_hash.to_json)
+  end
+end
+
+Entonces('tiene el turno para la fecha {string} con el médico {string} de la especialidad {string}') do |fecha, medico, especialidad|
+  body = JSON.parse(@response.body)
+  expect(
+    body.any? do |t|
+      t['fecha y hora'].start_with?(fecha) && t['medico'] == medico && t['especialidad'] == especialidad
+    end
+  ).to be true
+end
+
+Entonces('el turno tiene la fecha {string} y hora local {string}') do |fecha_esperada, hora_esperada|
+  body = JSON.parse(@response.body)
+  turno = body.find { |t| t['fecha y hora'].start_with?(fecha_esperada) }
+  expect(turno).not_to be_nil, "No se encontró un turno con fecha #{fecha_esperada} en la respuesta: #{body.inspect}"
+  fecha, hora = turno['fecha y hora'].split(' ')
+  expect(fecha).to eq(fecha_esperada)
+  expect(hora).to eq(hora_esperada)
+end
